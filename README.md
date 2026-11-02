@@ -35,6 +35,7 @@ Images go in `src/assets/work/<project>/`. New projects start with `draft: true`
 - [ ] Confirm you may show each client's logo.
 - [ ] Confirm the availability text, since it says you're open to roles while you're at STELLA.
 - [ ] Review both GM case studies. Their private notes list every image and claim to check.
+- [ ] Review the 10 case studies added in November 2026. They're held, so 8 existing project rows stay off the live site until you approve them. Get STELLA's written OK before approving the alerts story.
 - [ ] Confirm your Michigan Farm Bureau role.
 - [ ] Set `launched: true` in `src/data/site.yaml`. Until then, search engines are told to stay away.
 - [ ] Push to a private GitHub repo, import it into Vercel, and connect calebfrank.com. Held drafts and their images live in the source, so the repo must stay private.
