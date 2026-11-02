@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "/Users/thefranks/Developer/calebfrank-portfolio/node_modules/.bin/astro",
+      "runtimeArgs": ["dev", "--root", "/Users/thefranks/Developer/calebfrank-portfolio", "--port", "4321"],
+      "port": 4321
+    }
+  ]
+}

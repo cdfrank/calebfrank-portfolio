@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import { career } from '../lib/data';
+---
+<Base title="About" description="How a designer from advertising and agriculture came to lead enterprise product design.">
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Designer, strategist, and sometimes the only person who speaks farm.</h1>
+    </header>
+    <section class="about-grid">
+      <h2>The short version</h2>
+      <div>
+        <p>I started in advertising, turning strategy into campaigns for hospitals and food banks at Publicis. In 2015 my wife's doctoral program brought us to Ann Arbor, and I joined the General Motors account at Aimia, which became One10.</p>
+        <p>I started as a contract designer and went full-time within five months. There I moved from dealer playbooks into Lab313, GM's innovation group, and learned to frame problems, prototype fast, and test with real people. I ran customer research on dealer messaging, test drives, and document sharing, then wrote the business case that brought design-thinking training to the team. In 2019 I joined MRM//McCann, where I led product design for BASF, New York Lottery, Honeywell, and more. Today I'm a Product Manager at STELLA Automotive AI, working on voice AI for car dealerships and returning to questions I first studied at Lab313.</p>
+        <p>Outside of client work, I have served on the Michigan Farm Bureau and competed at the national level in agricultural policy debate. That life helped me earn trust at BASF, and it still shapes how I listen.</p>
+      </div>
+    </section>
+    <section class="about-grid">
+      <h2>How I work</h2>
+      <div class="steps">
+        {career.process.map((s: any) => <div><b>{s.name}</b><p>{s.text}</p></div>)}
+      </div>
+    </section>
+    <section class="about-grid">
+      <h2>Awards</h2>
+      <ul class="plain-list">
+        {career.awards.map((a: any) => <li>{a.name}<small>{a.work}</small></li>)}
+      </ul>
+    </section>
+    <section class="about-grid">
+      <h2>Press</h2>
+      <ul class="plain-list">
+        {career.press.map((s: string) => <li>{s}</li>)}
+      </ul>
+    </section>
+    <section class="about-grid">
+      <h2>Giving back</h2>
+      <ul class="plain-list">
+        {[...career.speaking, ...career.community].map((s: string) => <li>{s}</li>)}
+      </ul>
+    </section>
+  </div>
+</Base>

@@ -1,0 +1,9 @@
+node_modules
+dist
+.astro
+.DS_Store
+
+# Unredacted client screens. Keep them out of git history.
+src/assets/work/basf-salesx/account-overview.jpg
+src/assets/work/basf-salesx/activity-search.jpg
+src/assets/work/basf-salesx/relationship-structure.jpg

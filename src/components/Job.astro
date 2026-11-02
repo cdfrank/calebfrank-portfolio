@@ -1,0 +1,40 @@
+---
+import { capabilitiesOf, logoClass, whereOf, years, type ClientGroup, type Work } from '../lib/data';
+
+interface Props { work: Work; group: ClientGroup; compact?: boolean; }
+const { work: w, group, compact = false } = Astro.props;
+const d = w.data;
+const caps = capabilitiesOf(w);
+const showBrand = !compact && d.client !== group.name && group.work.some((x) => x.data.client !== group.work[0].data.client);
+const showRole = !compact && d.role && d.role !== group.role;
+const note = [showBrand ? d.client : undefined, showRole ? d.role : undefined].filter(Boolean).join(' · ');
+---
+<li
+  class="job"
+  data-search={`${group.name} ${d.client} ${d.title} ${d.summary} ${d.disciplines.join(' ')} ${d.industry}`.toLowerCase()}
+  data-group={group.id}
+  data-industry={d.industry}
+  data-caps={caps.join('|')}
+  data-where={whereOf(w)}
+  data-start={d.start}
+>
+  {compact && (
+    <span class="job-logo">
+      {group.logo
+        ? <img class={logoClass(group.logo)} src={`/logos/${group.logo}`} alt="" loading="lazy" />
+        : <span class="logo-text">{group.name}</span>}
+    </span>
+  )}
+  <div class="job-main">
+    <h4>{d.caseStudy ? <a href={`/work/${w.id}/`}>{d.title}</a> : d.title}</h4>
+    {note && <p class="job-note">{note}</p>}
+    {compact && <p class="job-note">{group.name}</p>}
+  </div>
+  <p class="job-summary">{d.summary}</p>
+  <div class="job-side">
+    <span class="job-year">{years(w)}</span>
+    {d.caseStudy && <a class="flag flag-case" href={`/work/${w.id}/`} aria-label={`Read the ${d.title} case study`}>{d.approved ? 'Case study' : 'Draft'}</a>}
+    {d.award && <span class="flag flag-award" title={d.award}>Award</span>}
+    {d.confidential && <span class="flag" title="Details under NDA">NDA</span>}
+  </div>
+</li>

@@ -1,0 +1,111 @@
+# This file feeds both the About page and the Resume page.
+summary: >-
+  Product designer and manager with 13+ years across agencies, enterprise
+  innovation labs, and long-term platform partnerships. Leads product strategy,
+  research, and design systems for complex products in automotive, agriculture,
+  government, manufacturing, and healthcare. Now runs product and design for
+  voice and text AI at STELLA Automotive AI.
+
+roles:
+  - company: STELLA Automotive AI
+    location: Remote
+    title: Product Manager
+    dates: February 2026 to present
+    note: Running both product management and product design for the platform.
+    points:
+      - Lead product strategy and execution for AI-driven customer engagement across voice, text, and digital channels for dealerships.
+      - Partner with engineering, AI/ML, and operations to turn product vision into a roadmap, then design what gets built.
+      - Design the STELLA Insights analytics experience end to end across desktop and mobile, including alerts, conversations, and user administration.
+      - Lead conversational design for STELLA's voice and text agent, defining how it speaks and behaves with customers.
+      - Develop the STELLA design system so designers, engineers, and AI agents can all apply it.
+      - Use real-time performance data to refine conversation flows and improve conversion and efficiency.
+  - company: MRM//McCann
+    location: Detroit, MI
+    title: Product Design Lead
+    dates: July 2019 to December 2025
+    note: UX Architect from 2019, Senior UX Architect from 2021, and Product Design Lead from 2023.
+    points:
+      - Led UX on BASF SalesX as it grew from a pilot of 40 users to 800+ sales professionals.
+      - Led product design on New York Lottery's Digital Playslip, sign-on, and CRM programs.
+      - Led research and design for the City of Raleigh website redesign.
+      - Worked across Honeywell, Fujifilm Instax, Valero, General Motors, and new business pitches.
+      - Co-created UX Jam Sessions and a Figma 101 to 301 series open to every department.
+  - company: One10 Marketing, formerly Aimia
+    location: Troy, MI
+    title: UX Strategist and Designer, GM Lab313
+    dates: 2015 to 2019
+    note: Joined as a contract designer in September 2015. Converted to full-time within 5 months.
+    points:
+      - Core member of GM's Lab313, running empathy research, ideation, and rapid prototyping for digital retail products.
+      - Tested 13 hypotheses across 4 MyCarDrive features in 10+ customer interviews, then turned the findings into prototype changes.
+      - Designed the customer and dealer experience for Test Drive My Way, Chevrolet's at-home test drive pilot.
+      - Ran dealer workshops that defined requirements for chat ownership, appointment routing, and data sharing.
+      - Wrote the business case for design-thinking training, won approval, attended, and taught it back to the team.
+      - Designed dealer playbooks, sourcebooks, and Voice of Customer materials across four GM brands.
+  - company: Publicis
+    location: Indianapolis, IN
+    title: Junior Art Director
+    dates: 2014 to 2015
+    points:
+      - Led visual work for TriHealth, Hancock Health, and Gleaners Food Bank.
+      - Won a Silver ADDY and a Healthcare Advertising Bronze.
+  - company: Ball State University Marketing and Communications
+    location: Muncie, IN
+    title: Graphic Designer
+    dates: 2013 to 2014
+    points:
+      - Built microsites, infographics, and interactive maps on a team of seven.
+  - company: Matchbook Creative
+    location: Indianapolis, IN
+    title: Graphic Design Intern
+    dates: 2013
+    points:
+      - Designed print, web, and packaging work and supported client meetings and shoots.
+
+education:
+  - school: Ball State University
+    degree: B.S. in Advertising, Creative Strategy and Design
+    detail: Minor in Marketing, Consumer Market Research. Outstanding Senior, Department of Advertising.
+    date: 2014
+
+awards:
+  - name: Indianapolis Silver ADDY
+    work: Gleaners
+  - name: Healthcare Advertising Awards Bronze
+    work: TriHealth ER campaign
+  - name: AAF East Central Indiana Silver ADDY
+    work: Ball State President's Holiday Card
+  - name: Student ADDY Best of Show
+    work: Glidden
+  - name: Student ADDY Gold
+    work: Mary Kay
+
+speaking:
+  - Guest lecturer on creative strategy and branding, Ball State University, 2018
+  - Speaker, Ball State AAF Thrive or Die
+  - Portfolio reviewer, AAF District 6 NSAC competition
+  - Ann Arbor Young Professionals 20-slide presentation, 2019
+  - Design thinking leadership readout, One10, 2019
+
+press:
+  - Resumes to Get You Noticed
+  - 10 Cool Resumes Made By Professional Graphic Designers
+
+community:
+  - Board member, Michigan Farm Bureau
+  - Competitor, national agricultural discussion meet
+
+skills:
+  Strategy: [Product strategy, AI product strategy, UX research, Service design, Design thinking facilitation, Technical writing]
+  Craft: [Interaction design, Conversational design, Visual design, Motion, Prototyping, Design systems, Information architecture]
+  Tools: [Figma, Axure, Adobe Experience Manager, Adobe Creative Cloud, Cursor, HTML, CSS, JavaScript]
+
+process:
+  - name: Discover
+    text: Ask questions before making assumptions. Watch people work, map the system, and find the problem worth solving.
+  - name: Define
+    text: Turn what we learned into a shared problem statement and a set of decisions a team can act on.
+  - name: Design
+    text: Prototype fast, test with real people, and build the system that keeps the work consistent.
+  - name: Deliver
+    text: Stay through launch. Specify the details, support engineering, and measure what happened.

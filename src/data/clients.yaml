@@ -1,0 +1,152 @@
+# Controls the archive page. List order is display order.
+# `match` lists every `client:` value from the project files that belongs in this group.
+# A client not listed here still appears, with its name instead of a logo.
+# Logos keep their color on the dark page unless listed under `whiteLogos` at the bottom.
+# Use a transparent background for every logo file.
+# Pitches and proposals list by name with no logo, so the wall shows only real clients.
+clients:
+  - id: basf
+    name: BASF
+    logo: basf.png
+    match: [BASF Agriculture]
+  - id: new-york-lottery
+    name: New York Lottery
+    logo: new-york-lottery.png
+    match: [New York Lottery]
+  - id: general-motors
+    name: General Motors
+    logo: general-motors.svg
+    brands: [chevrolet.svg, cadillac.svg, gmc.png]
+    match: [General Motors, Chevrolet, Cadillac, GM Accessories, 'GMC, Buick, and Chevrolet']
+  - id: lab313
+    name: GM Lab313
+    logo: lab313.svg
+    match: [GM Lab313]
+  - id: honeywell
+    name: Honeywell
+    logo: honeywell.svg
+    match: [Honeywell]
+  - id: fujifilm
+    name: Fujifilm and Instax
+    logo: fujifilm.svg
+    match: [Fujifilm, Fujifilm Instax]
+  - id: city-of-raleigh
+    name: City of Raleigh
+    logo: city-of-raleigh.svg
+    match: [City of Raleigh]
+  - id: valero
+    name: Valero
+    logo: valero.svg
+    match: [Valero]
+  - id: optum
+    name: Optum
+    logo: optum.svg
+    match: [Optum]
+  - id: astrazeneca
+    name: AstraZeneca
+    logo: astrazeneca.svg
+    match: [AstraZeneca]
+  - id: abbott
+    name: Abbott
+    match: [Abbott]
+  - id: general-mills
+    name: General Mills
+    match: [General Mills]
+  - id: mcdonalds
+    name: McDonald's
+    match: [McDonald's]
+  - id: jayco
+    name: Jayco
+    match: [Jayco]
+  - id: corebridge
+    name: Corebridge Financial
+    match: [Corebridge Financial]
+  - id: us-marine-corps
+    name: US Marine Corps
+    match: [US Marine Corps]
+  - id: phbi
+    name: Professional Home Builders Institute
+    logo: phbi.png
+    match: [Professional Home Builders Institute]
+  - id: mrm
+    name: MRM
+    logo: mrm.png
+    match: [MRM, MRM UX team]
+  - id: trihealth
+    name: TriHealth
+    logo: trihealth.png
+    match: [TriHealth]
+  - id: hancock-health
+    name: Hancock Health
+    logo: hancock.png
+    match: [Hancock Health]
+  - id: gleaners
+    name: Gleaners Food Bank
+    logo: gleaners.png
+    match: [Gleaners Food Bank]
+  - id: project-lead-the-way
+    name: Project Lead The Way
+    logo: pltw.png
+    match: [Project Lead The Way]
+  - id: ball-state
+    name: Ball State University
+    logo: ball-state.png
+    match: [Ball State University]
+  - id: judson-center
+    name: Judson Center
+    logo: judson-center.png
+    match: [Judson Center and Michigan State]
+  - id: thomas-edison-center
+    name: Thomas Edison Center
+    logo: thomas-edison-center.svg
+    match: [Thomas Edison Center]
+  - id: young-farmers
+    name: Young Farmers of Washtenaw County
+    logo: young-farmers.png
+    match: [Young Farmers of Washtenaw County]
+  - id: isle-box
+    name: Isle Box
+    logo: isle-box.png
+    match: [Isle Royale Equipment]
+  - id: olympia
+    name: Olympia Skate Shop
+    logo: olympia.png
+    match: [Olympia Skate Shop]
+  - id: karle
+    name: Karle Symposium
+    logo: karle.png
+    match: [Karle Symposium]
+  - id: own-work
+    name: My own work
+    last: true
+    match: [Self-initiated]
+
+# Groups the detailed discipline tags into the few filters people actually use.
+capabilities:
+  Product and UX: [Product, Enterprise UX, UX, Mobile, Prototyping, Portal, Interaction, Interactive, Motion, 3D, Voice, Authentication, Pilot, Concept, Sales enablement]
+  Design systems: [Design systems, Architecture, Information architecture, Localization]
+  Research and strategy: [Research, Strategy, Service design, New business, Audit, Business, Data, Data visualization]
+  Web and commerce: [Web, Responsive, E-commerce, B2B, CRM, Email, Regulated, Content]
+  Brand and campaign: [Brand, Campaign, Advertising, Art direction, Print, Editorial, Packaging, Outdoor, Events, Illustration]
+  AI and games: [AI, Games, AR]
+  Leadership: [Leadership, Education]
+
+# Logos too dark to read on the page, measured under 3:1 contrast. These render solid white.
+whiteLogos:
+  - astrazeneca.svg
+  - ball-state.png
+  - basf.png
+  - cadillac.svg
+  - city-of-raleigh.svg
+  - fujifilm.svg
+  - gleaners.png
+  - gmc.png
+  - hancock.png
+  - isle-box.png
+  - judson-center.png
+  - karle.png
+  - lab313.svg
+  - olympia.png
+  - pltw.png
+  - trihealth.png
+  - young-farmers.png

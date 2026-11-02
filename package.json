@@ -1,0 +1,24 @@
+{
+  "name": "calebfrank-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "new": "node scripts/new-project.mjs",
+    "resume:pdf": "node scripts/resume-pdf.mjs"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource/permanent-marker": "^5.3.0",
+    "astro": "^5.18.2",
+    "sharp": "^0.35.5",
+    "typescript": "^5.9.3",
+    "yaml": "^2.9.1"
+  }
+}

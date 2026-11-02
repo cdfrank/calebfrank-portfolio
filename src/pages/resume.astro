@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { career, site } from '../lib/data';
+---
+<Base title="Resume" description={`Resume for ${site.name}, ${site.title}.`}>
+  <div class="resume">
+    <div class="resume-top">
+      <div>
+        <h1>{site.name}</h1>
+        <p>{site.title}</p>
+      </div>
+      <p class="resume-contact">{site.location}<br />{site.email}<br />{site.linkedin.replace('https://www.', '')}</p>
+    </div>
+    <h2>Summary</h2>
+    <p>{career.summary}</p>
+    <h2>Experience</h2>
+    {career.roles.map((r: any) => (
+      <div class="resume-role">
+        <header><span>{r.title}, {r.company}</span><span>{r.dates}</span></header>
+        <em>{r.location}{r.note && ` · ${r.note}`}</em>
+        <ul>{r.points.map((p: string) => <li>{p}</li>)}</ul>
+      </div>
+    ))}
+    <h2>Education</h2>
+    {career.education.map((e: any) => (
+      <div class="resume-role">
+        <header><span>{e.degree}, {e.school}</span><span>{e.date}</span></header>
+        <em>{e.detail}</em>
+      </div>
+    ))}
+    <h2>Awards</h2>
+    <p>{career.awards.map((a: any) => `${a.name} (${a.work})`).join('; ')}.</p>
+    <h2>Skills</h2>
+    {Object.entries(career.skills).map(([k, v]) => <p><b>{k}:</b> {(v as string[]).join(', ')}</p>)}
+    <p class="resume-print"><a class="btn solid" href="/caleb-frank-resume.pdf" download>Download PDF</a></p>
+  </div>
+</Base>

@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { allWork, years } from '../lib/data';
+
+const lab = (await allWork()).filter((w) => w.data.kind === 'lab');
+---
+<Base title="Lab" description="Ventures, games, and experiments I build on my own time.">
+  <div class="wrap">
+    <header class="page-head">
+      <h1>The lab.</h1>
+      <p>Ventures, games, and experiments I make because I want to see if they work. Most are skate-shaped. Most are unfinished, on purpose.</p>
+    </header>
+    <ul class="archive-list">
+      {lab.map((w) => (
+        <li class="row">
+          <span class="row-year">{years(w)}</span>
+          <span class="row-client">{w.data.status}</span>
+          <div class="row-body">
+            <span class="row-title">{w.data.title}</span>
+            <p class="row-summary">{w.data.summary}</p>
+          </div>
+          <div class="row-meta">{w.data.role}</div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>

@@ -1,0 +1,49 @@
+---
+import { allWork, years } from '../lib/data';
+
+const work = await allWork();
+const first = Math.min(...work.map((w) => w.data.start));
+const last = Math.max(...work.map((w) => w.data.end ?? w.data.start));
+const columns = Array.from({ length: last - first + 1 }, (_, i) => first + i).map((year) => ({
+  year,
+  items: work.filter((w) => w.data.start === year),
+}));
+let i = 0;
+---
+<section class="record" aria-labelledby="record-title">
+  <div class="wrap">
+    <div class="record-head">
+      <strong id="record-title">{work.length} projects since {first}</strong>
+      <span class="record-readout" data-readout aria-live="polite"></span>
+    </div>
+    <div class="record-grid">
+      {columns.map((c, n) => (
+        <div class="record-year">
+          {c.items.map((w) => (
+            <a
+              class:list={['tick', { 'is-featured': w.data.featured, 'is-lab': w.data.kind === 'lab' }]}
+              style={`--i:${i++}`}
+              href={w.data.caseStudy ? `/work/${w.id}/` : `/work/?year=${c.year}`}
+              aria-label={`${w.data.client}: ${w.data.title}, ${years(w)}`}
+              data-label={`${w.data.client}: ${w.data.title}`}
+            ></a>
+          ))}
+          <a class:list={['record-label', { show: n === 0 || n === columns.length - 1 }]} href={`/work/?year=${c.year}`} aria-label={`Projects started in ${c.year}`}>{String(c.year).slice(2)}</a>
+        </div>
+      ))}
+    </div>
+    <div class="record-key">
+      <span><i class="k-f"></i> Case study</span>
+      <span><i></i> Project</span>
+      <span><i class="k-l"></i> My own lab work</span>
+    </div>
+  </div>
+</section>
+<script>
+  const out = document.querySelector<HTMLElement>('[data-readout]');
+  document.querySelectorAll<HTMLElement>('.tick').forEach((t) => {
+    const show = () => { if (out) out.textContent = t.dataset.label ?? ''; };
+    t.addEventListener('pointerenter', show);
+    t.addEventListener('focus', show);
+  });
+</script>
