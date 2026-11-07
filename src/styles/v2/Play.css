@@ -1,0 +1,26 @@
+body{margin:0;background:#111}
+a{color:inherit;text-decoration:none}
+.site{font-family:Inter,system-ui,sans-serif;color:#F4F1EC;background:#111 url(/v2/20b9d21952dd7b71faf4b1152907f876.jpg);overflow:clip;font-size:17px;line-height:1.6}
+.wrap{max-width:1280px;margin:0 auto;padding:0 clamp(16px,5vw,80px);box-sizing:border-box}
+.display{font-family:Anton,Impact,sans-serif;font-weight:400;text-transform:uppercase;line-height:1;margin:0}
+.muted{color:#B5AFA6}
+.nav{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;padding-top:24px;padding-bottom:24px}
+.nav img{height:58px;display:block}
+.links{display:flex;gap:2px;flex-wrap:wrap;background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:4px}
+.links a{display:flex;align-items:center;min-height:44px;padding:0 16px;font-size:14px;font-weight:600;border-radius:7px}
+.links a:hover,.links a.on{background:#2C2C2C}
+.top{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;padding-top:32px;padding-bottom:64px}
+.top h1{font-size:clamp(110px,17vw,250px)}
+.pic{position:relative}
+.pic>img.p{display:block;width:100%;transform:rotate(1.6deg);border:6px solid #F4F1EC;box-sizing:border-box}
+.pic .sp{position:absolute;left:-20%;top:-22%;width:140%;max-width:none}
+.pic .m{position:absolute;right:-6%;bottom:-16%;width:44%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:20px;padding-bottom:96px}
+.item{position:relative;display:flex;flex-direction:column;gap:10px;min-height:250px;padding:22px;background:#1A1A1A;border:1px solid #333;border-radius:12px;box-sizing:border-box;transition:transform .15s,border-color .15s}
+.item:hover{transform:translateY(-4px) rotate(.5deg);border-color:#FF2B2B}
+.item h2{font-size:34px}
+.st{align-self:flex-start;font-family:"Permanent Marker",cursive;font-size:15px;background:#FF2B2B;color:#111;padding:1px 10px;transform:rotate(-2deg)}
+.yr{margin-top:auto;font-size:14px;color:#B5AFA6}
+.item.pp{background:#E9E4DA url(/v2/a47cf5cdee5bff56e4086ff608897d1b.jpg);color:#111;border-color:#E9E4DA}
+.item.pp .yr,.item.pp p{color:#333}
+@media (max-width:860px){.top{grid-template-columns:minmax(0,1fr)}.nav img{height:46px}.links a{padding:0 11px}}

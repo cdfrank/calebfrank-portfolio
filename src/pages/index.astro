@@ -1,58 +1,8 @@
 ---
-import { Image } from 'astro:assets';
-import Base from '../layouts/Base.astro';
-import Record from '../components/Record.astro';
-import { allWork, site } from '../lib/data';
-
-const work = await allWork();
-const featured = work.filter((w) => w.data.featured).sort((a, b) => a.data.featured! - b.data.featured!);
-const lab = work.filter((w) => w.data.kind === 'lab').slice(0, 4);
+import V2 from '../layouts/V2.astro';
+import Home from '../components/v2/Home.jsx';
+import '../styles/v2/Home.css';
 ---
-<Base>
-  <section class="hero">
-    <div class="wrap">
-      <p class="hero-name">{site.title}</p>
-      <h1>{site.headline}</h1>
-      <div class="hero-foot">
-        <p>{site.intro}</p>
-        <div class="actions">
-          <a class="btn solid" href="#selected">See selected work</a>
-          <a class="btn" href="/work/">Browse everything</a>
-        </div>
-      </div>
-    </div>
-  </section>
-  <Record />
-  <section class="section" id="selected">
-    <div class="wrap">
-      <h2 class="section-title">Selected work</h2>
-      {featured.map((w) => (
-        <a class="feature" href={`/work/${w.id}/`}>
-          <div class="feature-media">
-            {w.data.cover && <Image src={w.data.cover} alt={w.data.coverAlt ?? ''} widths={[640, 960, 1400]} sizes="(max-width: 900px) 100vw, 66vw" />}
-          </div>
-          <div class="feature-copy">
-            <p class="feature-client">{w.data.client}</p>
-            <h3>{w.data.title}</h3>
-            <p>{w.data.summary}</p>
-            {w.data.outcome && <p class="outcome">{w.data.outcome}</p>}
-            <span class="more">Read the case study</span>
-          </div>
-        </a>
-      ))}
-    </div>
-  </section>
-  <section class="section lime-band">
-    <div class="wrap split">
-      <h2>I still build things nobody asked for.</h2>
-      <div>
-        <ul class="lab-list">
-          {lab.map((w) => (
-            <li><b>{w.data.title}</b><small>{w.data.status}</small><p>{w.data.summary}</p></li>
-          ))}
-        </ul>
-        <a class="more" href="/lab/">See the lab</a>
-      </div>
-    </div>
-  </section>
-</Base>
+<V2>
+  <Home client:load />
+</V2>

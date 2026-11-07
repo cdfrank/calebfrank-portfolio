@@ -6,7 +6,8 @@ import { allWork, years, type Work } from '../../lib/data';
 
 export async function getStaticPaths() {
   const work = await allWork();
-  const cases = work.filter((w) => w.data.caseStudy).sort((a, b) => (a.data.featured ?? 99) - (b.data.featured ?? 99));
+  // nyl-digital-playslip has its own v2 page.
+  const cases = work.filter((w) => w.data.caseStudy && w.id !== 'nyl-digital-playslip').sort((a, b) => (a.data.featured ?? 99) - (b.data.featured ?? 99));
   return cases.map((entry, i) => ({ params: { id: entry.id }, props: { entry, next: cases[(i + 1) % cases.length] } }));
 }
 
