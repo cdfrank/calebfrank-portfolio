@@ -9,7 +9,7 @@ class Component extends DCLogic {
   renderVals() {
     return {
       items: [
-        { t: 'Scan&Skate and SkateGO', st: 'In progress', d: 'Skate apps built in Cursor to explore real-world spots.', y: '2025', cls: '' },
+        { t: 'SkateGO', st: 'In progress', d: 'A skate app built in Cursor to explore real-world spots.', y: '2025', cls: '' },
         { t: 'Playable Figma Make games', st: 'Playable prototypes', d: 'Escape the Frame, Grinds & Gambles, Kickflip Chaos, Skateshop Empire, and UX Dungeon Crawler.', y: '2025', cls: '' },
         { t: 'Shred & Dice', st: 'Concept', d: 'A skateboarding roguelike built on tricks, dice, and real places.', y: '2025', cls: '' },
         { t: 'Indoor skatepark proposal', st: 'Proposal', d: 'A proposal for a year-round skate and creative space in Ann Arbor.', y: '2024', cls: 'pp' },
@@ -87,6 +87,48 @@ export default class Board extends Component {
           </div>
           {" "}
         </header>
+        {" "}
+        <section className={"wrap"} aria-label={"Featured game"}>
+          {" "}
+          <a className={"feat"} href={"https://skate-spotter-teal.vercel.app"} target={"_blank"} rel={"noopener"}>
+            {" "}
+            <div className={"vid"}>
+              {" "}
+              <video src={"/v2/7d99032c4f59c2d9577bdcfe7c29bb87.mp4"} poster={"/v2/26c138ebf8deccfc526cc80535cc75c0.jpg"} autoPlay muted loop playsInline preload={"auto"} aria-label={"Gameplay: DOOANE skating the bowl at Ann Arbor Skatepark"}></video>
+              {" "}
+              <span className={"live"}>
+                {"Playable now"}
+              </span>
+              {" "}
+            </div>
+            {" "}
+            <div className={"txt"}>
+              {" "}
+              <span className={"st"}>
+                {"Featured"}
+              </span>
+              {" "}
+              <h2 className={"display"}>
+                {"Scan&Skate"}
+              </h2>
+              {" "}
+              <p className={"muted"} style={{"margin": "0"}}>
+                {"Scan a real skate spot, then skate it. Real parks rebuilt at 1:1, starting with Ann Arbor Skatepark and the Cranbrook 11-stair. Built in Cursor."}
+              </p>
+              {" "}
+              <span className={"go"}>
+                {"Play it in your browser →"}
+              </span>
+              {" "}
+              <span className={"k"}>
+                {"Opens the live build in a new tab. Keyboard, controller or touch."}
+              </span>
+              {" "}
+            </div>
+            {" "}
+          </a>
+          {" "}
+        </section>
         {" "}
         <main className={"wrap grid"}>
           {" "}

@@ -308,6 +308,7 @@ a{color:inherit;text-decoration:none}
 .o1 .logos img{height:24px;max-width:110px;object-fit:contain;filter:brightness(0);opacity:.75}
 .o1 .links{background:#111;border-color:#111}
 .o1 .links a{color:#F4F1EC}
+.o1 .links a:focus-visible{outline:2px solid #FF2B2B;outline-offset:2px}
 
 
 .o1 .g{grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr)}
