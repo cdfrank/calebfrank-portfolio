@@ -92,7 +92,7 @@ export default class Board extends Component {
             {" "}
             <div className={"ph"}>
               {" "}
-              <img src={"/v2/14877b18dc7b1353596d3ee06489d7e6.png"} alt={"Halftone portrait of Caleb in profile, wearing a cap"} />
+              <img src={"/v2/2184a6875a30e53a897bda2c801b97c4.png"} alt={"Halftone portrait of Caleb, smiling, in glasses"} />
               {" "}
               <img className={"c"} src={"/v2/2634edd24a6dc2536077d5aa3a73fc1d.png"} alt={""} aria-hidden={"true"} />
               {" "}
