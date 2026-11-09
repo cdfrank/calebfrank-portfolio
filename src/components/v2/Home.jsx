@@ -138,13 +138,13 @@ class Component extends DCLogic {
       return {
         cls: ['on', 'k' + d[3], nda ? 'nda' : sh ? 'shot' : '', own ? 'own' : '', lg ? '' : 'nologo'].join(' '),
         ac: 'oklch(' + (0.34 + d[0] * 0.05).toFixed(3) + ' 0.008 80)',
-        shot: sh || '/v2/04090179b1b33cc067ebb8191c3e6f95.png', logo: lg || '/v2/04090179b1b33cc067ebb8191c3e6f95.png',
+        shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
         t: nda ? '' : d[5], client: nda ? '' : d[6], cmd: nda ? '' : '> ' + d[5].toLowerCase() + '_',
         w1: w(11), w2: w(12), w3: w(13),
         cap: nda ? 'Under NDA' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
       };
     };
-    const pv = picked ? pvOf(picked, sel) : { cls: '', ac: 'transparent', shot: '/v2/04090179b1b33cc067ebb8191c3e6f95.png', logo: '/v2/04090179b1b33cc067ebb8191c3e6f95.png', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '' };
+    const pv = picked ? pvOf(picked, sel) : { cls: '', ac: 'transparent', shot: '/dooane/pointing.webp', logo: '/dooane/pointing.webp', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '' };
     const types = ['', 'case', 'lab', 'nda'];
     const blocks = DATA.map((d, n) => ({
       cls: ['y' + d[0], 'd' + (n % 8), types[d[4]], sel === n ? 'sel' : ''].join(' '),
@@ -352,7 +352,7 @@ export default class Board extends Component {
           </div>
           {" "}
           <div className={`rider ${v.riderCls}`}>
-            <img src={"/v2/04090179b1b33cc067ebb8191c3e6f95.png"} alt={"Bit, the Dooane mascot, watching the blocks"} />
+            <img src={"/dooane/thinking.webp"} alt={"DOOANE the armadillo, watching the blocks"} />
           </div>
           {" "}
           <div className={"sr-title"} aria-live={"polite"}>
@@ -634,7 +634,7 @@ export default class Board extends Component {
           {" "}
         </section>
         {" "}
-        <section className={"paper torn"} style={{"paddingTop": "clamp(72px,8vw,120px)", "paddingBottom": "clamp(72px,8vw,120px)"}}>
+        <section className={"paper torn"} style={{"paddingTop": "clamp(72px,8vw,120px)", "paddingBottom": "clamp(144px,14vw,192px)"}}>
           {" "}
           <div className={"wrap about-grid"}>
             {" "}
@@ -675,7 +675,7 @@ export default class Board extends Component {
               {" "}
               <img className={"ph"} src={"/v2/2184a6875a30e53a897bda2c801b97c4.png"} alt={"Halftone portrait of Caleb, smiling, in glasses"} />
               {" "}
-              <img className={"mi"} src={"/v2/04090179b1b33cc067ebb8191c3e6f95.png"} alt={""} aria-hidden={"true"} />
+              <img className={"mi"} src={"/dooane/spray-can.webp"} alt={""} aria-hidden={"true"} />
               {" "}
             </div>
             {" "}

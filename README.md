@@ -27,6 +27,17 @@ Open http://localhost:4321.
 
 Images go in `src/assets/work/<project>/`. New projects start with `draft: true` and stay hidden until you remove that line.
 
+## DOOANE portfolio guide
+
+The bottom-right DOOANE widget offers guided, local answers about published work, experience, and contact details. It runs without an API key or chat service and sends no messages to a server. Each new page starts a fresh conversation.
+
+- `src/components/Dooane.astro` selects public project fields, excluding held, draft, and confidential projects even in development.
+- `src/lib/dooane.mjs` contains the prepared answers and project matching.
+- `src/components/DooaneChat.jsx` and `src/styles/dooane.css` control the panel and mascot animation. Both site layouts include it.
+- `public/dooane/sprites.webp` contains the idle, wave, waiting, and thinking poses derived from the custom DOOANE pet.
+
+Run `node --test scripts/dooane.test.mjs` and `npm run build` to check changes. The widget respects reduced motion and is hidden when printing the resume.
+
 ## Before launch
 
 - [ ] Confirm you may show BASF, New York Lottery, and all other client screens and numbers.

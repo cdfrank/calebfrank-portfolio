@@ -82,7 +82,7 @@ export default class Board extends Component {
             {" "}
             <img className={"p"} src={"/v2/900c9167eeb3c5dcdcd57ec9b99b3a4a.png"} alt={"Halftone photo of a concrete skatepark"} />
             {" "}
-            <img className={"m"} src={"/v2/04090179b1b33cc067ebb8191c3e6f95.png"} alt={""} aria-hidden={"true"} />
+            <img className={"m"} src={"/dooane/pointing.webp"} alt={""} aria-hidden={"true"} />
             {" "}
           </div>
           {" "}

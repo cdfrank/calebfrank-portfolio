@@ -108,7 +108,7 @@ class Component extends DCLogic {
     return {
       cls: ['on', 'k' + d[3], nda ? 'nda' : sh ? 'shot' : '', own ? 'own' : '', lg ? '' : 'nologo'].join(' '),
       ac: this.ramp(d[0]),
-      shot: sh || '/v2/04090179b1b33cc067ebb8191c3e6f95.png', logo: lg || '/v2/04090179b1b33cc067ebb8191c3e6f95.png',
+      shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
       t: nda ? '' : d[5], client: nda ? '' : d[6], cmd: nda ? '' : '> ' + d[5].toLowerCase() + '_',
       w1: w(11), w2: w(12), w3: w(13),
       cap: nda ? 'Under NDA' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
@@ -184,7 +184,7 @@ class Component extends DCLogic {
       lane: [W.top.t + ' leads with ' + W.top.n + '.', W.top.t === 'Automotive' ? 'It’s where I work now, too.' : 'The biggest industry on the record.'],
       craft: [W.top.n + ' in ' + W.top.t + '.', 'Shade is still the year. The dark ones are oldest.'],
     }[by];
-    const blank = { cls: '', ac: 'transparent', shot: '/v2/04090179b1b33cc067ebb8191c3e6f95.png', logo: '/v2/04090179b1b33cc067ebb8191c3e6f95.png', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '' };
+    const blank = { cls: '', ac: 'transparent', shot: '/dooane/pointing.webp', logo: '/dooane/pointing.webp', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '' };
     const needle = (q || '').trim().toLowerCase();
     const order = DATA.map((d, n) => n).sort((a, b) => DATA[b][0] - DATA[a][0] || a - b);
     const shown = order.filter((n) => {
@@ -197,7 +197,7 @@ class Component extends DCLogic {
       tiles, wlabels: W.labels,
       pv: p ? this.pvOf(p, sel) : blank,
       panelCls: p ? 'pick' : '',
-      pk: p ? (2013 + p[0]) + ' · ' + this.EMP[p[2]] : 'Bit · sorted by ' + this.AXES[by].n.toLowerCase(),
+      pk: p ? (2013 + p[0]) + ' · ' + this.EMP[p[2]] : 'DOOANE · sorted by ' + this.AXES[by].n.toLowerCase(),
       ph: p ? (p[4] === 3 ? 'Under NDA' : p[5]) : insight[0],
       pc: p ? (p[4] === 3 ? 'For ' + p[6] + '. That’s all I can say.' : p[6]) : insight[1],
       ps: p && p[4] !== 3 ? SUM[sel][0] : p ? '' : 'Point at any block.',
@@ -206,7 +206,7 @@ class Component extends DCLogic {
       filters: ['All'].concat(this.CAPS).map((label) => ({ label, cls: label === filter ? 'on' : '', pressed: label === filter ? 'true' : 'false', pick: () => this.setState({ filter: label }) })),
       rows: shown.map((n) => {
         const d = DATA[n], nda = d[4] === 3;
-        return { y: String(2013 + d[0]), c: nda ? 'Under NDA' : d[6], t: nda ? 'Through ' + d[6] : d[5], d: nda ? '' : SUM[n][0], rcls: nda ? 'row nda' : 'row', cs: d[4] === 1, href: d[5] === 'Digital Playslip' ? '/work/nyl-digital-playslip/' : '#wall', pick: () => this.setState({ sel: n }) };
+        return { y: String(2013 + d[0]), c: nda ? 'Under NDA' : d[6], t: nda ? 'Through ' + d[6] : d[5], d: nda ? '' : SUM[n][0], rcls: nda ? 'row nda' : 'row', cs: d[4] === 1, href: d[5] === 'Digital Playslip' ? '/work/nyl-digital-playslip/' : '#rec', pick: () => this.setState({ sel: n }) };
       }),
       countLabel: shown.length + ' of ' + DATA.length + ' projects',
     };
@@ -266,156 +266,7 @@ export default class Board extends Component {
           {" "}
         </header>
         {" "}
-        <section className={"wrap wallsec"} id={"wall"}>
-          {" "}
-          <div className={"sorts"} role={"group"} aria-label={"Sort the 94 projects by"}>
-            {" "}
-            <span className={"sl"}>
-              {"Sort by"}
-            </span>
-            {" "}
-            {(v.sorts || []).map((o, i0) => (
-              <React.Fragment key={i0}>
-                <button className={`chip ${o.cls}`} onClick={o.go} aria-pressed={o.pressed}>
-                  {`${o.t}`}
-                </button>
-              </React.Fragment>
-            ))}
-            {" "}
-            <span className={"key"}>
-              <i className={"k1"}></i>
-              {"Case study "}
-              <i className={"k2"}></i>
-              {"My own lab "}
-              <i className={"k3"}></i>
-              {"Under NDA"}
-            </span>
-            {" "}
-          </div>
-          {" "}
-          <div className={"wallbox"}>
-            {" "}
-            <div className={"wall"}>
-              {" "}
-              {(v.wlabels || []).map((l, i1) => (
-                <React.Fragment key={i1}>
-                  <span className={"wn"} style={{"left": l.x, "top": l.ny}}>
-                    {`${l.n}`}
-                  </span>
-                  <span className={"wl"} style={{"left": l.x, "width": l.w}}>
-                    {`${l.t}`}
-                  </span>
-                </React.Fragment>
-              ))}
-              {" "}
-              {(v.tiles || []).map((b, i2) => (
-                <React.Fragment key={i2}>
-                  <button className={b.cls} style={{"left": b.x, "top": b.y, "backgroundColor": b.c, "transitionDelay": b.dl}} aria-label={b.label} onClick={b.pick} onMouseEnter={b.pick} onFocus={b.pick}></button>
-                </React.Fragment>
-              ))}
-              {" "}
-            </div>
-            {" "}
-            <aside className={`panel ${v.panelCls}`}>
-              {" "}
-              <div className={`pv ${v.pv.cls}`} style={{"--ac": v.pv.ac}} aria-hidden={"true"}>
-                {" "}
-                <img className={"shot"} src={v.pv.shot} alt={""} />
-                {" "}
-                <div className={"mk"}>
-                  <div className={"bar"}></div>
-                  <div className={"hero"}></div>
-                  <div className={"notes"}>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                  </div>
-                  <div className={"ph"}>
-                    <i></i>
-                    <i></i>
-                  </div>
-                  <div className={"cards"}>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                  </div>
-                  <div className={"ttl"}>
-                    {`${v.pv.t}`}
-                  </div>
-                  <div className={"ln"}>
-                    <i style={{"width": v.pv.w1}}></i>
-                    <i style={{"width": v.pv.w2}}></i>
-                    <i style={{"width": v.pv.w3}}></i>
-                  </div>
-                  <div className={"term"}>
-                    {`${v.pv.cmd}`}
-                  </div>
-                </div>
-                {" "}
-                <img className={"logo"} src={v.pv.logo} alt={""} />
-                {" "}
-                <span className={"lt"}>
-                  {`${v.pv.client}`}
-                </span>
-                {" "}
-                <div className={"redact"}>
-                  <b>
-                    {"REDACTED"}
-                  </b>
-                </div>
-                {" "}
-                <div className={"cap"}>
-                  {`${v.pv.cap}`}
-                </div>
-                {" "}
-              </div>
-              {" "}
-              <div className={"pbody"} aria-live={"polite"}>
-                {" "}
-                <img className={"bot"} src={"/v2/04090179b1b33cc067ebb8191c3e6f95.png"} alt={""} />
-                {" "}
-                <span className={"pk"}>
-                  {`${v.pk}`}
-                </span>
-                {" "}
-                <b>
-                  {`${v.ph}`}
-                </b>
-                {" "}
-                <span className={"pc"}>
-                  {`${v.pc}`}
-                </span>
-                {" "}
-                <span className={"ps"}>
-                  {`${v.ps}`}
-                </span>
-                {" "}
-                <a className={`btn-mini ${v.caseCls}`} href={"/work/nyl-digital-playslip/"}>
-                  {"Read the case study →"}
-                </a>
-                {" "}
-              </div>
-              {" "}
-            </aside>
-            {" "}
-          </div>
-          {" "}
-        </section>
-        {" "}
         <main className={"wrap rec"} id={"rec"} style={{"paddingBottom": "96px"}}>
-          {" "}
-          <h2 className={"display rh"}>
-            {"The client record."}
-          </h2>
-          {" "}
-          <p className={"muted rintro"}>
-            {`${v.recIntro}`}
-          </p>
           {" "}
           <section className={v.rwallCls} aria-label={"Filter by client"}>
             {" "}

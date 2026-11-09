@@ -60,7 +60,7 @@ export default class Board extends Component {
                 <br />
                 {"problems."}
                 <br />
-                {"Clean lines."}
+                {"Strategic solution."}
               </h1>
               {" "}
               <img src={"/v2/73f5db1a7934994f4a806442391f3084.png"} alt={""} aria-hidden={"true"} style={{"display": "block", "width": "300px", "margin": "2px 0 20px"}} />

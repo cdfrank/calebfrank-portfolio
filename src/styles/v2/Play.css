@@ -14,7 +14,7 @@ a{color:inherit;text-decoration:none}
 .pic{position:relative}
 .pic>img.p{display:block;width:100%;transform:rotate(1.6deg);border:6px solid #F4F1EC;box-sizing:border-box}
 .pic .sp{position:absolute;left:-20%;top:-22%;width:140%;max-width:none}
-.pic .m{position:absolute;right:-6%;bottom:-16%;width:44%}
+.pic .m{position:absolute;right:-3%;bottom:-12%;width:32%}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:20px;padding-bottom:96px}
 .item{position:relative;display:flex;flex-direction:column;gap:10px;min-height:250px;padding:22px;background:#1A1A1A;border:1px solid #333;border-radius:12px;box-sizing:border-box;transition:transform .15s,border-color .15s}
 .item:hover{transform:translateY(-4px) rotate(.5deg);border-color:#FF2B2B}

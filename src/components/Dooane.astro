@@ -1,0 +1,14 @@
+---
+import DooaneChat from './DooaneChat.jsx';
+import { allWork, career, site } from '../lib/data';
+import { publicProjects } from '../lib/dooane.mjs';
+
+const portfolio = {
+  summary: career.summary,
+  email: site.email,
+  linkedin: site.linkedin,
+  availability: site.availability,
+  projects: publicProjects(await allWork()),
+};
+---
+<DooaneChat portfolio={portfolio} client:idle />

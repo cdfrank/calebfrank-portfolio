@@ -244,14 +244,14 @@ export default class Board extends Component {
         {" "}
         <section className={"wrap"} style={{"paddingBottom": "40px"}}>
           {" "}
-          <a className={"next"} href={"/work/#wall"}>
+          <a className={"next"} href={"/work/#rec"}>
             {" "}
             <img className={"np"} src={"/v2/2b0a49fcd7d47662999b75aa3816a1df.jpg"} alt={"Angled SalesX screens showing a territory map, customer accounts, and sales charts"} />
             {" "}
             <span className={"nb"}>
-              <img className={"bot"} src={"/v2/04090179b1b33cc067ebb8191c3e6f95.png"} alt={""} />
+              <img className={"bot"} src={"/dooane/waving.webp"} alt={""} />
               <span className={"k"}>
-                {"Bit · up next"}
+                {"DOOANE · up next"}
               </span>
               <b>
                 {"SalesX for BASF Agriculture"}

@@ -9,6 +9,8 @@ import '@fontsource/permanent-marker';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
 import { site } from '../lib/data';
+import Dooane from '../components/Dooane.astro';
+import '../styles/paint-edges.css';
 
 interface Props { title?: string; description?: string; }
 const { title, description = site.intro } = Astro.props;
@@ -40,5 +42,6 @@ const ogImage = new URL('/og.png', Astro.site).href;
   </head>
   <body>
     <slot />
+    <Dooane />
   </body>
 </html>

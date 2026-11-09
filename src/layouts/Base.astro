@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { site } from '../lib/data';
+import Dooane from '../components/Dooane.astro';
 
 interface Props { title?: string; description?: string; }
 const { title, description = site.intro } = Astro.props;
@@ -64,5 +65,6 @@ const nav = [
         <p class="fine">© {new Date().getFullYear()} {site.name}</p>
       </div>
     </footer>
+    <Dooane />
   </body>
 </html>

@@ -1,0 +1,26 @@
+/* Keep content solid; mask only the final strip into aerosol grain and drips. */
+.paper.torn,.paper.torn-b{
+  position:relative;clip-path:none;
+  -webkit-mask-image:linear-gradient(#000,#000),var(--paint-mask,url('/dooane/spray-edge.webp'));
+  mask-image:linear-gradient(#000,#000),var(--paint-mask,url('/dooane/spray-edge.webp'));
+  -webkit-mask-size:100% calc(100% - 158px),100% 160px;
+  mask-size:100% calc(100% - 158px),100% 160px;
+  -webkit-mask-position:top,bottom;mask-position:top,bottom;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+}
+.paper.torn::before{
+  content:"";position:absolute;left:0;right:0;top:-60px;height:120px;z-index:1;
+  background:#111 url('/v2/20b9d21952dd7b71faf4b1152907f876.jpg');
+  -webkit-mask:url('/dooane/spray-top.webp') center/100% 100% no-repeat;
+  mask:url('/dooane/spray-top.webp') center/100% 100% no-repeat;
+  pointer-events:none;
+}
+@media(max-width:600px){
+  .paper.torn,.paper.torn-b{
+    -webkit-mask-size:100% calc(100% - 110px),100% 112px;
+    mask-size:100% calc(100% - 110px),100% 112px;
+  }
+  .paper.torn::before{height:96px;top:-48px}
+}
+
+.paper.torn{--paint-mask:url('/dooane/spray-home.webp')}

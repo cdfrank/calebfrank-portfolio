@@ -3,7 +3,7 @@
 # A client not listed here still appears, with its name instead of a logo.
 # Logos keep their color on the dark page unless listed under `whiteLogos` at the bottom.
 # Use a transparent background for every logo file.
-# Pitches and proposals list by name with no logo, so the wall shows only real clients.
+# Client and proposal groups use the supplied brand assets when available.
 clients:
   - id: basf
     name: BASF
@@ -48,21 +48,27 @@ clients:
     match: [AstraZeneca]
   - id: abbott
     name: Abbott
+    logo: abbott-full.png
     match: [Abbott]
   - id: general-mills
     name: General Mills
+    logo: general-mills-reversed.png
     match: [General Mills]
   - id: mcdonalds
     name: McDonald's
+    logo: mcdonalds.svg
     match: [McDonald's]
   - id: jayco
     name: Jayco
+    logo: jayco.png
     match: [Jayco]
   - id: corebridge
     name: Corebridge Financial
+    logo: corebridge-reversed.svg
     match: [Corebridge Financial]
   - id: us-marine-corps
     name: US Marine Corps
+    logo: us-marine-corps.svg
     match: [US Marine Corps]
   - id: phbi
     name: Professional Home Builders Institute
@@ -116,8 +122,25 @@ clients:
     name: Karle Symposium
     logo: karle.png
     match: [Karle Symposium]
+  - id: one10
+    name: One10 Marketing
+    logo: one10.svg
+    match: [One10 Marketing]
+  - id: glidden
+    name: Glidden
+    logo: glidden.png
+    match: [Glidden]
+  - id: mary-kay
+    name: Mary Kay
+    logo: mary-kay.svg
+    match: [Mary Kay]
+  - id: viral-launch
+    name: Viral Launch
+    logo: viral-launch-dark.svg
+    match: [Viral Launch]
   - id: own-work
     name: My own work
+    logo: dooane.png
     last: true
     match: [Self-initiated]
 
@@ -133,6 +156,7 @@ capabilities:
 
 # Logos too dark to read on the page, measured under 3:1 contrast. These render solid white.
 whiteLogos:
+  - abbott-full.png
   - astrazeneca.svg
   - ball-state.png
   - basf.png
