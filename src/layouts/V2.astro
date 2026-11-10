@@ -11,6 +11,8 @@ import '@fontsource/jetbrains-mono/700.css';
 import { site } from '../lib/data';
 import Dooane from '../components/Dooane.astro';
 import '../styles/paint-edges.css';
+import '../styles/transitions.css';
+import '../styles/sticky-nav.css';
 
 interface Props { title?: string; description?: string; }
 const { title, description = site.intro } = Astro.props;
@@ -39,9 +41,19 @@ const ogImage = new URL('/og.png', Astro.site).href;
     <meta property="og:image:alt" content={`${site.name}: ${site.headline}`} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      // Arriving from a nav transition: keep the overlay up from first paint until the reveal starts.
+      (function () { try {
+        var p = JSON.parse(sessionStorage.getItem('tx-pend') || 'null'); sessionStorage.removeItem('tx-pend');
+        if (!p || Date.now() - p.ts > 6000 || p.u.replace(/\/$/, '') !== location.pathname.replace(/\/$/, '') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var d = document.documentElement; d.dataset.tx = p.t; d.dataset.txP = 'hold'; if (p.q) d.dataset.txQ = '';
+      } catch (e) {} })();
+    </script>
   </head>
   <body>
+    <div id="tx" aria-hidden="true"><div class="tx-bg"></div><div class="tx-bars"><i></i><i></i><i></i></div><div class="tx-tag"></div><div class="tx-guy"></div><p class="tx-word"></p></div>
     <slot />
     <Dooane />
+    <script>import '../scripts/transitions.js'; import '../scripts/sticky-nav.js';</script>
   </body>
 </html>

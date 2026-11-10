@@ -90,11 +90,11 @@ export default class Board extends Component {
         {" "}
         <section className={"wrap"} aria-label={"Featured game"}>
           {" "}
-          <a className={"feat"} href={"https://skate-spotter-teal.vercel.app"} target={"_blank"} rel={"noopener"}>
+          <a className={"feat ssf"} href={"https://skate-spotter-teal.vercel.app"} target={"_blank"} rel={"noopener"}>
             {" "}
             <div className={"vid"}>
               {" "}
-              <video src={"/v2/7d99032c4f59c2d9577bdcfe7c29bb87.mp4"} poster={"/v2/26c138ebf8deccfc526cc80535cc75c0.jpg"} autoPlay muted loop playsInline preload={"auto"} aria-label={"Gameplay: DOOANE skating the bowl at Ann Arbor Skatepark"}></video>
+              <video src={"/v2/street-signal/dev-cut.mp4"} poster={"/v2/street-signal/dev-cut.jpg"} autoPlay muted loop playsInline preload={"auto"} aria-label={"Street Signal development cut: the real Cranbrook stair set in Michigan, then the same spot as playable gameplay"}></video>
               {" "}
               <span className={"live"}>
                 {"Playable now"}
@@ -109,11 +109,11 @@ export default class Board extends Component {
               </span>
               {" "}
               <h2 className={"display"}>
-                {"Scan&Skate"}
+                {"Street Signal"}
               </h2>
               {" "}
               <p className={"muted"} style={{"margin": "0"}}>
-                {"Scan a real skate spot, then skate it. Real parks rebuilt at 1:1, starting with Ann Arbor Skatepark and the Cranbrook 11-stair. Built in Cursor."}
+                {"Scan a real skate spot, then skate it. Real spots rebuilt as playable lines, starting with Ann Arbor Skatepark and the Cranbrook stair set. Board control, tricks and grinds. Built in Cursor."}
               </p>
               {" "}
               <span className={"go"}>

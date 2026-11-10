@@ -1,0 +1,12 @@
+/* Sticky nav for every v2 page except home (sticky-nav.js sets html[data-navpin]). Once scrolled,
+   html[data-nav-stuck] gives it a full-width bar in its section's colour. */
+html[data-navpin] .site .wrap.nav{position:fixed;top:0;left:0;right:0;z-index:60;margin:0 auto;color:var(--nav-c)}
+html[data-navpin=island] .site{padding-top:var(--navh)}
+html[data-navpin][data-nav-stuck] .site .wrap.nav{padding-top:10px;padding-bottom:10px;background:var(--bar-c);box-shadow:0 0 0 100vmax var(--bar-c);clip-path:inset(0 -100vmax)}
+html[data-navpin][data-nav-stuck] .site .wrap.nav img{height:40px !important}
+.site [id]{scroll-margin-top:72px}
+@media (max-width:860px){
+  html[data-navpin] .site .wrap.nav .links{flex:1 1 100%;flex-wrap:nowrap;justify-content:space-between}
+  html[data-navpin] .site .wrap.nav .links a{padding:0 8px;font-size:13px;min-height:40px}
+  html[data-navpin][data-nav-stuck] .site .wrap.nav:has(.links)>a{display:none}
+}

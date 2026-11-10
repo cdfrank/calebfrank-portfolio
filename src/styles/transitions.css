@@ -1,0 +1,88 @@
+/* Nav page transitions. transitions.js sets html[data-tx=<item>] and walks data-tx-p through
+   out (cover the old page) -> hold (next page, still covered) -> in (reveal). data-tx-q marks a repeat visit. */
+#tx{position:fixed;inset:0;z-index:2147483000;visibility:hidden;pointer-events:none;--wm:url(/v2/dooane-wordmark-white.png)}
+html[data-tx] #tx{visibility:visible;pointer-events:auto;cursor:pointer}
+#tx>*{position:absolute;pointer-events:none}
+.tx-bg{inset:0;background:#111}
+.tx-bars,.tx-tag,.tx-guy,.tx-word{display:none}
+.tx-guy{bottom:0;background:center bottom/contain no-repeat;transform:translateY(105%)}
+.tx-word{margin:0;font:400 clamp(30px,4.4vw,60px)/1 "Permanent Marker",cursive;color:#111;white-space:nowrap;opacity:0}
+html[data-tx-p=in] .tx-guy{animation:tx-pop .32s cubic-bezier(.3,1.5,.5,1) both}
+html[data-tx-p=in] .tx-word{animation:tx-word .28s cubic-bezier(.3,1.6,.5,1) .12s both}
+@keyframes tx-pop{from{transform:translateY(105%)}to{transform:none}}
+@keyframes tx-word{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
+
+/* About: ink drops, DOOANE sprays the red tag, then the page shows through the letters as they grow */
+html[data-tx=about][data-tx-p=out] #tx{animation:tx-drop .32s cubic-bezier(.7,0,.3,1) both}
+@keyframes tx-drop{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+html[data-tx=about] .tx-tag{display:block;left:50%;top:50%;width:min(78vw,820px);aspect-ratio:1104/450;translate:-50% -50%;background:#FF2B2B;-webkit-mask:var(--wm) center/contain no-repeat;mask:var(--wm) center/contain no-repeat;clip-path:inset(0 100% 0 0)}
+html[data-tx=about][data-tx-p=in] .tx-tag{animation:tx-spray .5s cubic-bezier(.3,.1,.4,1) .12s both}
+@keyframes tx-spray{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
+html[data-tx=about] .tx-guy{display:block;left:50%;width:clamp(140px,18vw,240px);aspect-ratio:550/900;margin-left:calc(clamp(140px,18vw,240px)/-2);background-image:url(/dooane/spray-can.webp);transform:translateX(-70vw)}
+html[data-tx=about][data-tx-p=in] .tx-guy{animation:tx-sprayer 1.05s cubic-bezier(.4,0,.2,1) both}
+@keyframes tx-sprayer{0%{transform:translateX(-70vw)}22%{transform:translateX(-34vw) rotate(-4deg)}62%{transform:translateX(30vw) rotate(3deg)}78%{transform:translateX(34vw)}100%{transform:translateX(80vw) translateY(12%)}}
+html[data-tx=about][data-tx-p=in] #tx{-webkit-mask:var(--wm) center/0 auto no-repeat,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:var(--wm) center/0 auto no-repeat exclude,linear-gradient(#000 0 0);animation:tx-hole .56s cubic-bezier(.6,0,.2,1) .68s forwards}
+@keyframes tx-hole{0%{-webkit-mask-size:min(78vw,820px) auto,100% 100%;mask-size:min(78vw,820px) auto,100% 100%}35%{opacity:1}85%,100%{opacity:0}100%{-webkit-mask-size:700vw auto,100% 100%;mask-size:700vw auto,100% 100%}}
+
+/* Work: a torn paper sheet slaps up, DOOANE points the way, the sheet tears off the top */
+html[data-tx=work] #tx{--paper:#E9E4DA}
+html[data-tx=work] .tx-bg{inset:-6vh 0;background:var(--paper);clip-path:polygon(0 3%,8% 1%,17% 4%,26% .5%,36% 3.5%,47% 1%,58% 4.5%,69% 1.5%,80% 4%,90% .5%,100% 3%,100% 97%,91% 99.5%,82% 96%,72% 99%,61% 95.5%,50% 99%,39% 96.5%,28% 99.5%,18% 96%,9% 99%,0 97%)}
+html[data-tx=work][data-tx-p=out] #tx{animation:tx-up-in .38s cubic-bezier(.2,.8,.3,1) both}
+html[data-tx=work][data-tx-p=in] #tx{animation:tx-up-out .46s cubic-bezier(.6,0,.4,1) .42s both}
+@keyframes tx-up-in{from{transform:translateY(112vh)}to{transform:none}}
+@keyframes tx-up-out{to{transform:translateY(-118vh)}}
+html[data-tx=work] .tx-guy{display:block;right:7vw;width:clamp(130px,16vw,220px);aspect-ratio:580/900;background-image:url(/dooane/pointing.webp)}
+html[data-tx=work] .tx-word{display:block;right:calc(7vw + clamp(130px,16vw,220px));bottom:34vh;rotate:-4deg}
+html[data-tx=work] .tx-word::after{content:"\2190  this way"}
+
+/* Process: a blueprint grid rules in from the left, DOOANE thinks, the grid wipes off to the right */
+html[data-tx=process] .tx-bg{background:linear-gradient(rgba(244,241,236,.14) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,rgba(244,241,236,.14) 1px,transparent 1px) 0 0/48px 48px,#111}
+html[data-tx=process][data-tx-p=out] #tx{animation:tx-rule .32s cubic-bezier(.7,0,.3,1) both}
+html[data-tx=process][data-tx-p=in] #tx{animation:tx-unrule .42s cubic-bezier(.6,0,.4,1) .44s both}
+@keyframes tx-rule{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
+@keyframes tx-unrule{from{clip-path:inset(0)}to{clip-path:inset(0 0 0 100%)}}
+html[data-tx=process] .tx-guy{display:block;left:50%;width:clamp(170px,20vw,280px);aspect-ratio:273/282;margin-left:calc(clamp(170px,20vw,280px)/-2);background-image:url(/dooane/crouch.png)}
+html[data-tx=process] .tx-word{display:block;left:50%;top:22vh;translate:-50% 0;color:#F4F1EC;font:400 clamp(56px,9vw,140px)/1 Anton,Impact,sans-serif;text-transform:uppercase}
+html[data-tx=process] .tx-word::after{content:"Process"}
+
+/* Play: Street Signal blue and yellow bars sweep across, skating DOOANE rides through */
+html[data-tx=play]:not([data-tx-q]) .tx-bg{display:none}
+html[data-tx=play] .tx-bg{background:#173DF4}
+html[data-tx=play] .tx-bars{display:block;inset:0}
+.tx-bars i{position:absolute;left:-20vw;width:140vw;height:35%;background:#173DF4;transform:skewX(-14deg)}
+.tx-bars i:nth-child(2){top:33%;background:#EEFF00}
+.tx-bars i:nth-child(3){top:66%}
+html[data-tx=play][data-tx-p=out] .tx-bars i{animation:tx-bar-in .32s cubic-bezier(.2,.8,.3,1) both}
+html[data-tx=play][data-tx-p=in] .tx-bars i{animation:tx-bar-out .4s cubic-bezier(.6,0,.4,1) .36s both}
+html[data-tx=play][data-tx-p=out] .tx-bars i:nth-child(2){animation-delay:50ms}
+html[data-tx=play][data-tx-p=out] .tx-bars i:nth-child(3){animation-delay:100ms}
+html[data-tx=play][data-tx-p=in] .tx-bars i:nth-child(2){animation-delay:.41s}
+html[data-tx=play][data-tx-p=in] .tx-bars i:nth-child(3){animation-delay:.46s}
+@keyframes tx-bar-in{from{transform:translateX(-150vw) skewX(-14deg)}to{transform:skewX(-14deg)}}
+@keyframes tx-bar-out{from{transform:skewX(-14deg)}to{transform:translateX(150vw) skewX(-14deg)}}
+html[data-tx=play] .tx-guy{display:block;left:0;top:50%;bottom:auto;width:clamp(150px,17vw,240px);aspect-ratio:287/340;margin-top:calc(clamp(150px,17vw,240px)*-.6);transform:translateX(-40vw)}
+html[data-tx=play] .tx-guy{background-image:url(/dooane/skating.png)}
+html[data-tx=play][data-tx-p=in] .tx-guy{animation:tx-ride .9s cubic-bezier(.3,.1,.5,1) both}
+@keyframes tx-ride{0%{transform:translateX(-30vw)}40%{transform:translateX(38vw) translateY(-6%) rotate(-6deg)}70%{transform:translateX(70vw) translateY(-14%) rotate(-10deg)}100%{transform:translateX(115vw) translateY(-4%) rotate(4deg)}}
+
+/* Contact: a red sticker slaps down, DOOANE waves, the sticker peels off; the chat launcher pulses */
+html[data-tx=contact] .tx-bg{inset:-2vh -2vw;background:#FF2B2B;border-radius:28px}
+html[data-tx=contact] #tx{transform-origin:100% 0}
+html[data-tx=contact][data-tx-p=out] #tx{animation:tx-slap .3s cubic-bezier(.2,1.3,.4,1) both}
+html[data-tx=contact][data-tx-p=in] #tx{animation:tx-peel .48s cubic-bezier(.6,0,.4,1) .38s both}
+@keyframes tx-slap{from{opacity:0;transform:scale(1.25) rotate(-5deg)}to{opacity:1;transform:none}}
+@keyframes tx-peel{to{transform:translate(60vw,-115vh) rotate(16deg)}}
+html[data-tx=contact] .tx-guy{display:block;left:50%;width:clamp(120px,14vw,190px);aspect-ratio:186/331;margin-left:calc(clamp(120px,14vw,190px)/-2);background-image:url(/dooane/cap-tip.png)}
+html[data-tx=contact] .tx-word{display:block;left:50%;top:24vh;translate:-50% 0;rotate:-3deg;font-size:clamp(52px,8vw,120px)}
+html[data-tx=contact] .tx-word::after{content:"say hi"}
+.dooane-launcher.tx-pulse{animation:tx-pulse 1.2s ease}
+@keyframes tx-pulse{20%{transform:scale(1.14)}40%{transform:scale(.96)}60%{transform:scale(1.05)}}
+
+/* Repeat visits: a quick fade in the item's colour, no DOOANE */
+html[data-tx-q] #tx>:not(.tx-bg){display:none}
+html[data-tx-q] .tx-bg{inset:0;clip-path:none;border-radius:0}
+html[data-tx-q][data-tx-p=out] #tx{animation:tx-fade .17s ease both!important}
+html[data-tx-q][data-tx-p=in] #tx{-webkit-mask:none;mask:none;animation:tx-fade .24s ease reverse both!important}
+@keyframes tx-fade{from{opacity:0}to{opacity:1}}
+
+@media (prefers-reduced-motion:reduce){#tx{display:none}}

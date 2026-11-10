@@ -1,5 +1,5 @@
 ---
-title: "Scan&Skate and SkateGO"
+title: "Street Signal and SkateGO"
 client: "Self-initiated"
 kind: lab
 role: "Designer and builder"

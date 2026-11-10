@@ -11,60 +11,42 @@ class Component extends DCLogic {
     this.LOGO = {"BASF Agriculture": "/v2/98f679b1c71070b93de1d1fd7ecd6283.png", "New York Lottery": "/v2/2a657719827a673597dea866ed30821a.png", "General Motors": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "Chevrolet": "/v2/616f543469fefd85a1353376fc536366.svg", "Cadillac": "/v2/680560a9d6e6bf1136d09c4827a90eb8.svg", "GM Accessories": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "GMC": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "Buick": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "and Chevrolet": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "Honeywell": "/v2/6f26237dfd79aa9807e00c01f1ec12ce.svg", "Fujifilm": "/v2/51e33b550edc54490312bb7c959e2ff7.svg", "Fujifilm Instax": "/v2/51e33b550edc54490312bb7c959e2ff7.svg", "Optum": "/v2/5911379b2a03ea490842406df4572106.svg", "AstraZeneca": "/v2/a17a691730ee02181178232cceb44c6b.svg", "Professional Home Builders Institute": "/v2/8e1a565339eeb37f0bee1d233d6b969c.png", "MRM": "/v2/aea971e64d387348e8c1f58819d522eb.png", "MRM UX team": "/v2/aea971e64d387348e8c1f58819d522eb.png", "TriHealth": "/v2/39c0c1dfb5336632ef3402b9e049234b.png", "Hancock Health": "/v2/104aece41c14cd28c2d7fa00fc12636d.png", "Gleaners Food Bank": "/v2/2c0d05d19116480682f892cc48d5d788.png", "Project Lead The Way": "/v2/08e7857d1cec611099fc72df1e27dd4b.png", "Ball State University": "/v2/4ba5f95f3c380fe7e701778bc45b815f.png", "Judson Center and Michigan State": "/v2/36c365a88ab08a2b409c68a78d72f48b.png", "Thomas Edison Center": "/v2/0fbc3cde8c24d1bb53a51da0b5e34a3c.svg", "Young Farmers of Washtenaw County": "/v2/527b9e7472daa68c9dba3981fae522e5.png", "Isle Royale Equipment": "/v2/15d5a1242a32e7b0f3a7a10c45ad1bfa.png", "Olympia Skate Shop": "/v2/24f573f245ac9121f39fb9a262170747.png", "Karle Symposium": "/v2/6b8bce22c3851e6cd4dcb9b050ca1699.png", "GMC, Buick, and Chevrolet": "/v2/d2bd8c0a9659280cb2b441471e446366.png"};
     this.SHOT = {"SalesX: re-engineering a sales force": "/v2/2b0a49fcd7d47662999b75aa3816a1df.jpg", "Digital Playslip": "/v2/04eadf151721aaaf1005bbe69761a593.jpg"};
     this.state = { step: 0, x: 'year', y: '', yaw: 0, pitch: 0, sel: null, drag: false };
-    this.dillSetup();
-    this.DATA = [[0,0,0,3,0,"Embrace 2013 microsite","Ball State University"],[0,0,0,1,0,"Journalism program pages","Ball State University"],[0,0,0,3,0,"President's Holiday Card","Ball State University"],[0,0,0,1,0,"Client design internship","Various clients"],[1,1,1,0,0,"Hunger campaign","Gleaners Food Bank"],[1,4,4,0,0,"Glidden campaign","Glidden"],[1,1,1,0,0,"Identity and campaigns","Hancock Health"],[1,0,1,0,0,"Logo work","Impact IQ and Spin Across America"],[1,4,4,0,0,"Mary Kay campaign","Mary Kay"],[1,1,1,0,0,"ER campaign","TriHealth"],[1,1,1,0,0,"Outdoor and print advertising","TriHealth"],[2,2,2,3,0,"Dealer playbooks","Chevrolet"],[2,1,4,0,0,"Poster work","CLC and A Bicycle Built for 95,000"],[2,2,2,3,0,"Voice of Customer program","General Motors"],[2,2,2,3,0,"InfoSource apps","GMC, Buick, and Chevrolet"],[2,0,1,0,0,"Summit 2016 identity","Project Lead The Way"],[2,1,1,1,0,"TriHealth.com refresh","TriHealth"],[3,2,2,1,0,"Vehicle pages and launch sites","Cadillac"],[3,2,2,0,0,"SEMA coffee table book","Chevrolet"],[3,2,2,0,0,"Customer experience award programs","General Motors"],[3,2,2,0,0,"iMR identity","General Motors"],[3,2,2,3,0,"Mystery Shop reporting","General Motors"],[3,2,2,1,0,"RSMS holiday card","General Motors"],[3,2,2,1,0,"Accessories shoots and pages","GM Accessories"],[3,4,4,0,0,"Packaging redesign","Viral Launch"],[4,3,4,0,0,"Baker Farms identity","Baker Farms"],[4,2,2,2,0,"E2UL sourcebook","Cadillac"],[4,2,2,0,0,"CamaroFest and Car of the Year materials","Chevrolet"],[4,1,2,1,0,"Jerseys for Judson","Judson Center and Michigan State"],[4,0,4,0,0,"Karle Symposium identity","Karle Symposium"],[4,0,2,1,0,"One10 website launch","One10 Marketing"],[4,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,2,0,"Fleet guide","General Motors"],[5,4,4,1,0,"Brand standards and landing page","Isle Royale Equipment"],[5,4,4,1,0,"Brand, web, and Nike materials","Olympia Skate Shop"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,4,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,4,3,"Under NDA","Aimia / One10"],[6,3,3,3,1,"SalesX: re-engineering a sales force","BASF Agriculture"],[6,3,4,0,0,"Young Farmers materials","Young Farmers of Washtenaw County"],[6,2,3,2,3,"Under NDA","MRM//McCann"],[6,2,3,3,3,"Under NDA","MRM//McCann"],[6,2,2,3,3,"Under NDA","Aimia / One10"],[6,2,2,3,3,"Under NDA","Aimia / One10"],[7,1,3,3,0,"Interactive concepts","Abbott"],[7,3,3,3,0,"Canada Agriculture website","BASF Agriculture"],[7,3,3,3,0,"Claims system","BASF Agriculture"],[7,3,3,2,0,"Engenia herbicide site","BASF Agriculture"],[7,3,3,3,0,"Unified login","BASF Agriculture"],[7,4,3,2,0,"Pillsbury pitch","General Mills"],[7,0,3,2,0,"Coffee & Collabs","MRM UX team"],[8,3,3,3,0,"Partner Portal","BASF Agriculture"],[8,5,3,3,0,"Design library","New York Lottery"],[8,5,3,3,1,"Digital Playslip","New York Lottery"],[8,0,3,2,0,"Learning site unification","Professional Home Builders Institute"],[9,3,3,1,0,"Global Seeds & Traits","BASF Agriculture"],[9,3,3,1,0,"US Crop website","BASF Agriculture"],[9,4,3,2,0,"Instax North America website","Fujifilm Instax"],[9,2,3,0,0,"Lab313 rebrand","General Motors"],[9,4,3,2,0,"Cart and checkout","Honeywell"],[9,4,3,3,0,"Design language refresh","Honeywell"],[9,5,3,1,0,"Twelve-language website","New York Lottery"],[9,1,4,1,0,"Thomas Edison Center website","Thomas Edison Center"],[10,4,3,2,0,"Direct-to-consumer platform","Fujifilm"],[10,4,3,4,0,"Chatbot and service tools","Honeywell"],[10,0,3,2,0,"Figma 101, 201, and 301","MRM"],[10,0,3,2,0,"Office Blind Date","MRM"],[11,1,3,1,0,"Farxiga landing pages","AstraZeneca"],[11,4,3,2,0,"Amazon experience review","Fujifilm"],[11,4,3,2,0,"CRM pitch","McDonald's"],[11,0,3,4,0,"AI and asset management vision","MRM"],[11,5,3,4,0,"Alexa skills and Help Center","New York Lottery"],[11,5,3,2,0,"CRM overhaul","New York Lottery"],[11,5,3,1,0,"Live Drawing and Integrity pages","New York Lottery"],[11,5,3,2,0,"Quick Draw rebrand","New York Lottery"],[11,1,3,3,0,"Experience design support","Optum"],[11,6,4,2,2,"Indoor skatepark proposal","Self-initiated"],[11,6,4,3,2,"TART","Self-initiated"],[11,6,4,2,2,"Tin Minnows Bearings Co.","Self-initiated"],[11,5,3,2,0,"Marine Corps pitch","US Marine Corps"],[12,4,3,2,0,"New business story","Corebridge Financial"],[12,4,3,2,0,"Building Automation site proposal","Honeywell"],[12,4,3,4,0,"Product experience proposal","Jayco"],[12,6,4,4,2,"Design System Scanner","Self-initiated"],[12,6,4,4,2,"Playable Figma Make games","Self-initiated"],[12,6,4,4,2,"Portfolios Please","Self-initiated"],[12,6,4,4,2,"Scan&Skate and SkateGO","Self-initiated"],[12,6,4,4,2,"Shred & Dice","Self-initiated"]];
+    this.DATA = [[0,0,0,3,0,"Embrace 2013 microsite","Ball State University"],[0,0,0,1,0,"Journalism program pages","Ball State University"],[0,0,0,3,0,"President's Holiday Card","Ball State University"],[0,0,0,1,0,"Client design internship","Various clients"],[1,1,1,0,0,"Hunger campaign","Gleaners Food Bank"],[1,4,4,0,0,"Glidden campaign","Glidden"],[1,1,1,0,0,"Identity and campaigns","Hancock Health"],[1,0,1,0,0,"Logo work","Impact IQ and Spin Across America"],[1,4,4,0,0,"Mary Kay campaign","Mary Kay"],[1,1,1,0,0,"ER campaign","TriHealth"],[1,1,1,0,0,"Outdoor and print advertising","TriHealth"],[2,2,2,3,0,"Dealer playbooks","Chevrolet"],[2,1,4,0,0,"Poster work","CLC and A Bicycle Built for 95,000"],[2,2,2,3,0,"Voice of Customer program","General Motors"],[2,2,2,3,0,"InfoSource apps","GMC, Buick, and Chevrolet"],[2,0,1,0,0,"Summit 2016 identity","Project Lead The Way"],[2,1,1,1,0,"TriHealth.com refresh","TriHealth"],[3,2,2,1,0,"Vehicle pages and launch sites","Cadillac"],[3,2,2,0,0,"SEMA coffee table book","Chevrolet"],[3,2,2,0,0,"Customer experience award programs","General Motors"],[3,2,2,0,0,"iMR identity","General Motors"],[3,2,2,3,0,"Mystery Shop reporting","General Motors"],[3,2,2,1,0,"RSMS holiday card","General Motors"],[3,2,2,1,0,"Accessories shoots and pages","GM Accessories"],[3,4,4,0,0,"Packaging redesign","Viral Launch"],[4,3,4,0,0,"Baker Farms identity","Baker Farms"],[4,2,2,2,0,"E2UL sourcebook","Cadillac"],[4,2,2,0,0,"CamaroFest and Car of the Year materials","Chevrolet"],[4,1,2,1,0,"Jerseys for Judson","Judson Center and Michigan State"],[4,0,4,0,0,"Karle Symposium identity","Karle Symposium"],[4,0,2,1,0,"One10 website launch","One10 Marketing"],[4,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,2,0,"Fleet guide","General Motors"],[5,4,4,1,0,"Brand standards and landing page","Isle Royale Equipment"],[5,4,4,1,0,"Brand, web, and Nike materials","Olympia Skate Shop"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,4,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,4,3,"Under NDA","Aimia / One10"],[6,3,3,3,1,"SalesX: re-engineering a sales force","BASF Agriculture"],[6,3,4,0,0,"Young Farmers materials","Young Farmers of Washtenaw County"],[6,2,3,2,3,"Under NDA","MRM//McCann"],[6,2,3,3,3,"Under NDA","MRM//McCann"],[6,2,2,3,3,"Under NDA","Aimia / One10"],[6,2,2,3,3,"Under NDA","Aimia / One10"],[7,1,3,3,0,"Interactive concepts","Abbott"],[7,3,3,3,0,"Canada Agriculture website","BASF Agriculture"],[7,3,3,3,0,"Claims system","BASF Agriculture"],[7,3,3,2,0,"Engenia herbicide site","BASF Agriculture"],[7,3,3,3,0,"Unified login","BASF Agriculture"],[7,4,3,2,0,"Pillsbury pitch","General Mills"],[7,0,3,2,0,"Coffee & Collabs","MRM UX team"],[8,3,3,3,0,"Partner Portal","BASF Agriculture"],[8,5,3,3,0,"Design library","New York Lottery"],[8,5,3,3,1,"Digital Playslip","New York Lottery"],[8,0,3,2,0,"Learning site unification","Professional Home Builders Institute"],[9,3,3,1,0,"Global Seeds & Traits","BASF Agriculture"],[9,3,3,1,0,"US Crop website","BASF Agriculture"],[9,4,3,2,0,"Instax North America website","Fujifilm Instax"],[9,2,3,0,0,"Lab313 rebrand","General Motors"],[9,4,3,2,0,"Cart and checkout","Honeywell"],[9,4,3,3,0,"Design language refresh","Honeywell"],[9,5,3,1,0,"Twelve-language website","New York Lottery"],[9,1,4,1,0,"Thomas Edison Center website","Thomas Edison Center"],[10,4,3,2,0,"Direct-to-consumer platform","Fujifilm"],[10,4,3,4,0,"Chatbot and service tools","Honeywell"],[10,0,3,2,0,"Figma 101, 201, and 301","MRM"],[10,0,3,2,0,"Office Blind Date","MRM"],[11,1,3,1,0,"Farxiga landing pages","AstraZeneca"],[11,4,3,2,0,"Amazon experience review","Fujifilm"],[11,4,3,2,0,"CRM pitch","McDonald's"],[11,0,3,4,0,"AI and asset management vision","MRM"],[11,5,3,4,0,"Alexa skills and Help Center","New York Lottery"],[11,5,3,2,0,"CRM overhaul","New York Lottery"],[11,5,3,1,0,"Live Drawing and Integrity pages","New York Lottery"],[11,5,3,2,0,"Quick Draw rebrand","New York Lottery"],[11,1,3,3,0,"Experience design support","Optum"],[11,6,4,2,2,"Indoor skatepark proposal","Self-initiated"],[11,6,4,3,2,"TART","Self-initiated"],[11,6,4,2,2,"Tin Minnows Bearings Co.","Self-initiated"],[11,5,3,2,0,"Marine Corps pitch","US Marine Corps"],[12,4,3,2,0,"New business story","Corebridge Financial"],[12,4,3,2,0,"Building Automation site proposal","Honeywell"],[12,4,3,4,0,"Product experience proposal","Jayco"],[12,6,4,4,2,"Design System Scanner","Self-initiated"],[12,6,4,4,2,"Playable Figma Make games","Self-initiated"],[12,6,4,4,2,"Portfolios Please","Self-initiated"],[12,6,4,4,2,"Street Signal and SkateGO","Self-initiated"],[12,6,4,4,2,"Shred & Dice","Self-initiated"]];
   }
-  // DOOANE the armadillo: 24 Blender angles. Drag to spin, tap to talk, and he turns to face the pointer.
-  dillSetup() {
-    this.DF = ["/v2/1a5fe4cc2788eed6cc561f68a69d5c4e.webp", "/v2/6ab8db91c5d3d8b7f2f32fc79dfffb78.webp", "/v2/d6a2cee9d22cda34c4c7ca3de20de8a5.webp", "/v2/b3df2304cd75c6916aa50335d9e72005.webp", "/v2/0e2811d0f922bcef27ad9347bf216a39.webp", "/v2/103ca142963d240861f6396709d077e6.webp", "/v2/b99827563a5158d050c12ca8db48ea81.webp", "/v2/f7e256ab0ec41214296012a1a1af9d82.webp", "/v2/beaa63e10f57ad2fb60acf46072f8821.webp", "/v2/4f3164d81d3739d8bd443ba0c3223eea.webp", "/v2/9d69f52b65ddab4e74b2cefe526edaf8.webp", "/v2/9461bf1efeb2567327e929cb6b62f450.webp", "/v2/651c658646e9a3b950d233481144097d.webp", "/v2/d93850db70147fabe597eae60388fe03.webp", "/v2/c4145ea8987dbd31bf79f850a84eef14.webp", "/v2/71474eb38fa7f4e4e2623d07da26a19f.webp", "/v2/af33408a0c31e745390902db24d0b60f.webp", "/v2/aa25cdee71d336227e02c77c6e3092b9.webp", "/v2/3ec779002fb6021bda9d29319cfc7f42.webp", "/v2/419f51af4eec88925ad28e251c7f6fbd.webp", "/v2/090315bd134e55878fd6d95a7ce27845.webp", "/v2/0dd6cbaa4c550676e19278be54ea89ca.webp", "/v2/6f2086d8c2e02728b91720d67b2b4a7b.webp", "/v2/4ecf80e8a7491657f00f2a952d5d3d6d.webp"];
-    this.DFRONT = 22;
-    this.SAY = [
-      'Hey. I’m Dooane. Drag me around.',
-      'Same letters. Different energy.',
-      'Armored shell. Soft on the details.',
-      '94 projects on the record. Go look.',
-      'Hiring? The work is one click away.',
-    ];
-    Object.assign(this.state, { df: this.DFRONT, dsay: 0, dhop: false, ddrag: false });
+  // Street Signal hero: the character loop on wide screens, the skate-away clip on phones. Video starts after mount so only one file loads.
+  componentDidMount() {
+    const mq = window.matchMedia('(max-width: 860px)');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.ssPick = () => {
+      const el = this.ssVid;
+      if (!el) return;
+      const src = mq.matches ? '/v2/street-signal/skate-away.mp4' : '/v2/street-signal/character-loop.mp4';
+      if (el.getAttribute('src') !== src) { el.setAttribute('src', src); el.load(); }
+      if (!this.state.ssPaused) el.play().catch(() => {});
+    };
+    this.ssMq = mq;
+    mq.addEventListener('change', this.ssPick);
+    if (still) this.setState({ ssPaused: true }, this.ssPick); else this.ssPick();
+    // The nav is fixed; once the page scrolls it gets a solid bar so it reads over every section.
+    const nav = document.querySelector('.ss>.nav');
+    this.navStick = () => { if (nav) nav.classList.toggle('stuck', window.scrollY > 8); };
+    window.addEventListener('scroll', this.navStick, { passive: true });
+    this.navStick();
   }
-  dillTap() {
-    this.setState({ dhop: true, dsay: this.state.dsay + 1 });
-    clearTimeout(this.dhopT);
-    this.dhopT = setTimeout(() => this.setState({ dhop: false }), 460);
-  }
-  dillVals() {
-    const N = this.DF.length, { df, dsay, dhop, ddrag } = this.state;
-    const wrap = (v) => ((v % N) + N) % N;
+  ssVals() {
     return {
-      dFrames: this.DF.map((src, i) => ({ src, cls: i === df ? 'on' : '' })),
-      dCls: [dhop ? 'hop' : '', ddrag ? 'drag' : ''].join(' '),
-      dSay: this.SAY[dsay % this.SAY.length],
-      dAngle: String(Math.round((wrap(df - this.DFRONT) * 360) / N)),
-      dDown: (e) => { this.dx = e.clientX; this.df0 = df; this.dmoved = false; this.setState({ ddrag: true }); },
-      dMove: (e) => {
-        if (!this.state.ddrag) return;
-        const d = Math.round((e.clientX - this.dx) / 16);
-        if (d) { this.dmoved = true; this.dspun = Date.now(); }
-        const next = wrap(this.df0 + d);
-        if (next !== this.state.df) this.setState({ df: next });
-      },
-      dUp: () => { if (!this.state.ddrag) return; const tap = !this.dmoved; this.setState({ ddrag: false }); if (tap) this.dillTap(); },
-      dLook: (e) => {
-        if (this.state.ddrag || Date.now() - (this.dspun || 0) < 2500) return;
-        const box = e.currentTarget.getBoundingClientRect ? e.currentTarget.getBoundingClientRect() : null;
-        if (!box || !box.width) return;
-        const k = Math.max(-5, Math.min(5, Math.round(((e.clientX - box.left) / box.width - 0.72) * 14)));
-        const next = wrap(this.DFRONT + k);
-        if (next !== this.state.df) this.setState({ df: next });
-      },
-      dKey: (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); this.dspun = Date.now(); this.setState({ df: wrap(df + (e.key === 'ArrowRight' ? 1 : -1)) }); }
-        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.dillTap(); }
+      ssPaused: Boolean(this.state.ssPaused),
+      ssLabel: 'Street Signal animation: the lead skater, Ann Arbor streets, blue and yellow',
+      ssToggle: () => {
+        const el = this.ssVid, paused = !this.state.ssPaused;
+        this.setState({ ssPaused: paused });
+        if (!el) return;
+        if (paused) el.pause(); else { if (!el.getAttribute('src')) this.ssPick(); el.play().catch(() => {}); }
       },
     };
   }
-  renderVals() { return Object.assign(this.srVals(), this.dillVals()); }
-  componentWillUnmount() { clearTimeout(this.dhopT); }
+  renderVals() { return Object.assign(this.srVals(), this.ssVals()); }
+  componentWillUnmount() { if (this.ssMq) this.ssMq.removeEventListener('change', this.ssPick); window.removeEventListener('scroll', this.navStick); }
   srVals() {
     const DATA = this.DATA;
     const AXES = {
@@ -201,109 +183,98 @@ export default class Board extends Component {
       <div className={"site"}>
         {" "}
         <div className={"o1"}>
-          <section className={"hero o1p"} onPointerMove={v.dLook}>
-            {" "}
+          <section className={"hero ss"} aria-label={"Street Signal, the skate game I am building"}>
             <div className={"wrap nav"}>
-              {" "}
               <a href={"/"} aria-label={"Dooane, home"}>
-                <img src={"/v2/fbe450132c9926658233b780d325d119.png"} alt={"Dooane"} />
+                <img src={"/v2/dooane-wordmark-white.png"} alt={"Dooane"} />
               </a>
-              {" "}
               <nav className={"links"} aria-label={"Main"}>
-                {" "}
-                <a href={"/work/"}>
-                  {"Work"}
-                </a>
-                {" "}
-                <a href={"/about/"}>
-                  {"About"}
-                </a>
-                {" "}
-                <a href={"#process"}>
-                  {"Process"}
-                </a>
-                {" "}
-                <a href={"/play/"}>
-                  {"Play"}
-                </a>
-                {" "}
-                <a href={"#contact"}>
-                  {"Contact"}
-                </a>
-                {" "}
+                <a href={"/work/"}>{"Work"}</a>
+                <a href={"/about/"}>{"About"}</a>
+                <a href={"#process"}>{"Process"}</a>
+                <a href={"/play/"}>{"Play"}</a>
+                <a href={"#contact"}>{"Contact"}</a>
               </nav>
-              {" "}
             </div>
-            <div className={"body"}>
-              <div className={"wrap g"}>
-                {" "}
-                <div>
-                  {" "}
-                  <p className={"k"}>
-                    {"Caleb Frank · Product design lead"}
-                  </p>
-                  {" "}
-                  <h1 className={"display"}>
-                    {"I design complex products that "}
-                    <em>
-                      {"ship."}
-                      <img src={"/v2/136d3302f7ab40e768b6bc8d20a027f7.png"} alt={""} aria-hidden={"true"} />
-                    </em>
-                  </h1>
-                  {" "}
-                  <p className={"s muted"}>
-                    {"13+ years of turning fragmented tools and ambiguous requirements into products that endure, for enterprise platforms, regulated ecosystems, and multi-brand systems."}
-                  </p>
-                  {" "}
-                  <div className={"ctas"}>
-                    <a className={"btn btn-ink"} href={"/work/"}>
-                      {"View the work "}
-                      <span aria-hidden={"true"}>
-                        {"→"}
-                      </span>
-                    </a>
-                    <a className={"btn btn-line"} href={"/#contact"}>
-                      {"Get in touch"}
-                    </a>
-                  </div>
-                  {" "}
+            <div className={"wrap ss-g"}>
+              <div className={"ss-copy"}>
+                <p className={"ss-k"}>{"In Alpha"}</p>
+                <span className={"ss-tag"}>{"Real spots. Playable lines."}</span>
+                <h1 className={"display ss-h"}>
+                  <span>{"Street"}</span>
+                  <span>{"Signal"}</span>
+                </h1>
+                <p className={"ss-s"}>{"A skate game I’m designing and building in Ann Arbor. Scan a real skate spot, then skate it."}</p>
+                <div className={"ctas"}>
+                  <a className={"btn ss-play"} href={"https://skate-spotter-teal.vercel.app"} target={"_blank"} rel={"noopener"}>
+                    {"Play the prototype "}
+                    <span aria-hidden={"true"}>{"→"}</span>
+                  </a>
+                  <a className={"btn ss-line"} href={"/work/"}>{"See the product work"}</a>
                 </div>
-                {" "}
-                <div className={"side dill"}>
-                  {" "}
-                  <p className={"dsay"} aria-live={"polite"}>
-                    {`${v.dSay}`}
-                  </p>
-                  {" "}
-                  <div className={`dstage ${v.dCls}`} role={"slider"} tabIndex={"0"} aria-label={"DOOANE the armadillo. Drag or use the arrow keys to turn him. Press Enter to make him talk."} aria-valuemin={"0"} aria-valuemax={"345"} aria-valuenow={v.dAngle} onPointerDown={v.dDown} onPointerMove={v.dMove} onPointerUp={v.dUp} onPointerLeave={v.dUp} onKeyDown={v.dKey}>
-                    {" "}
-                    {(v.dFrames || []).map((f, i0) => (
-                      <React.Fragment key={i0}>
-                        <img className={f.cls} src={f.src} alt={""} draggable={"false"} />
-                      </React.Fragment>
-                    ))}
-                    {" "}
-                  </div>
-                  {" "}
-                  <span className={"marker"}>
-                    {"Drag me. Tap me."}
-                  </span>
-                  {" "}
-                </div>
-                {" "}
+                <p className={"ss-meta"}>{"In development · Keyboard, controller or touch"}</p>
+              </div>
+              <div className={"ss-media"}>
+                <video ref={(el) => { this.ssVid = el; }} muted loop playsInline preload={"none"} aria-label={v.ssLabel}></video>
+                <button className={"ss-pause"} onClick={v.ssToggle}>
+                  {v.ssPaused ? "Play animation" : "Pause animation"}
+                </button>
               </div>
             </div>
-            {" "}
-            <div className={"wrap"} style={{"paddingBottom": "36px"}}>
-              <div className={"logos"}>
-                <img src={"/v2/98f679b1c71070b93de1d1fd7ecd6283.png"} alt={"BASF"} />
-                <img src={"/v2/2a657719827a673597dea866ed30821a.png"} alt={"New York Lottery"} />
-                <img src={"/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg"} alt={"General Motors"} />
-                <img src={"/v2/6f26237dfd79aa9807e00c01f1ec12ce.svg"} alt={"Honeywell"} />
-                <img src={"/v2/51e33b550edc54490312bb7c959e2ff7.svg"} alt={"Fujifilm"} />
-                <img src={"/v2/616f543469fefd85a1353376fc536366.svg"} alt={"Chevrolet"} />
-                <img src={"/v2/39c0c1dfb5336632ef3402b9e049234b.png"} alt={"TriHealth"} />
-                <img src={"/v2/5911379b2a03ea490842406df4572106.svg"} alt={"Optum"} />
+          </section>
+          <section className={"who o1p"} aria-label={"Who I am"}>
+            <div className={"wrap who-g"}>
+              <div>
+                <p className={"k"}>{"Caleb Frank · Product design lead"}</p>
+                <h2 className={"display"}>
+                  {"I design complex products that "}
+                  <em>
+                    {"ship."}
+                    <img src={"/v2/drip-red.png"} alt={""} aria-hidden={"true"} />
+                  </em>
+                </h2>
+              </div>
+              <div>
+                <p className={"s muted"}>{"13+ years of turning fragmented tools and ambiguous requirements into products that endure, for enterprise platforms, regulated ecosystems, and multi-brand systems."}</p>
+                <div className={"ctas"}>
+                  <a className={"btn btn-ink"} href={"/work/"}>
+                    {"View the work "}
+                    <span aria-hidden={"true"}>{"→"}</span>
+                  </a>
+                  <a className={"btn btn-line"} href={"/#contact"}>{"Get in touch"}</a>
+                </div>
+              </div>
+            </div>
+            <div className={"marquee"} role={"region"} aria-label={"Clients I have designed for"}>
+              <div className={"marquee-track"}>
+                <div className={"marquee-set"}>
+                  <img src={"/v2/98f679b1c71070b93de1d1fd7ecd6283.png"} alt={"BASF"} />
+                  <img className={"sq"} src={"/v2/2a657719827a673597dea866ed30821a.png"} alt={"New York Lottery"} />
+                  <img className={"sq"} src={"/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg"} alt={"General Motors"} />
+                  <img className={"sq"} src={"/v2/616f543469fefd85a1353376fc536366.svg"} alt={"Chevrolet"} />
+                  <img className={"sq"} src={"/v2/680560a9d6e6bf1136d09c4827a90eb8.svg"} alt={"Cadillac"} />
+                  <img src={"/v2/6f26237dfd79aa9807e00c01f1ec12ce.svg"} alt={"Honeywell"} />
+                  <img src={"/v2/51e33b550edc54490312bb7c959e2ff7.svg"} alt={"Fujifilm"} />
+                  <img src={"/v2/a17a691730ee02181178232cceb44c6b.svg"} alt={"AstraZeneca"} />
+                  <img src={"/v2/5911379b2a03ea490842406df4572106.svg"} alt={"Optum"} />
+                  <img src={"/v2/39c0c1dfb5336632ef3402b9e049234b.png"} alt={"TriHealth"} />
+                  <img src={"/v2/104aece41c14cd28c2d7fa00fc12636d.png"} alt={"Hancock Health"} />
+                  <img src={"/v2/2c0d05d19116480682f892cc48d5d788.png"} alt={"Gleaners Food Bank"} />
+                </div>
+                <div className={"marquee-set"} aria-hidden={"true"}>
+                  <img src={"/v2/98f679b1c71070b93de1d1fd7ecd6283.png"} alt={""} />
+                  <img className={"sq"} src={"/v2/2a657719827a673597dea866ed30821a.png"} alt={""} />
+                  <img className={"sq"} src={"/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg"} alt={""} />
+                  <img className={"sq"} src={"/v2/616f543469fefd85a1353376fc536366.svg"} alt={""} />
+                  <img className={"sq"} src={"/v2/680560a9d6e6bf1136d09c4827a90eb8.svg"} alt={""} />
+                  <img src={"/v2/6f26237dfd79aa9807e00c01f1ec12ce.svg"} alt={""} />
+                  <img src={"/v2/51e33b550edc54490312bb7c959e2ff7.svg"} alt={""} />
+                  <img src={"/v2/a17a691730ee02181178232cceb44c6b.svg"} alt={""} />
+                  <img src={"/v2/5911379b2a03ea490842406df4572106.svg"} alt={""} />
+                  <img src={"/v2/39c0c1dfb5336632ef3402b9e049234b.png"} alt={""} />
+                  <img src={"/v2/104aece41c14cd28c2d7fa00fc12636d.png"} alt={""} />
+                  <img src={"/v2/2c0d05d19116480682f892cc48d5d788.png"} alt={""} />
+                </div>
               </div>
             </div>
           </section>
