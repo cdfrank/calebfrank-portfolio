@@ -168,11 +168,11 @@ a{color:inherit;text-decoration:none}
 .rjlogo .logo{max-height:32px}
 .rjlogo .ltext{font-size:14px;font-weight:600;color:var(--quiet)}
 .rempty{padding:32px 0;color:var(--quiet)}
-/* With a mouse, the thumbnail hides and opens as a larger card beside the cursor while its row is hovered or focused. */
+/* With a mouse, the thumbnail hides and opens as a larger card above (or below) its row while the row is hovered or focused. */
 @media (min-width:861px) and (hover:hover) and (pointer:fine){
 .rjob{position:relative;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr) 104px}
 .rbyyear .rjob{grid-template-columns:112px minmax(0,.9fr) minmax(0,1.25fr) 104px}
-.rthumb{position:absolute;z-index:5;left:var(--tx,calc(100% - 468px));top:var(--ty,50%);width:340px;pointer-events:none;opacity:0;visibility:hidden;translate:0 -50%;scale:.9;rotate:-1.5deg;box-shadow:6px 6px 0 #FF2B2B;transition:opacity .15s,scale .22s cubic-bezier(.3,.7,.2,1),visibility .15s}
+.rthumb{position:absolute;z-index:5;left:var(--tx,calc(100% - 468px));top:var(--ty,-226px);width:340px;pointer-events:none;opacity:0;visibility:hidden;scale:.9;rotate:-1.5deg;box-shadow:6px 6px 0 #FF2B2B;transition:opacity .15s,scale .22s cubic-bezier(.3,.7,.2,1),visibility .15s}
 .rjob:hover .rthumb,.rjob:focus-within .rthumb{opacity:1;visibility:visible;scale:1;outline:0}
 }
 @media (min-width:861px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:reduce){.rthumb{transition:none;scale:1}}

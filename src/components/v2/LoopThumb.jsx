@@ -44,24 +44,29 @@ export default function LoopThumb({ slug }) {
       if (reduce) return;
       const host = box.closest('li') || box;
       if (canHover) {
-        const on = () => play(svg), off = () => rest(svg);
-        // The card follows the cursor, flipping to its left near the row's right edge.
-        const move = (e) => {
-          const r = host.getBoundingClientRect(), w = box.offsetWidth, x = e.clientX - r.left;
-          box.style.setProperty('--tx', (x + 28 + w > r.width ? x - w - 28 : x + 28) + 'px');
-          box.style.setProperty('--ty', e.clientY - r.top + 'px');
+        const off = () => rest(svg);
+        // The card sits above its row (below it when there's no room under the nav) and slides
+        // sideways with the cursor, so it never covers the row's own text.
+        const place = (cx) => {
+          const r = host.getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
+          const x = cx == null ? r.width - w - 128 : cx - r.left - w / 2;
+          box.style.setProperty('--tx', Math.max(0, Math.min(r.width - w, x)) + 'px');
+          box.style.setProperty('--ty', (r.top - h - 16 > 96 ? -h - 14 : r.height + 14) + 'px');
         };
+        const on = (e) => { place(e && e.clientX); play(svg); };
+        const move = (e) => place(e.clientX);
+        const focus = () => on();
         const leave = () => { off(); box.style.removeProperty('--tx'); box.style.removeProperty('--ty'); };
         host.addEventListener('mouseenter', on);
         host.addEventListener('mousemove', move);
         host.addEventListener('mouseleave', leave);
-        host.addEventListener('focusin', on);
+        host.addEventListener('focusin', focus);
         host.addEventListener('focusout', off);
         cleanups.push(() => {
           host.removeEventListener('mouseenter', on);
           host.removeEventListener('mousemove', move);
           host.removeEventListener('mouseleave', leave);
-          host.removeEventListener('focusin', on);
+          host.removeEventListener('focusin', focus);
           host.removeEventListener('focusout', off);
         });
       } else {
