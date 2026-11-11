@@ -50,9 +50,27 @@ const loop = !d.cover && existsSync(loopFile) ? readFileSync(loopFile, 'utf8') :
       <Image src={d.cover} alt={d.coverAlt ?? ''} widths={[800, 1400, 2000]} sizes="100vw" loading="eager" />
     </div>
   )}
-  {loop && <div class="case-cover case-loop" set:html={loop} />}
+  {loop && <div class="case-cover case-loop" data-c3d={entry.id} set:html={loop} />}
   <article class="prose">
     <Content />
     {next.id !== entry.id && <p class="case-next"><a href={`/work/${next.id}/`}>Next: {next.data.client}</a></p>}
   </article>
 </Base>
+
+<script>
+  // Case studies with a 3D scene: swap the coded loop for the WebGL stage. The loop stays as the
+  // fallback for reduced motion, no WebGL, or any failure while loading.
+  const host = document.querySelector<HTMLElement>('[data-c3d]');
+  if (host && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    import('../../components/v2/case3d/index.js').then(({ createPlayer, webglOK, scenes }) => {
+      const slug = host.dataset.c3d || '';
+      if (!webglOK() || !scenes[slug]) return;
+      const stage = document.createElement('div');
+      try {
+        host.appendChild(stage);
+        createPlayer(stage, scenes).load(slug);
+        host.querySelector('svg.hl')?.remove();
+      } catch (e) { stage.remove(); }
+    }).catch(() => {});
+  }
+</script>
