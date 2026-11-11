@@ -24,6 +24,7 @@ Open http://localhost:4321.
 | Hold a project for review | Add `approved: false`; it shows in `npm run dev` only, and every build leaves out its text, images, and private notes |
 | Refresh the resume PDF | `npm run resume:pdf`, after any change to `career.yaml` |
 | Add a client logo or reorder clients | Put the logo in `public/logos/`, then edit `src/data/clients.yaml` |
+| Add or replace a project's hover loop | Drop `public/loops/<project id>.svg` (the id is the Markdown file name). Rows on /work/ pick it up at build time |
 
 Images go in `src/assets/work/<project>/`. New projects start with `draft: true` and stay hidden until you remove that line.
 

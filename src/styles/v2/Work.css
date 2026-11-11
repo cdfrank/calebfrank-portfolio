@@ -141,7 +141,10 @@ a{color:inherit;text-decoration:none}
 .rbrands{display:none;align-items:center;gap:16px;height:26px;margin-top:10px}
 .rbrands.on{display:flex}
 .rbrands .logo{max-height:22px;max-width:60px}
-.rjob{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr) 104px;gap:3px 24px;padding:9px 0;border-top:1px solid #262626;align-items:baseline}
+.rjob{display:grid;grid-template-columns:112px minmax(0,.95fr) minmax(0,1.25fr) 104px;gap:3px 24px;padding:12px 0;border-top:1px solid #262626;align-items:baseline}
+.rthumb{display:block;align-self:start;width:112px;aspect-ratio:16/10;border-radius:6px;overflow:hidden;background:#1A1A1A}
+.rthumb .hl{border-radius:6px}
+.rjob:hover .rthumb,.rjob:focus-within .rthumb{outline:2px solid #FF2B2B;outline-offset:2px}
 .rwork li:first-child{border-top:0;padding-top:0}
 .rjob h4{margin:0;font:700 17px/1.25 Inter,sans-serif;letter-spacing:-.012em;color:var(--ink)}
 .rjob h4 a{color:inherit;text-decoration:underline;text-decoration-color:#FF2B2B;text-underline-offset:.2em}
@@ -160,14 +163,14 @@ a{color:inherit;text-decoration:none}
 .rmore{display:none;margin-top:8px;padding:6px 0;background:none;border:0;color:var(--ink);font:700 15px Inter,sans-serif;text-decoration:underline;text-underline-offset:.25em;cursor:pointer}
 .rmore.on{display:inline-block}
 .rbyyear.on{border-top:1px solid var(--line)}
-.rbyyear .rjob{grid-template-columns:112px minmax(0,.9fr) minmax(0,1.25fr) 104px;align-items:center}
+.rbyyear .rjob{grid-template-columns:112px 112px minmax(0,.9fr) minmax(0,1.25fr) 104px;align-items:center}
 .rjlogo{display:flex;align-items:center;height:40px;max-width:96px}
 .rjlogo .logo{max-height:32px}
 .rjlogo .ltext{font-size:14px;font-weight:600;color:var(--quiet)}
 .rempty{padding:32px 0;color:var(--quiet)}
 @media (max-width:860px){
-.rjob{grid-template-columns:minmax(0,1fr) 96px}.rsum{grid-column:1;grid-row:2}.rside{grid-column:2;grid-row:1/span 2}
-.rbyyear .rjob{grid-template-columns:112px minmax(0,1fr) 96px}.rbyyear .rjlogo{grid-row:1/span 2}.rbyyear .rsum{grid-column:2}.rbyyear .rside{grid-column:3}
+.rjob,.rbyyear .rjob{grid-template-columns:96px minmax(0,1fr);gap:4px 14px;align-items:start}.rthumb{width:96px;grid-column:1;grid-row:1/span 3}.rmain{grid-column:2;grid-row:1}.rsum{grid-column:2;grid-row:2}.rside{grid-column:2;grid-row:3;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
+.rbyyear .rjlogo{display:none}
 .rclient{grid-template-columns:minmax(0,1fr)}
 .rhead{position:static;display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 16px;align-items:center}
 .rmark{grid-row:1/span 3;width:96px;height:54px;margin:0}.rmark .logo{max-height:46px}.rbrands{grid-column:2;margin-top:6px}

@@ -1,5 +1,6 @@
 // Generated from the Claude Design board Work-j593.dc.html. The logic class is the board's own code.
 import React from 'react';
+import LoopThumb from './LoopThumb.jsx';
 
 class DCLogic extends React.Component {
   constructor(props) { super(props); this.state = {}; }
@@ -130,7 +131,7 @@ class Component extends DCLogic {
       const w = W[n], g = R.G[w.g];
       return { t: w.t, s: w.s, y: w.y, note: compact ? g.name : note, href: w.href || '#rec', link: w.href ? 'on' : '', cls: 'rjob' + (w.nda ? ' nda' : ''),
         cs: w.cs ? 'on' : '', aw: w.aw ? 'on' : '', nda: w.nda ? 'on' : '',
-        lsrc: g.logo ? g.logo.src : '', lcls: g.logo ? (g.logo.w ? 'logo white' : 'logo') : 'none', lname: g.name };
+        lsrc: g.logo ? g.logo.src : '', lcls: g.logo ? (g.logo.w ? 'logo white' : 'logo') : 'none', lname: g.name, loop: w.loop || '' };
     };
     const groups = R.G.map((g) => {
       const rows = g.items.map((it) => { const k = it.indexOf('|'); return { n: +it.slice(0, k), note: it.slice(k + 1) }; }).filter((r) => hit[r.n]);
@@ -412,6 +413,8 @@ export default class Board extends Component {
                         <React.Fragment key={i10}>
                           <li className={j.cls}>
                             {" "}
+                            <LoopThumb slug={j.loop} />
+                            {" "}
                             <div className={"rmain"}>
                               <h4>
                                 {j.link ? (
@@ -472,6 +475,8 @@ export default class Board extends Component {
             {(v.ryear || []).map((j, i11) => (
               <React.Fragment key={i11}>
                 <li className={j.cls}>
+                  {" "}
+                  <LoopThumb slug={j.loop} />
                   {" "}
                   <span className={"rjlogo"}>
                     <img className={j.lcls} src={j.lsrc} alt={""} />
