@@ -1,4 +1,9 @@
 import { capabilitiesOf, capabilityMap, groupByClient, logoClass, whereOf, years, type Work } from './data';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+// Hover loop files live in public/loops/<project id>.svg. A row gets one only if its file exists.
+const loopOf = (id: string) => (existsSync(join(process.cwd(), 'public', 'loops', `${id}.svg`)) ? id : '');
 
 // The client record on /work/: approved work only, grouped like the archive. NDA rows keep only the client name.
 export function clientRecord(all: Work[]) {
@@ -33,6 +38,7 @@ export function clientRecord(all: Work[]) {
     const g = groups[groupIndex.get(w.id)!];
     return {
       t: nda ? 'Under NDA' : d.title,
+      loop: loopOf(w.id),
       s: nda ? '' : d.summary ?? '',
       y: years(w),
       st: String(d.start),
