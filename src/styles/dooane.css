@@ -1,12 +1,12 @@
-.dooane-widget{--d-ink:#111;--d-paper:#f4f1ec;--d-red:#ff2b2b;position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:1;pointer-events:none;color:var(--d-paper);font:14px/1.5 Inter,system-ui,sans-serif;color-scheme:dark}
+.dooane-widget{--d-ink:#111;--d-paper:#f4f1ec;--d-red:#ff2b2b;position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:30;pointer-events:none;color:var(--d-paper);font:14px/1.5 Inter,system-ui,sans-serif;color-scheme:dark}
 .dooane-widget:has(.dooane-panel){z-index:30}
-.dooane-panel,.dooane-launcher-label{pointer-events:auto}
+.dooane-panel,.dooane-launcher{pointer-events:auto}
 .dooane-widget *{box-sizing:border-box}
 .dooane-widget button,.dooane-widget input{font:inherit}
 .dooane-widget button{cursor:pointer}
 .dooane-widget button:disabled{cursor:default;opacity:.48}
 .dooane-widget :focus-visible{outline:3px solid var(--d-red);outline-offset:4px}
-.dooane-sprite{display:block;flex:none;width:96px;height:104px;background:url('/dooane/sprites.webp') var(--sprite-x,0) var(--sprite-y,0)/768px 1144px no-repeat;pointer-events:none;transform:scaleX(-1)}
+.dooane-sprite{display:block;flex:none;width:96px;height:104px;background:url('/dooane/sprites.webp') 0 0/768px 1144px no-repeat;animation:dooane-loop 1.44s steps(6) infinite;pointer-events:none;transform:scaleX(-1)}
 .dooane-sprite-small{transform:scale(-.62,.62);transform-origin:center;width:96px;margin:-20px -19px}
 .dooane-launcher{display:flex;align-items:flex-end;gap:4px;border:0;background:transparent;color:var(--d-paper);padding:0 0 2px 6px;margin-left:auto;min-height:104px;text-align:left}
 .dooane-launcher-label{display:flex;align-items:center;gap:14px;background:var(--d-ink);border:1px solid #6b655e;border-radius:10px 10px 0 10px;padding:11px 14px;margin-bottom:17px;font:700 11px/1.2 'JetBrains Mono',monospace;letter-spacing:.06em;box-shadow:3px 3px 0 var(--d-red)}
@@ -50,3 +50,11 @@
 .site .nav{position:relative;z-index:40}
 .rec .rtools{z-index:40}
 .rec .rclear{position:relative;z-index:40}
+
+/* Discrete sprite frames stay on one browser clock, independent of React renders. */
+.dooane-sprite-waiting{background-position-y:-624px;animation-duration:1.14s}
+.dooane-sprite-thinking{background-position-y:-728px;animation-duration:.9s}
+.dooane-sprite-waving{background-position-y:-312px;animation:dooane-wave .68s steps(4) 1}
+@keyframes dooane-loop{from{background-position-x:0}to{background-position-x:-576px}}
+@keyframes dooane-wave{from{background-position-x:0}to{background-position-x:-384px}}
+@media(prefers-reduced-motion:reduce){.dooane-sprite{animation:none;background-position-x:0}}

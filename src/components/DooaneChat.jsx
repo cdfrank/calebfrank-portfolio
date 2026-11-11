@@ -2,25 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { answerQuestion, greeting, suggestions } from '../lib/dooane.mjs';
 import '../styles/dooane.css';
 
-const states = { idle: [0, 6, 240], waving: [3, 4, 170], waiting: [6, 6, 190], thinking: [7, 6, 150] };
-
-function Mascot({ state = 'idle', small = false }) {
-  const [frame, setFrame] = useState(0);
-  const [row, count, delay] = states[state];
-  useEffect(() => {
-    setFrame(0);
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let timer;
-    const update = () => {
-      clearInterval(timer);
-      setFrame(0);
-      if (!motion.matches) timer = setInterval(() => setFrame((f) => (f + 1) % count), delay);
-    };
-    update();
-    motion.addEventListener('change', update);
-    return () => { clearInterval(timer); motion.removeEventListener('change', update); };
-  }, [count, delay, state]);
-  return <span className={`dooane-sprite${small ? ' dooane-sprite-small' : ''}`} aria-hidden="true" style={{ '--sprite-x': `${-frame * 96}px`, '--sprite-y': `${-row * 104}px` }} />;
+function Mascot({ state = 'idle', small = false, onWaveEnd }) {
+  return <span className={`dooane-sprite dooane-sprite-${state}${small ? ' dooane-sprite-small' : ''}`} aria-hidden="true" onAnimationEnd={state === 'waving' ? onWaveEnd : undefined} />;
 }
 
 function Arrow() { return <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m5 12 14 0m-6-6 6 6-6 6" /></svg>; }
@@ -45,15 +28,16 @@ export default function DooaneChat({ portfolio }) {
     if (box) box.scrollTop = box.scrollHeight;
   }, [messages, busy, open]);
 
-  function close() { setOpen(false); requestAnimationFrame(() => launcher.current?.focus()); }
+  function close() { setHover(false); setOpen(false); requestAnimationFrame(() => launcher.current?.focus()); }
   function ask(value) {
     const question = value.trim().slice(0, 400);
-    if (!question || busy) return;
+    if (!question || pending.current !== null) return;
     setMessages((history) => [...history.slice(-27), { role: 'user', text: question, links: [] }]);
     setDraft('');
     setBusy(true);
     // Brief animation gives the visitor visible feedback; replies are local and prepared.
     pending.current = setTimeout(() => {
+      pending.current = null;
       setMessages((history) => [...history, { role: 'assistant', ...answerQuestion(question, portfolio) }]);
       setBusy(false);
       input.current?.focus();
@@ -83,9 +67,9 @@ export default function DooaneChat({ portfolio }) {
       </form>
       <p className="dooane-note">A guided tour, powered by the published portfolio.</p>
     </section>}
-    <button className={`dooane-launcher${open ? ' dooane-launcher-open' : ''}`} ref={launcher} aria-label={open ? 'Close DOOANE portfolio guide' : 'Ask DOOANE about Caleb’s portfolio'} aria-expanded={open} aria-controls={open ? 'dooane-chat' : undefined} onClick={() => open ? close() : setOpen(true)} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+    <button className={`dooane-launcher${open ? ' dooane-launcher-open' : ''}`} ref={launcher} aria-label={open ? 'Close DOOANE portfolio guide' : 'Ask DOOANE about Caleb’s portfolio'} aria-expanded={open} aria-controls={open ? 'dooane-chat' : undefined} onClick={() => { setHover(false); open ? close() : setOpen(true); }} onPointerEnter={(event) => { if (event.pointerType !== 'touch' && !open) setHover(true); }}>
       <span className="dooane-launcher-label">{open ? 'CLOSE CHAT' : 'ASK DOOANE'}<span aria-hidden="true">{open ? '×' : '↗'}</span></span>
-      <Mascot state={open ? 'waiting' : hover ? 'waving' : 'idle'} />
+      <Mascot state={open ? 'waiting' : hover ? 'waving' : 'idle'} onWaveEnd={() => setHover(false)} />
     </button>
   </aside>;
 }

@@ -3,6 +3,8 @@ import '../styles/global.css';
 import { site } from '../lib/data';
 import Dooane from '../components/Dooane.astro';
 
+import '../styles/mobile.css';
+
 interface Props { title?: string; description?: string; }
 const { title, description = site.intro } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.title}`;

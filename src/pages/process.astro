@@ -1,0 +1,9 @@
+---
+import V2 from '../layouts/V2.astro';
+import Process from '../components/v2/Process.jsx';
+import { career } from '../lib/data';
+import '../styles/v2/Process.css';
+---
+<V2 title="Process" description="One four-step loop, and the many roles I play inside it: product manager, researcher, facilitator, product design lead, conversation designer, systems designer, art director, builder, and teacher.">
+  <Process skills={career.skills} />
+</V2>

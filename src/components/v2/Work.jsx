@@ -237,7 +237,7 @@ export default class Board extends Component {
               {"About"}
             </a>
             {" "}
-            <a href={"/#process"}>
+            <a href={"/process/"}>
               {"Process"}
             </a>
             {" "}

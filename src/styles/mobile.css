@@ -1,0 +1,86 @@
+/* Shared phone layout: a steady menu height keeps scrolling and anchors predictable. */
+@media (max-width: 860px) {
+  html body .site .wrap.nav {
+    position: fixed !important;
+    inset: 0 0 auto !important;
+    z-index: 60 !important;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: max(8px, env(safe-area-inset-top)) 16px 8px !important;
+    background: var(--bar-c, #111) !important;
+    color: var(--nav-c, #f4f1ec);
+    box-shadow: 0 1px 0 #ffffff20 !important;
+    clip-path: none !important;
+    border: 0 !important;
+    transform: none;
+    gap: 4px 12px;
+    transition: none;
+  }
+  html body .site .wrap.nav:has(.links) { min-height: 104px; }
+  html body .site .wrap.nav:not(:has(.links)) { height: 68px; }
+  html body .site .wrap.nav:not(:has(.links)) img { height: 40px !important; }
+  html body .site .wrap.nav:has(.links) > a { display: block !important; }
+  html body .site .wrap.nav:has(.links) img { height: 32px !important; width: auto; }
+  html body .site .wrap.nav .links {
+    display: flex;
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    min-width: 0;
+    margin: 0;
+    padding: 2px;
+    box-sizing: border-box;
+  }
+  html body .site .wrap.nav .links a {
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
+  html body .site .ss { --navh: 104px; padding-top: 104px; }
+  .site .ss > .ss-g { padding-top: 24px; }
+  .site [id] { scroll-margin-top: 120px; }
+  .site .wrap { padding-inline: 20px; }
+  .site .intro { padding-top: 28px; padding-bottom: 104px; gap: 40px; }
+  .site .top { padding-top: 28px; padding-bottom: 48px; gap: 32px; }
+  .site > .head { padding-top: 28px; padding-bottom: 28px; }
+  .site .section { padding-top: 48px; padding-bottom: 48px; }
+  .site .hero { padding-top: 24px; padding-bottom: 104px; gap: 40px; }
+  .site .block { padding-block: 48px; gap: 28px; }
+  .site .grid { padding-bottom: 48px; }
+  .site .ss-media { box-sizing: border-box; }
+  .site .loop { box-sizing: border-box; }
+  .site .fw-scroll { box-sizing: border-box; max-width: 100%; }
+  .site .foot { padding-bottom: 104px; }
+}
+@media (max-width: 520px) {
+  html body .site .wrap.nav .links a { padding-inline: 6px; font-size: 12px; }
+  .site .wrap { padding-inline: 16px; }
+  .site .intro h1 { font-size: clamp(54px, 16vw, 68px); }
+  .site .top h1 { font-size: clamp(88px, 26vw, 110px); }
+  .site .feat h2 { font-size: clamp(42px, 12vw, 62px); }
+  .site .feat .txt { padding: 20px; }
+  .site .item { min-height: 0; padding: 20px; gap: 12px; }
+  .site .item p { margin-block: 0; }
+  .site .item .yr { margin-top: 8px; }
+  .site .pic { margin-bottom: 16px; }
+  .site .ph .t { left: 0; font-size: 18px; }
+  .site .rec .rjob { grid-template-columns: minmax(0, 1fr); gap: 6px; padding-block: 16px; }
+  .site .rec .rsum { grid-column: 1; grid-row: auto; }
+  .site .rec .rside { grid-column: 1; grid-row: auto; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+  .site .rec .rbyyear .rjob { grid-template-columns: 64px minmax(0, 1fr); gap: 6px 12px; }
+  .site .rec .rbyyear .rjlogo { grid-row: 1 / span 3; }
+  .site .rec .rbyyear .rsum, .site .rec .rbyyear .rside { grid-column: 2; grid-row: auto; }
+  .site .rec .rstatus { flex-wrap: wrap; gap: 6px; }
+  .site .slip { position: static; box-sizing: border-box; gap: 4px; padding: 8px; margin-bottom: 24px; }
+  .site .slip .sk { flex: 1 1 100%; }
+  .site .slip a { width: 40px; height: 44px; }
+  .dooane-widget .dooane-launcher { min-height: 76px; }
+  .dooane-widget .dooane-launcher > .dooane-sprite { transform: scale(-.72,.72); transform-origin: center bottom; margin-left: -13px; margin-right: -13px; margin-top: -29px; }
+  .dooane-widget .dooane-launcher-label { padding: 10px; gap: 8px; margin-bottom: 10px; font-size: 9px; }
+  .dooane-widget .dooane-panel { bottom: 90px; height: min(580px, calc(100dvh - 116px)); }
+  .site-head > .wrap { flex-wrap: wrap; gap: 4px 12px; padding-block: 8px; }
+  .site-head .site-nav { flex-wrap: wrap; gap: 8px 14px; }
+  .site-head .site-nav a { display: inline-flex; align-items: center; min-height: 44px; }
+}

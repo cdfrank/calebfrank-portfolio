@@ -191,7 +191,7 @@ export default class Board extends Component {
               <nav className={"links"} aria-label={"Main"}>
                 <a href={"/work/"}>{"Work"}</a>
                 <a href={"/about/"}>{"About"}</a>
-                <a href={"#process"}>{"Process"}</a>
+                <a href={"/process/"}>{"Process"}</a>
                 <a href={"/play/"}>{"Play"}</a>
                 <a href={"#contact"}>{"Contact"}</a>
               </nav>
@@ -660,6 +660,10 @@ export default class Board extends Component {
             <h2 className={"display"}>
               {"Process"}
             </h2>
+            <a className={"btn btn-line"} href={"/process/"}>
+              {"How I work, in depth "}
+              <span aria-hidden={"true"}>{"→"}</span>
+            </a>
           </div>
           {" "}
           <div className={"steps"}>

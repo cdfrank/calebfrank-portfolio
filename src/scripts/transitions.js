@@ -3,15 +3,16 @@
 // First visit to each item per session gets the DOOANE antics; repeats get a quick fade.
 const d = document.documentElement;
 const OUT = { about: 320, work: 380, process: 320, play: 420, contact: 300 };
-const IN = { about: 1250, work: 900, process: 860, play: 980, contact: 840 };
+const HOLD = 2200; // matches --hold in transitions.css: the pause after DOOANE's antics
+const IN = { about: 1250 + HOLD, work: 900 + HOLD, process: 860 + HOLD, play: 980 + HOLD, contact: 840 + HOLD };
 const ART = { about: '/dooane/spray-can.webp', work: '/dooane/pointing.webp', process: '/dooane/crouch.png', play: '/dooane/skating.png', contact: '/dooane/cap-tip.png' };
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 let timer = 0;
 
 function kind(url) {
   if (url.origin !== location.origin) return null;
-  if (url.pathname === '/' && (url.hash === '#process' || url.hash === '#contact')) return url.hash.slice(1);
-  const m = url.pathname.match(/^\/(about|work|play)\/?$/);
+  if (url.pathname === '/' && url.hash === '#contact') return 'contact';
+  const m = url.pathname.match(/^\/(about|work|process|play)\/?$/);
   return m ? m[1] : null;
 }
 
