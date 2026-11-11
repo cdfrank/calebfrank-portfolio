@@ -33,6 +33,16 @@ class Component extends DCLogic {
     this.navStick = () => { if (nav) nav.classList.toggle('stuck', window.scrollY > 8); };
     window.addEventListener('scroll', this.navStick, { passive: true });
     this.navStick();
+    // The board was laid out for a stage about 1650 x 1000; scale the 3D world down so it all fits the section.
+    // Set on <html> so React-owned markup is never touched.
+    this.srFit = () => {
+      const el = document.getElementById('numbers');
+      if (!el) return;
+      const f = Math.min(1, el.clientWidth / 1650, el.clientHeight / 1000);
+      document.documentElement.style.setProperty('--sr-fit', Math.max(0.45, f).toFixed(3));
+    };
+    window.addEventListener('resize', this.srFit);
+    this.srFit();
   }
   ssVals() {
     return {
@@ -57,7 +67,7 @@ class Component extends DCLogic {
     el.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
     el.dataset.state = still ? 'rest' : 'play';
   }
-  componentWillUnmount() { if (this.ssMq) this.ssMq.removeEventListener('change', this.ssPick); window.removeEventListener('scroll', this.navStick); }
+  componentWillUnmount() { if (this.ssMq) this.ssMq.removeEventListener('change', this.ssPick); window.removeEventListener('scroll', this.navStick); window.removeEventListener('resize', this.srFit); }
   srVals() {
     const DATA = this.DATA;
     const AXES = {

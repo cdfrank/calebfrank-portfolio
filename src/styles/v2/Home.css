@@ -389,3 +389,12 @@ a{color:inherit;text-decoration:none}
 .sr .pv .lp{inset:0}
 .sr .pv .lp .hl{width:100%;height:100%;border-radius:0}
 .sr .pv.loop .mk,.sr .pv.loop .shot,.sr .pv.loop .logo,.sr .pv.loop .lt{display:none !important}
+/* Fit the board to the viewport on desktop: the section is one screen tall and the 3D world scales to it (--sr-fit from Home.jsx). */
+@media (min-width:1001px){
+.sr{height:clamp(560px,100svh,900px)}
+.sr .scaler{scale:var(--sr-fit,1)}
+.sr .sr-title h2{font-size:clamp(44px,min(5.6vw,9svh),84px)}
+.sr .sr-title{top:96px}
+.sr .sr-card{top:112px;width:min(300px,calc(100% - 32px))}
+.sr .rider{bottom:clamp(96px,15svh,132px);width:clamp(80px,13svh,120px)}
+}
