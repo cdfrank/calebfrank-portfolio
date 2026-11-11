@@ -1,5 +1,6 @@
 // Generated from the Claude Design board Main-egx9.dc.html. The logic class is the board's own code.
 import React from 'react';
+import { LOOPS } from '../../data/hover-loops.js';
 
 class DCLogic extends React.Component {
   constructor(props) { super(props); this.state = {}; }
@@ -46,6 +47,16 @@ class Component extends DCLogic {
     };
   }
   renderVals() { return Object.assign(this.srVals(), this.ssVals()); }
+  // Coded preview loops: play the picked project's loop from the top, or hold its poster frame for reduced motion.
+  componentDidUpdate() {
+    const el = document.querySelector('.sr .pv .lp svg.hl');
+    if (!el || el.dataset.state || !el.getAnimations) return;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const t = parseFloat(el.dataset.poster || 5) * 1000;
+    el.classList.add('hl-js');
+    el.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
+    el.dataset.state = still ? 'rest' : 'play';
+  }
   componentWillUnmount() { if (this.ssMq) this.ssMq.removeEventListener('change', this.ssPick); window.removeEventListener('scroll', this.navStick); }
   srVals() {
     const DATA = this.DATA;
@@ -114,19 +125,20 @@ class Component extends DCLogic {
     else cam = 'scale(' + (cur.y ? 0.68 : cur.x === 'year' ? 0.82 : 1) + ') rotateX(' + (58 + pitch) + 'deg) rotateZ(' + (-22 + yaw) + 'deg) translate3d(0,0,-30px)';
     const picked = sel === null ? null : DATA[sel];
     const pvOf = (d, n) => {
-      const nda = d[4] === 3, own = d[6] === 'Self-initiated', sh = this.SHOT[d[5]];
+      const nda = d[4] === 3, own = d[6] === 'Self-initiated', sh = this.SHOT[d[5]], lp = nda ? '' : LOOPS[d[5]] || '';
       const lg = own ? '/v2/e295297c792a99090470f555e3216f0a.png' : this.LOGO[d[6]];
       const w = (k) => (40 + Math.round(rnd(n, k) * 50)) + '%';
       return {
-        cls: ['on', 'k' + d[3], nda ? 'nda' : sh ? 'shot' : '', own ? 'own' : '', lg ? '' : 'nologo'].join(' '),
+        cls: ['on', 'k' + d[3], nda ? 'nda' : sh ? 'shot' : '', own ? 'own' : '', lg ? '' : 'nologo', lp ? 'loop' : ''].join(' '),
+        loop: lp,
         ac: 'oklch(' + (0.34 + d[0] * 0.05).toFixed(3) + ' 0.008 80)',
         shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
         t: nda ? '' : d[5], client: nda ? '' : d[6], cmd: nda ? '' : '> ' + d[5].toLowerCase() + '_',
         w1: w(11), w2: w(12), w3: w(13),
-        cap: nda ? 'Under NDA' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
+        cap: nda ? 'Under NDA' : lp ? 'Concept loop' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
       };
     };
-    const pv = picked ? pvOf(picked, sel) : { cls: '', ac: 'transparent', shot: '/dooane/pointing.webp', logo: '/dooane/pointing.webp', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '' };
+    const pv = picked ? pvOf(picked, sel) : { cls: '', ac: 'transparent', shot: '/dooane/pointing.webp', logo: '/dooane/pointing.webp', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '', loop: '' };
     const types = ['', 'case', 'lab', 'nda'];
     const blocks = DATA.map((d, n) => ({
       cls: ['y' + d[0], 'd' + (n % 8), types[d[4]], sel === n ? 'sel' : ''].join(' '),
@@ -404,6 +416,7 @@ export default class Board extends Component {
               <div className={"cap"}>
                 {`${v.pv.cap}`}
               </div>
+              {v.pv.loop ? <div className={"lp"} key={v.pv.t} dangerouslySetInnerHTML={{ __html: v.pv.loop }} /> : null}
               {" "}
             </div>
             {" "}

@@ -45,13 +45,22 @@ export default function LoopThumb({ slug }) {
       const host = box.closest('li') || box;
       if (canHover) {
         const on = () => play(svg), off = () => rest(svg);
+        // The card follows the cursor, flipping to its left near the row's right edge.
+        const move = (e) => {
+          const r = host.getBoundingClientRect(), w = box.offsetWidth, x = e.clientX - r.left;
+          box.style.setProperty('--tx', (x + 28 + w > r.width ? x - w - 28 : x + 28) + 'px');
+          box.style.setProperty('--ty', e.clientY - r.top + 'px');
+        };
+        const leave = () => { off(); box.style.removeProperty('--tx'); box.style.removeProperty('--ty'); };
         host.addEventListener('mouseenter', on);
-        host.addEventListener('mouseleave', off);
+        host.addEventListener('mousemove', move);
+        host.addEventListener('mouseleave', leave);
         host.addEventListener('focusin', on);
         host.addEventListener('focusout', off);
         cleanups.push(() => {
           host.removeEventListener('mouseenter', on);
-          host.removeEventListener('mouseleave', off);
+          host.removeEventListener('mousemove', move);
+          host.removeEventListener('mouseleave', leave);
           host.removeEventListener('focusin', on);
           host.removeEventListener('focusout', off);
         });
