@@ -170,7 +170,7 @@ class Component extends DCLogic {
         loop: lp,
         ac: 'oklch(' + (0.34 + d[0] * 0.05).toFixed(3) + ' 0.008 80)',
         shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
-        t: nda ? '' : d[5], client: nda ? '' : d[6], cmd: nda ? '' : '> ' + d[5].toLowerCase() + '_',
+        t: nda ? 'Under NDA' : d[5], client: nda ? '' : d[6], cmd: nda ? '> under nda_' : '> ' + d[5].toLowerCase() + '_',
         w1: w(11), w2: w(12), w3: w(13),
         cap: nda ? 'Under NDA' : lp ? 'Concept loop' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
       };
@@ -253,7 +253,7 @@ class Component extends DCLogic {
 }
 
 export default class Board extends Component {
-  // The project preview: sketch, screenshot, coded loop or redaction. Shared by the card and the full-screen view.
+  // The project preview: sketch, screenshot or coded loop. Shared by the card and the full-screen view.
   renderPv(v) {
     return (
             <div className={`pv ${v.pv.cls}`} style={{"--ac": v.pv.ac}} aria-hidden={"true"}>
@@ -300,12 +300,6 @@ export default class Board extends Component {
               <span className={"lt"}>
                 {`${v.pv.client}`}
               </span>
-              {" "}
-              <div className={"redact"}>
-                <b>
-                  {"REDACTED"}
-                </b>
-              </div>
               {" "}
               <div className={"cap"}>
                 {`${v.pv.cap}`}

@@ -252,8 +252,6 @@ a{color:inherit;text-decoration:none}
 .sr .pv .ln{left:10%;right:10%;display:none}
 .sr .pv .ln i{height:5px;margin-top:6px;background:oklch(.15 .012 40 / .3)}
 .sr .pv .cap{left:0;top:0;padding:2px 6px;background:oklch(.15 .012 40);color:oklch(.97 .015 90);font:700 10px "JetBrains Mono",monospace;text-transform:uppercase;z-index:2}
-.sr .pv .redact{inset:0;display:none;background:repeating-linear-gradient(45deg,oklch(.15 .012 40) 0 8px,oklch(.97 .015 90) 8px 16px)}
-.sr .pv .redact b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-6deg);padding:4px 12px;background:oklch(.15 .012 40);color:oklch(.97 .015 90);font:400 28px/1 Anton,sans-serif;letter-spacing:.06em}
 .sr .pv.k0 .mk{background:linear-gradient(var(--ac),var(--ac)) 0 0/38% 100% no-repeat}
 .sr .pv.k0 .ttl{display:block;left:44%;right:8px;top:24px;font-size:24px}
 .sr .pv.k0 .ln{display:block;left:44%;right:14%;top:62%}
@@ -282,8 +280,8 @@ a{color:inherit;text-decoration:none}
 .sr .pv.own .sr-cards i{background:oklch(.97 .015 90 / .2)}
 .sr .pv.shot .shot{display:block}
 .sr .pv.shot .mk,.sr .pv.shot .logo,.sr .pv.shot .lt{display:none}
-.sr .pv.nda .redact{display:block}
-.sr .pv.nda .mk,.sr .pv.nda .logo,.sr .pv.nda .lt{display:none}
+/* NDA work keeps its sketch; only the client mark is held back. */
+.sr .pv.nda .logo,.sr .pv.nda .lt{display:none}
 
 /* Hero: Opener 1, Say it plain, with DOOANE */
 .o1p{background:#E9E4DA url(/v2/a47cf5cdee5bff56e4086ff608897d1b.jpg);color:#111;padding-bottom:0;display:flex;flex-direction:column;min-height:900px}
