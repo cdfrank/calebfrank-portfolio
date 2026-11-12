@@ -77,8 +77,9 @@ a{color:inherit;text-decoration:none}
   .toc a[aria-current]{border-left-color:#FF2B2B;background:#1A1A1A}
   .prose{margin:0}
   /* Wide media start at the story's left edge and run into the open space on the right, clear of the rail. */
-  .prose img,.prose .cap,.prose .hypo,.prose .thread{left:0;transform:none;width:min(960px,calc(700px + (100vw - 1000px) / 2 - 24px))}
-  .prose .cap{text-align:left}
+  .case-body .prose img,.case-body .prose .cap,.case-body .prose .hypo,.case-body .prose .thread{left:0;transform:none;width:min(960px,calc(700px + (100vw - 1000px) / 2 - 24px))}
+  .case-body .prose .phones img{width:100%}
+  .case-body .prose .cap{text-align:left}
 }
 .prose>p{margin:0 0 1.15em}
 .prose strong,.prose b{color:#F4F1EC}
