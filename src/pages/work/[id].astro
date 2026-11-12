@@ -72,7 +72,7 @@ const chips = [d.industry, ...d.disciplines].filter((c, i, a) => c && a.indexOf(
       {chapters.length > 2 && (
         <nav class="toc" aria-label="In this case study">
           <details open>
-            <summary>In this case study</summary>
+            <summary><span class="lbl">In this case study</span><span class="cur" aria-hidden="true"></span></summary>
             <ol>
               {chapters.map((h, i) => <li><a href={`#${h.slug}`}><span class="n">{String(i + 1).padStart(2, '0')}</span>{h.text}</a></li>)}
             </ol>
@@ -106,16 +106,27 @@ const chips = [d.industry, ...d.disciplines].filter((c, i, a) => c && a.indexOf(
 </V2>
 
 <script>
-  // Chapters: mark the section being read, and close the list on phones so it starts compact.
+  // Chapters: mark the section being read; on tablets and phones the list starts closed and shows the current chapter.
   const toc = document.querySelector<HTMLElement>('.toc');
   if (toc) {
     const det = toc.querySelector('details');
     if (det && window.matchMedia('(max-width: 1099px)').matches) det.open = false;
+    const cur = toc.querySelector<HTMLElement>('.cur');
+    // On tablets and phones the list sticks just under the fixed site nav, so track the nav's height.
+    const nav = document.querySelector<HTMLElement>('.nav');
+    if (nav) {
+      const setTop = () => document.documentElement.style.setProperty('--navh', `${Math.round(nav.getBoundingClientRect().bottom)}px`);
+      setTop();
+      new ResizeObserver(setTop).observe(nav);
+      window.addEventListener('scroll', setTop, { passive: true });
+    }
     const links = new Map([...toc.querySelectorAll<HTMLAnchorElement>('a')].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
     const io = new IntersectionObserver((es) => es.forEach((e) => {
       if (!e.isIntersecting) return;
       links.forEach((a) => a.removeAttribute('aria-current'));
-      links.get(e.target.id)?.setAttribute('aria-current', 'true');
+      const a = links.get(e.target.id);
+      a?.setAttribute('aria-current', 'true');
+      if (cur && a) cur.textContent = a.textContent?.replace(/^(\d+)/, '$1 ') ?? '';
     }), { rootMargin: '-20% 0px -70% 0px' });
     links.forEach((_, id) => { const h = document.getElementById(id); if (h) io.observe(h); });
     toc.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a') && det && window.matchMedia('(max-width: 1099px)').matches) det.open = false; });
