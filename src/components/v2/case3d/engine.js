@@ -232,7 +232,7 @@ export function webglOK() {
   try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'))); } catch (e) { return false; }
 }
 export const ANSWER_AT = 25.6;
-const SETS = { paper: { bg: C.paper, fog: [17, 50], hemi: 2.3, sun: 2.4, shadow: 0.3 }, ink: { bg: 0x0d0d0d, fog: [11, 36], hemi: 1.25, sun: 2.7, shadow: 0 } };
+const SETS = { paper: { bg: C.paper, fog: [17, 50], hemi: 2.3, sun: 2.4, shadow: 0.3 }, ink: { bg: 0x0d0d0d, fog: [11, 36], hemi: 1.6, sun: 2.7, shadow: 0 } };
 
 export function createPlayer(el, scenes) {
   if (!document.getElementById('c3d-css')) { const s = document.createElement('style'); s.id = 'c3d-css'; s.textContent = CSS; document.head.appendChild(s); }

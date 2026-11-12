@@ -2,6 +2,7 @@ import { createPlayer, webglOK } from './engine.js';
 import { A } from './scenes_a.js';
 import { B } from './scenes_b.js';
 import { V } from './scenes_v2.js';
+import { V3 } from './scenes_v3.js';
 // The platform: every case opens on the question under the brief and ends on the fact that answers it.
 const Q = {
   'basf-agriculture-customer-portal': 'Who bought what?',
@@ -17,4 +18,5 @@ const Q = {
 export const scenes = { ...A, ...B };
 for (const k of Object.keys(Q)) scenes[k].question = Q[k];
 for (const k of Object.keys(V)) scenes[k] = V[k];
+for (const k of Object.keys(V3)) scenes[k] = V3[k];
 export { createPlayer, webglOK };

@@ -8,14 +8,14 @@ export const V = {};
 V['new-york-lottery-single-sign-on'] = {
   client: 'New York Lottery', title: 'One account for every New York Lottery door', question: 'Which password was this one?', result: '1 account across 4 experiences.', warp: 1,
   acts: [[0, ''], [9, ''], [19, '']], sets: ['ink', 'ink', 'ink'],
-  cam: [[0, [-3.5, 1, 13.5], [0, 3.5, 0], 52], [8.8, [2, 1.3, 12], [0, 3.5, 0], 52], [9, [-8, 2.4, 9.5], [-2.4, 3, 0], 40], [18.8, [7, 2.2, 9.5], [2.4, 3, 0], 40], [19, [0, 0.8, 11], [0, 3.8, 0], 66], [25.6, [0, 1.6, 17], [0, 3.4, 0], 66]],
+  cam: [[0, [-3.5, 1, 13.5], [0, 3.5, 0], 52], [8.8, [2, 1.3, 12], [0, 3.5, 0], 52], [9, [-8, 2.6, 10.5], [-2.4, 3.4, 0], 40], [18.8, [7, 2.4, 10.5], [2.4, 3.4, 0], 40], [19, [0, 0.8, 11], [0, 3.8, 0], 66], [25.6, [0, 1.6, 17], [0, 3.4, 0], 66]],
   build(S) {
     const g = S.group(0, 31), xs = [-5.7, -1.9, 1.9, 5.7], names = ['WEBSITE', 'APP', "COLLECT 'N WIN", 'SECOND CHANCE'], openAt = [10.6, 12.6, 14.6, 16.6], failAt = [2.4, 3.9, 5.4, 6.9];
     const redGlow = new THREE.MeshBasicMaterial({ color: C.red }), spill = new THREE.MeshBasicMaterial({ color: C.red, transparent: true, opacity: 0.92 });
     const doors = xs.map((x, i) => {
       const f = at(new THREE.Group(), x, 0, 0, g);
       at(box(2.9, 7.4, 0.8, C.white), 0, 3.7, -0.42, f);
-      at(face(S, names[i], { size: 0.3, mono: true, weight: 700 }), 0, 6.2, 0, f);
+      at(face(S, names[i], { size: 0.3, mono: true, weight: 700 }), 0, 5.35, 0, f);
       const glow = at(new THREE.Mesh(new THREE.PlaneGeometry(1.9, 4.8), redGlow), 0, 2.4, 0.0, f);
       const pg = new THREE.PlaneGeometry(1.9, 1); pg.translate(0, -0.5, 0);
       const light = at(new THREE.Mesh(pg, spill), 0, 0.03, 0.1, f); light.rotation.x = -PI / 2;
@@ -107,18 +107,18 @@ V['city-of-raleigh-website-redesign'] = {
 // ================================================================ GM Build & Price: the wall becomes one car
 V['general-motors-build-price-platform-redesign'] = {
   client: 'General Motors', title: 'Rebuilding how people build a vehicle', question: 'Where do I even start?', result: 'One builder: clearer model choice, real comparison, built to scale across brands.', warp: 1,
-  acts: [[0, ''], [9, ''], [19, '']], sets: ['ink', 'ink', 'paper'],
+  acts: [[0, ''], [9, ''], [19, '']], sets: ['ink', 'paper', 'paper'],
   cam: [[0, [-6, 0.7, 6.5], [1.5, 5.5, 0], 62], [8.8, [4.5, 1.1, 8], [-1, 5, 0], 62], [9, [0, 4.4, 17], [0, 1.5, 0], 35], [13.6, [1.5, 3.6, 15], [0, 1.5, 0], 35], [13.9, [0, 3.4, 15.5], [0, 1.7, 0.8], 35], [18.8, [-2, 3, 13.5], [0, 1.7, 0.8], 35], [19, [5, 1.5, 9.5], [0, 1.5, 0], 44], [25.6, [-5, 2.4, 10], [0, 1.6, 0], 44]],
   build(S) {
     const g1 = S.group(0, 9), cols = 30, rows = 22, N = cols * rows, wall = inst(new THREE.BoxGeometry(0.56, 0.36, 0.1), N, C.white); wall.castShadow = false; g1.add(wall);
     const col = new THREE.Color(); for (let i = 0; i < N; i++) wall.setColorAt(i, col.set([C.white, C.raised, C.dim, C.mid][Math.floor(rnd(i, 4) * 4)]));
     const lost = at(pawn(C.white, 0.85), 0.4, 0, 2.6, g1);
     const g2a = S.group(9, 13.8), g2b = S.group(13.8, 19), g3 = S.group(19, 31);
-    const trio = ['EV', 'SUV', 'TRUCK'].map((kd, i) => { const w = at(new THREE.Group(), (i - 1) * 5, 0, 0, g2a); at(cyl(2.1, 0.25, C.raised), 0, 0.125, 0, w); const c = at(car(kd, C.white), 0, 0.25, 0, w); c.scale.setScalar(0.85); w.car = c; return w; });
-    const halo = at(torus(2.35, 0.09, C.white), 0, 0.3, 0, g2a); halo.rotation.x = PI / 2;
+    const trio = ['EV', 'SUV', 'TRUCK'].map((kd, i) => { const w = at(new THREE.Group(), (i - 1) * 5, 0, 0, g2a); at(cyl(2.1, 0.25, C.white), 0, 0.125, 0, w); const c = at(car(kd, C.ink), 0, 0.25, 0, w); c.scale.setScalar(0.85); w.car = c; return w; });
+    const halo = at(torus(2.35, 0.09, C.ink), 0, 0.3, 0, g2a); halo.rotation.x = PI / 2;
     S.caption('Pick a model first.', 10.4, 13.6);
-    const duo = [at(car('SUV', C.white), -4, 0, -0.5, g2b), at(car('TRUCK', C.white), 4, 0, -0.5, g2b)]; duo[0].rotation.y = 0.35; duo[1].rotation.y = PI - 0.35;
-    const bars = []; [[2.4, 1.5], [1.2, 2.7], [2.1, 1.6]].forEach(([a, b], i) => { [[-0.24, a, a > b], [0.24, b, b > a]].forEach(([dx, h, win], s) => { const c = at(box(0.4, h, 0.4, win ? C.white : C.mid), (i - 1) * 1.15 + dx, 0, 2.4, g2b); c.geometry.translate(0, h / 2, 0); c.t0 = 14.6 + i * 0.4 + s * 0.15; bars.push(c); }); });
+    const duo = [at(car('SUV', C.ink), -4, 0, -0.5, g2b), at(car('TRUCK', C.ink), 4, 0, -0.5, g2b)]; duo[0].rotation.y = 0.35; duo[1].rotation.y = PI - 0.35;
+    const bars = []; [[2.4, 1.5], [1.2, 2.7], [2.1, 1.6]].forEach(([a, b], i) => { [[-0.24, a, a > b], [0.24, b, b > a]].forEach(([dx, h, win], s) => { const c = at(box(0.4, h, 0.4, win ? C.ink : C.dim), (i - 1) * 1.15 + dx, 0, 2.4, g2b); c.geometry.translate(0, h / 2, 0); c.t0 = 14.6 + i * 0.4 + s * 0.15; bars.push(c); }); });
     S.caption('Then compare two, side by side.', 15.2, 18.8);
     at(cyl(3.3, 0.3, C.white), 0, 0.15, 0, g3); const hero = at(car('SUV', C.red), 0, 0.3, 0, g3); hero.scale.setScalar(1.3);
     [['Chevrolet', 19.6, 21.6], ['GMC', 21.6, 23.6], ['Buick', 23.6, 26]].forEach(([b, a, z]) => S.hero('One builder.', b, a, z)); S.kicks.push(19.05);
