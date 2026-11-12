@@ -326,7 +326,7 @@ export function createPlayer(el, scenes) {
     const open = t < 3.3, ended = t >= ANSWER_AT;
     setLayer(ui.lq, open && t > 0.12); setLayer(ui.pin, !open && !ended);
     const h = !open && !ended && S.heroes.find(([, , a, b]) => ts >= a && ts < b);
-    if (h) { if (ui.big.textContent !== h[0]) { ui.big.textContent = h[0]; ui.big.classList.toggle('line', h[0].length > 7); } if (ui.unit.textContent !== h[1]) ui.unit.textContent = h[1]; }
+    if (h) { if (ui.big.textContent !== h[0]) { ui.big.textContent = h[0]; ui.big.classList.toggle('line', h[0].length > 6); } if (ui.unit.textContent !== h[1]) ui.unit.textContent = h[1]; }
     setLayer(ui.lh, !!h);
     const cap = !open && !ended && !h && S.caps.find(([, a, b]) => ts >= a && ts < b);
     if (cap && ui.capt.textContent !== cap[0]) ui.capt.textContent = cap[0];
