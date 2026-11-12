@@ -138,7 +138,21 @@ const chips = [d.industry, ...d.disciplines].filter((c, i, a) => c && a.indexOf(
     mark();
     window.addEventListener('scroll', mark, { passive: true });
     window.addEventListener('resize', mark);
-    toc.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a') && det && window.matchMedia('(max-width: 1099px)').matches) det.open = false; });
+    // Jumping to a chapter glides there (unless the visitor prefers reduced motion). The list closes
+    // first on tablets and phones so its height change can't throw off where the scroll lands.
+    toc.addEventListener('click', (e) => {
+      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a');
+      if (!a) return;
+      const target = document.getElementById(decodeURIComponent(a.hash.slice(1)));
+      if (!target) return;
+      e.preventDefault();
+      if (det && window.matchMedia('(max-width: 1099px)').matches) det.open = false;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        history.pushState(null, '', a.hash);
+      });
+    });
   }
   // Captions: show each screenshot's description under it (screen readers already get it as alt text).
   document.querySelectorAll<HTMLImageElement>('.prose img[alt]').forEach((img) => {

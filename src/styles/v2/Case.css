@@ -56,6 +56,7 @@ a{color:inherit;text-decoration:none}
 /* Chapters: a sticky rail beside the story on wide screens, a fold-out list above it on smaller ones */
 .toc{max-width:700px;margin:0 auto 40px}
 .toc .cur{display:none}
+.prose h2{scroll-margin-top:calc(var(--navh,96px) + 24px)}
 /* Tablets and phones: the closed list sticks under the site nav and names the chapter being read */
 @media (max-width:1099px){
   .toc{position:sticky;top:var(--navh,96px);z-index:40;margin-bottom:32px}
