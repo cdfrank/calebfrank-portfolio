@@ -27,16 +27,19 @@ html[data-tx=about][data-tx-p=in] .tx-guy{animation:tx-sprayer .68s cubic-bezier
 html[data-tx=about][data-tx-p=in] #tx{-webkit-mask:var(--wm) center/0 auto no-repeat,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:var(--wm) center/0 auto no-repeat exclude,linear-gradient(#000 0 0);animation:tx-hole .56s cubic-bezier(.6,0,.2,1) calc(.68s + var(--hold)) forwards}
 @keyframes tx-hole{0%{-webkit-mask-size:min(78vw,820px) auto,100% 100%;mask-size:min(78vw,820px) auto,100% 100%}35%{opacity:1}85%,100%{opacity:0}100%{-webkit-mask-size:700vw auto,100% 100%;mask-size:700vw auto,100% 100%}}
 
-/* Work: a torn paper sheet slaps up, DOOANE points the way, the sheet tears off the top */
+/* Work: a torn paper sheet slides in from the right, DOOANE sprays "this way" and a left arrow
+   (tx-tag.js, Three.js), then the sheet leaves to the left, the way the arrow points.
+   data-tx-fb is the no-WebGL fallback: the still DOOANE pointing left. */
 html[data-tx=work] #tx{--paper:#E9E4DA}
-html[data-tx=work] .tx-bg{inset:-6vh 0;background:var(--paper);clip-path:polygon(0 3%,8% 1%,17% 4%,26% .5%,36% 3.5%,47% 1%,58% 4.5%,69% 1.5%,80% 4%,90% .5%,100% 3%,100% 97%,91% 99.5%,82% 96%,72% 99%,61% 95.5%,50% 99%,39% 96.5%,28% 99.5%,18% 96%,9% 99%,0 97%)}
-html[data-tx=work][data-tx-p=out] #tx{animation:tx-up-in .38s cubic-bezier(.2,.8,.3,1) both}
-html[data-tx=work][data-tx-p=in] #tx{animation:tx-up-out .46s cubic-bezier(.6,0,.4,1) calc(.42s + var(--hold)) both}
-@keyframes tx-up-in{from{transform:translateY(112vh)}to{transform:none}}
-@keyframes tx-up-out{to{transform:translateY(-118vh)}}
-html[data-tx=work] .tx-guy{display:block;right:7vw;width:clamp(130px,16vw,220px);aspect-ratio:580/900;background-image:url(/dooane/pointing.webp)}
-html[data-tx=work] .tx-word{display:block;right:calc(7vw + clamp(130px,16vw,220px));bottom:34vh;rotate:-4deg}
-html[data-tx=work] .tx-word::after{content:"\2190  this way"}
+html[data-tx=work] .tx-bg{inset:-6vh -7vw;background:var(--paper);clip-path:polygon(2% 3%,8% 1%,17% 4%,26% .5%,36% 3.5%,47% 1%,58% 4.5%,69% 1.5%,80% 4%,90% .5%,97.5% 3%,99.5% 12%,96.5% 22%,99% 33%,96% 45%,99.5% 56%,97% 68%,99% 79%,96.5% 90%,98% 97%,91% 99.5%,82% 96%,72% 99%,61% 95.5%,50% 99%,39% 96.5%,28% 99.5%,18% 96%,9% 99%,2.5% 97%,.5% 88%,3.5% 77%,1% 66%,4% 54%,.5% 43%,3% 31%,1% 20%,3.5% 10%)}
+html[data-tx=work][data-tx-p=out] #tx{animation:tx-left-in .38s cubic-bezier(.2,.8,.3,1) both}
+html[data-tx=work][data-tx-p=in] #tx{animation:tx-left-out .46s cubic-bezier(.6,0,.4,1) calc(.3s + var(--hold)) both}
+@keyframes tx-left-in{from{transform:translateX(116vw)}to{transform:none}}
+@keyframes tx-left-out{to{transform:translateX(-120vw) rotate(-2deg)}}
+.tx-gl{inset:0;width:100%;height:100%}
+html[data-tx=work][data-tx-fb] .tx-guy{display:block;right:7vw;width:clamp(130px,16vw,220px);aspect-ratio:580/900;background-image:url(/dooane/pointing.webp)}
+html[data-tx=work][data-tx-fb] .tx-word{display:block;right:calc(7vw + clamp(130px,16vw,220px));bottom:34vh;rotate:-4deg}
+html[data-tx=work][data-tx-fb] .tx-word::after{content:"\2190  this way"}
 
 /* Process: a blueprint grid rules in from the left, DOOANE thinks, the grid wipes off to the right */
 html[data-tx=process] .tx-bg{background:linear-gradient(rgba(244,241,236,.14) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,rgba(244,241,236,.14) 1px,transparent 1px) 0 0/48px 48px,#111}
