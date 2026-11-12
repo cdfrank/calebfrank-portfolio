@@ -121,14 +121,23 @@ const chips = [d.industry, ...d.disciplines].filter((c, i, a) => c && a.indexOf(
       window.addEventListener('scroll', setTop, { passive: true });
     }
     const links = new Map([...toc.querySelectorAll<HTMLAnchorElement>('a')].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
-    const io = new IntersectionObserver((es) => es.forEach((e) => {
-      if (!e.isIntersecting) return;
+    // The current chapter is the last heading scrolled past the upper part of the screen.
+    const heads = [...links.keys()].map((id) => document.getElementById(id)).filter((h): h is HTMLElement => !!h);
+    let active = '';
+    const mark = () => {
+      const line = window.innerHeight * 0.3;
+      let id = heads[0]?.id ?? '';
+      for (const h of heads) { if (h.getBoundingClientRect().top <= line) id = h.id; else break; }
+      if (id === active) return;
+      active = id;
       links.forEach((a) => a.removeAttribute('aria-current'));
-      const a = links.get(e.target.id);
+      const a = links.get(id);
       a?.setAttribute('aria-current', 'true');
       if (cur && a) cur.textContent = a.textContent?.replace(/^(\d+)/, '$1 ') ?? '';
-    }), { rootMargin: '-20% 0px -70% 0px' });
-    links.forEach((_, id) => { const h = document.getElementById(id); if (h) io.observe(h); });
+    };
+    mark();
+    window.addEventListener('scroll', mark, { passive: true });
+    window.addEventListener('resize', mark);
     toc.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a') && det && window.matchMedia('(max-width: 1099px)').matches) det.open = false; });
   }
   // Captions: show each screenshot's description under it (screen readers already get it as alt text).
