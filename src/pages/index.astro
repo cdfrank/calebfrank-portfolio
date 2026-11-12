@@ -3,7 +3,12 @@ import V2 from '../layouts/V2.astro';
 import Home from '../components/v2/Home.jsx';
 import '../styles/v2/Home.css';
 import '../styles/hover-loops.css';
+import { allWork } from '../lib/data';
+import { publicProjects } from '../lib/dooane.mjs';
+
+// Public summaries and case-study links for the record's full-screen project view. Held, draft and confidential work never reaches the page.
+const details = Object.fromEntries(publicProjects(await allWork()).map((p) => [`${p.client}|${p.title}`, { s: p.summary, h: p.href === '/work/' ? '' : p.href }]));
 ---
 <V2>
-  <Home client:load />
+  <Home client:load details={details} />
 </V2>

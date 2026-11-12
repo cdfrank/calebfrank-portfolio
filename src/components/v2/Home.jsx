@@ -1,5 +1,6 @@
 // Generated from the Claude Design board Main-egx9.dc.html. The logic class is the board's own code.
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { LOOPS } from '../../data/hover-loops.js';
 
 class DCLogic extends React.Component {
@@ -11,7 +12,7 @@ class Component extends DCLogic {
     super(props);
     this.LOGO = {"BASF Agriculture": "/v2/98f679b1c71070b93de1d1fd7ecd6283.png", "New York Lottery": "/v2/2a657719827a673597dea866ed30821a.png", "General Motors": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "Chevrolet": "/v2/616f543469fefd85a1353376fc536366.svg", "Cadillac": "/v2/680560a9d6e6bf1136d09c4827a90eb8.svg", "GM Accessories": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "GMC": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "Buick": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "and Chevrolet": "/v2/a1ebfa488f65be0231c2866d4c42ea3a.svg", "Honeywell": "/v2/6f26237dfd79aa9807e00c01f1ec12ce.svg", "Fujifilm": "/v2/51e33b550edc54490312bb7c959e2ff7.svg", "Fujifilm Instax": "/v2/51e33b550edc54490312bb7c959e2ff7.svg", "Optum": "/v2/5911379b2a03ea490842406df4572106.svg", "AstraZeneca": "/v2/a17a691730ee02181178232cceb44c6b.svg", "Professional Home Builders Institute": "/v2/8e1a565339eeb37f0bee1d233d6b969c.png", "MRM": "/v2/aea971e64d387348e8c1f58819d522eb.png", "MRM UX team": "/v2/aea971e64d387348e8c1f58819d522eb.png", "TriHealth": "/v2/39c0c1dfb5336632ef3402b9e049234b.png", "Hancock Health": "/v2/104aece41c14cd28c2d7fa00fc12636d.png", "Gleaners Food Bank": "/v2/2c0d05d19116480682f892cc48d5d788.png", "Project Lead The Way": "/v2/08e7857d1cec611099fc72df1e27dd4b.png", "Ball State University": "/v2/4ba5f95f3c380fe7e701778bc45b815f.png", "Judson Center and Michigan State": "/v2/36c365a88ab08a2b409c68a78d72f48b.png", "Thomas Edison Center": "/v2/0fbc3cde8c24d1bb53a51da0b5e34a3c.svg", "Young Farmers of Washtenaw County": "/v2/527b9e7472daa68c9dba3981fae522e5.png", "Isle Royale Equipment": "/v2/15d5a1242a32e7b0f3a7a10c45ad1bfa.png", "Olympia Skate Shop": "/v2/24f573f245ac9121f39fb9a262170747.png", "Karle Symposium": "/v2/6b8bce22c3851e6cd4dcb9b050ca1699.png", "GMC, Buick, and Chevrolet": "/v2/d2bd8c0a9659280cb2b441471e446366.png"};
     this.SHOT = {"SalesX: re-engineering a sales force": "/v2/2b0a49fcd7d47662999b75aa3816a1df.jpg", "Digital Playslip": "/v2/04eadf151721aaaf1005bbe69761a593.jpg"};
-    this.state = { step: 0, x: 'year', y: '', yaw: 0, pitch: 0, sel: null, drag: false };
+    this.state = { step: 0, x: 'year', y: '', yaw: 0, pitch: 0, sel: null, drag: false, narrow: false, full: false, origin: null };
     this.DATA = [[0,0,0,3,0,"Embrace 2013 microsite","Ball State University"],[0,0,0,1,0,"Journalism program pages","Ball State University"],[0,0,0,3,0,"President's Holiday Card","Ball State University"],[0,0,0,1,0,"Client design internship","Various clients"],[1,1,1,0,0,"Hunger campaign","Gleaners Food Bank"],[1,4,4,0,0,"Glidden campaign","Glidden"],[1,1,1,0,0,"Identity and campaigns","Hancock Health"],[1,0,1,0,0,"Logo work","Impact IQ and Spin Across America"],[1,4,4,0,0,"Mary Kay campaign","Mary Kay"],[1,1,1,0,0,"ER campaign","TriHealth"],[1,1,1,0,0,"Outdoor and print advertising","TriHealth"],[2,2,2,3,0,"Dealer playbooks","Chevrolet"],[2,1,4,0,0,"Poster work","CLC and A Bicycle Built for 95,000"],[2,2,2,3,0,"Voice of Customer program","General Motors"],[2,2,2,3,0,"InfoSource apps","GMC, Buick, and Chevrolet"],[2,0,1,0,0,"Summit 2016 identity","Project Lead The Way"],[2,1,1,1,0,"TriHealth.com refresh","TriHealth"],[3,2,2,1,0,"Vehicle pages and launch sites","Cadillac"],[3,2,2,0,0,"SEMA coffee table book","Chevrolet"],[3,2,2,0,0,"Customer experience award programs","General Motors"],[3,2,2,0,0,"iMR identity","General Motors"],[3,2,2,3,0,"Mystery Shop reporting","General Motors"],[3,2,2,1,0,"RSMS holiday card","General Motors"],[3,2,2,1,0,"Accessories shoots and pages","GM Accessories"],[3,4,4,0,0,"Packaging redesign","Viral Launch"],[4,3,4,0,0,"Baker Farms identity","Baker Farms"],[4,2,2,2,0,"E2UL sourcebook","Cadillac"],[4,2,2,0,0,"CamaroFest and Car of the Year materials","Chevrolet"],[4,1,2,1,0,"Jerseys for Judson","Judson Center and Michigan State"],[4,0,4,0,0,"Karle Symposium identity","Karle Symposium"],[4,0,2,1,0,"One10 website launch","One10 Marketing"],[4,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,2,0,"Fleet guide","General Motors"],[5,4,4,1,0,"Brand standards and landing page","Isle Royale Equipment"],[5,4,4,1,0,"Brand, web, and Nike materials","Olympia Skate Shop"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,2,3,"Under NDA","Aimia / One10"],[5,2,2,4,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,3,3,"Under NDA","Aimia / One10"],[5,2,2,4,3,"Under NDA","Aimia / One10"],[6,3,3,3,1,"SalesX: re-engineering a sales force","BASF Agriculture"],[6,3,4,0,0,"Young Farmers materials","Young Farmers of Washtenaw County"],[6,2,3,2,3,"Under NDA","MRM//McCann"],[6,2,3,3,3,"Under NDA","MRM//McCann"],[6,2,2,3,3,"Under NDA","Aimia / One10"],[6,2,2,3,3,"Under NDA","Aimia / One10"],[7,1,3,3,0,"Interactive concepts","Abbott"],[7,3,3,3,0,"Canada Agriculture website","BASF Agriculture"],[7,3,3,3,0,"Claims system","BASF Agriculture"],[7,3,3,2,0,"Engenia herbicide site","BASF Agriculture"],[7,3,3,3,0,"Unified login","BASF Agriculture"],[7,4,3,2,0,"Pillsbury pitch","General Mills"],[7,0,3,2,0,"Coffee & Collabs","MRM UX team"],[8,3,3,3,0,"Partner Portal","BASF Agriculture"],[8,5,3,3,0,"Design library","New York Lottery"],[8,5,3,3,1,"Digital Playslip","New York Lottery"],[8,0,3,2,0,"Learning site unification","Professional Home Builders Institute"],[9,3,3,1,0,"Global Seeds & Traits","BASF Agriculture"],[9,3,3,1,0,"US Crop website","BASF Agriculture"],[9,4,3,2,0,"Instax North America website","Fujifilm Instax"],[9,2,3,0,0,"Lab313 rebrand","General Motors"],[9,4,3,2,0,"Cart and checkout","Honeywell"],[9,4,3,3,0,"Design language refresh","Honeywell"],[9,5,3,1,0,"Twelve-language website","New York Lottery"],[9,1,4,1,0,"Thomas Edison Center website","Thomas Edison Center"],[10,4,3,2,0,"Direct-to-consumer platform","Fujifilm"],[10,4,3,4,0,"Chatbot and service tools","Honeywell"],[10,0,3,2,0,"Figma 101, 201, and 301","MRM"],[10,0,3,2,0,"Office Blind Date","MRM"],[11,1,3,1,0,"Farxiga landing pages","AstraZeneca"],[11,4,3,2,0,"Amazon experience review","Fujifilm"],[11,4,3,2,0,"CRM pitch","McDonald's"],[11,0,3,4,0,"AI and asset management vision","MRM"],[11,5,3,4,0,"Alexa skills and Help Center","New York Lottery"],[11,5,3,2,0,"CRM overhaul","New York Lottery"],[11,5,3,1,0,"Live Drawing and Integrity pages","New York Lottery"],[11,5,3,2,0,"Quick Draw rebrand","New York Lottery"],[11,1,3,3,0,"Experience design support","Optum"],[11,6,4,2,2,"Indoor skatepark proposal","Self-initiated"],[11,6,4,3,2,"TART","Self-initiated"],[11,6,4,2,2,"Tin Minnows Bearings Co.","Self-initiated"],[11,5,3,2,0,"Marine Corps pitch","US Marine Corps"],[12,4,3,2,0,"New business story","Corebridge Financial"],[12,4,3,2,0,"Building Automation site proposal","Honeywell"],[12,4,3,4,0,"Product experience proposal","Jayco"],[12,6,4,4,2,"Design System Scanner","Self-initiated"],[12,6,4,4,2,"Playable Figma Make games","Self-initiated"],[12,6,4,4,2,"Portfolios Please","Self-initiated"],[12,6,4,4,2,"Street Signal and SkateGO","Self-initiated"],[12,6,4,4,2,"Shred & Dice","Self-initiated"]];
   }
   // Street Signal hero: the character loop on wide screens, the skate-away clip on phones. Video starts after mount so only one file loads.
@@ -43,7 +44,21 @@ class Component extends DCLogic {
     };
     window.addEventListener('resize', this.srFit);
     this.srFit();
+    // Stacked layout (phones, tablets): the detail card sits below the map, so a tapped block opens full screen instead.
+    this.srMq = window.matchMedia('(max-width: 1000px)');
+    this.srNarrow = () => this.setState({ narrow: this.srMq.matches, full: this.srMq.matches && this.state.full });
+    this.srMq.addEventListener('change', this.srNarrow);
+    this.srNarrow();
+    this.srKey = (e) => {
+      if (!this.state.full) return;
+      if (e.key === 'Escape') this.srClose();
+      else if (e.key === 'ArrowRight') this.srStep(1);
+      else if (e.key === 'ArrowLeft') this.srStep(-1);
+    };
+    window.addEventListener('keydown', this.srKey);
   }
+  srClose() { this.setState({ full: false, origin: null }); }
+  srStep(by) { const n = this.DATA.length; this.setState({ sel: ((this.state.sel || 0) + by + n) % n, origin: null }); }
   ssVals() {
     return {
       ssPaused: Boolean(this.state.ssPaused),
@@ -58,16 +73,28 @@ class Component extends DCLogic {
   }
   renderVals() { return Object.assign(this.srVals(), this.ssVals()); }
   // Coded preview loops: play the picked project's loop from the top, or hold its poster frame for reduced motion.
-  componentDidUpdate() {
-    const el = document.querySelector('.sr .pv .lp svg.hl');
-    if (!el || el.dataset.state || !el.getAnimations) return;
+  componentDidUpdate(prevProps, prevState) {
+    // Full-screen detail: hold the page still behind it, and hand focus in and back out.
+    if (prevState.full !== this.state.full) {
+      document.documentElement.style.overflow = this.state.full ? 'hidden' : '';
+      const to = this.state.full ? this.srX : document.querySelectorAll('#numbers .b')[this.state.sel];
+      if (to) to.focus({ preventScroll: true });
+    }
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const t = parseFloat(el.dataset.poster || 5) * 1000;
-    el.classList.add('hl-js');
-    el.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
-    el.dataset.state = still ? 'rest' : 'play';
+    document.querySelectorAll('.sr .pv .lp svg.hl').forEach((el) => {
+      if (el.dataset.state || !el.getAnimations) return;
+      const t = parseFloat(el.dataset.poster || 5) * 1000;
+      el.classList.add('hl-js');
+      el.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
+      el.dataset.state = still ? 'rest' : 'play';
+    });
   }
-  componentWillUnmount() { if (this.ssMq) this.ssMq.removeEventListener('change', this.ssPick); window.removeEventListener('scroll', this.navStick); window.removeEventListener('resize', this.srFit); }
+  componentWillUnmount() {
+    if (this.ssMq) this.ssMq.removeEventListener('change', this.ssPick);
+    if (this.srMq) this.srMq.removeEventListener('change', this.srNarrow);
+    window.removeEventListener('scroll', this.navStick); window.removeEventListener('resize', this.srFit); window.removeEventListener('keydown', this.srKey);
+    document.documentElement.style.overflow = '';
+  }
   srVals() {
     const DATA = this.DATA;
     const AXES = {
@@ -85,7 +112,7 @@ class Component extends DCLogic {
       { mode: 'name', h: 'By who did it.', t: '80 blocks I can show you. The 14 I can’t are holding up the name.', b: 'Mess it up again' },
     ];
     const FONT = { D: ['1110', '1001', '1001', '1001', '1001', '1110'], O: ['0110', '1001', '1001', '1001', '1001', '0110'], A: ['0110', '1001', '1111', '1001', '1001', '1001'], N: ['1001', '1101', '1011', '1001', '1001', '1001'], E: ['1111', '1000', '1110', '1000', '1000', '1111'] };
-    const { step, x, y, yaw, pitch, sel, drag } = this.state;
+    const { step, x, y, yaw, pitch, sel, drag, narrow, full, origin } = this.state;
     const custom = step < 0;
     const cur = custom ? { x, y } : STEPS[step];
     const mode = cur.mode || 'pivot';
@@ -155,11 +182,39 @@ class Component extends DCLogic {
       tf: tfs[n],
       label: d[5] + ', ' + d[6] + ', ' + (2013 + d[0]),
       pick: () => { if (sel !== n) this.setState({ sel: n }); },
+      // A tap that ends a drag is not a pick. In the stacked layout a real tap opens the project full screen, growing from the block.
+      open: (e) => {
+        if (this.dragged) { this.dragged = false; return; }
+        if (!narrow) { if (sel !== n) this.setState({ sel: n }); return; }
+        const r = e.currentTarget.getBoundingClientRect();
+        this.setState({ sel: n, full: true, origin: [Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2)] });
+      },
     }));
+    const info = picked ? (this.props.details || {})[picked[6] + '|' + picked[5]] : null;
+    const fx = {
+      on: Boolean(full && picked),
+      key: sel,
+      label: picked ? picked[5] + ', ' + picked[6] : '',
+      count: sel === null ? '' : (sel + 1) + ' of ' + DATA.length,
+      ox: origin ? origin[0] + 'px' : '50%', oy: origin ? origin[1] + 'px' : '40%',
+      sum: picked ? (picked[4] === 3 ? 'Counted in the 94. The details stay private.' : info ? info.s : '') : '',
+      href: info && info.h ? info.h : '',
+      close: () => this.srClose(),
+      prev: () => this.srStep(-1),
+      next: () => this.srStep(1),
+      down: (e) => { this.sx = e.clientX; this.sy = e.clientY; },
+      up: (e) => {
+        if (this.sx === undefined) return;
+        const dx = e.clientX - this.sx, dy = e.clientY - this.sy;
+        this.sx = undefined;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) this.srStep(dx < 0 ? 1 : -1);
+      },
+    };
     const st = custom ? { h: 'Your sort.', t: 'Same 94 blocks. Ask them something else.', b: 'Back to the story' } : STEPS[step];
     return {
       cam,
       pv,
+      fx,
       stageCls: drag ? 'drag' : '',
       blocks,
       xlabels,
@@ -168,8 +223,8 @@ class Component extends DCLogic {
       riderCls: mode === 'name' ? '' : 'off',
       crownCls: !picked && biggest ? 'on' : '',
       cardKicker: picked ? 'Project, ' + (2013 + picked[0]) : biggest ? 'Biggest pile' : '94 projects',
-      pickTitle: picked ? picked[5] : biggest ? biggest.name : 'Point at any block',
-      pickSub: picked ? picked[6] : biggest ? biggest.n + ' projects' : 'Each one is a real project. Drag to look around.',
+      pickTitle: picked ? picked[5] : biggest ? biggest.name : narrow ? 'Tap any block' : 'Point at any block',
+      pickSub: picked ? picked[6] : biggest ? biggest.n + (narrow ? ' projects. Tap any block to open it.' : ' projects') : narrow ? 'Each one is a real project. Tap one to open it.' : 'Each one is a real project. Drag to look around.',
       advance: () => this.setState({ step: custom ? 1 : (step + 1) % STEPS.length, sel: null, yaw: 0, pitch: 0 }),
       xopts: Object.keys(AXES).map((k) => ({
         n: AXES[k].n,
@@ -185,9 +240,10 @@ class Component extends DCLogic {
           this.setState({ step: -1, x: nowX, y: o.k, sel: null, yaw: 0, pitch: 0 });
         },
       })),
-      down: (e) => { this.px = e.clientX; this.py = e.clientY; this.yaw0 = yaw; this.pitch0 = pitch; this.setState({ drag: true }); },
+      down: (e) => { this.px = e.clientX; this.py = e.clientY; this.yaw0 = yaw; this.pitch0 = pitch; this.dragged = false; this.setState({ drag: true }); },
       move: (e) => {
         if (!this.state.drag) return;
+        if (Math.abs(e.clientX - this.px) + Math.abs(e.clientY - this.py) > 8) this.dragged = true;
         const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
         this.setState({ yaw: clamp(this.yaw0 + (e.clientX - this.px) * 0.18, -40, 40), pitch: clamp(this.pitch0 - (e.clientY - this.py) * 0.14, -14, 12) });
       },
@@ -197,6 +253,68 @@ class Component extends DCLogic {
 }
 
 export default class Board extends Component {
+  // The project preview: sketch, screenshot, coded loop or redaction. Shared by the card and the full-screen view.
+  renderPv(v) {
+    return (
+            <div className={`pv ${v.pv.cls}`} style={{"--ac": v.pv.ac}} aria-hidden={"true"}>
+              {" "}
+              <img className={"shot"} src={v.pv.shot} alt={""} />
+              {" "}
+              <div className={"mk"}>
+                <div className={"bar"}></div>
+                <div className={"sr-hero"}></div>
+                <div className={"notes"}>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </div>
+                <div className={"ph"}>
+                  <i></i>
+                  <i></i>
+                </div>
+                <div className={"sr-cards"}>
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </div>
+                <div className={"ttl"}>
+                  {`${v.pv.t}`}
+                </div>
+                <div className={"ln"}>
+                  <i style={{"width": v.pv.w1}}></i>
+                  <i style={{"width": v.pv.w2}}></i>
+                  <i style={{"width": v.pv.w3}}></i>
+                </div>
+                <div className={"term"}>
+                  {`${v.pv.cmd}`}
+                </div>
+              </div>
+              {" "}
+              <img className={"logo"} src={v.pv.logo} alt={""} />
+              {" "}
+              <span className={"lt"}>
+                {`${v.pv.client}`}
+              </span>
+              {" "}
+              <div className={"redact"}>
+                <b>
+                  {"REDACTED"}
+                </b>
+              </div>
+              {" "}
+              <div className={"cap"}>
+                {`${v.pv.cap}`}
+              </div>
+              {v.pv.loop ? <div className={"lp"} key={v.pv.t} dangerouslySetInnerHTML={{ __html: v.pv.loop }} /> : null}
+              {" "}
+            </div>
+    );
+  }
   render() {
     const v = this.renderVals();
     return (
@@ -304,7 +422,7 @@ export default class Board extends Component {
         {" "}
         <section className={"sr"} id={"numbers"} aria-label={"The record, sortable"}>
           {" "}
-          <div className={`stage ${v.stageCls}`} onPointerDown={v.down} onPointerMove={v.move} onPointerUp={v.up} onPointerLeave={v.up}>
+          <div className={`stage ${v.stageCls}`} onPointerDown={v.down} onPointerMove={v.move} onPointerUp={v.up} onPointerLeave={v.up} onPointerCancel={v.up}>
             {" "}
             <div className={"scaler"}>
               {" "}
@@ -330,7 +448,7 @@ export default class Board extends Component {
                 {" "}
                 {(v.blocks || []).map((b, i3) => (
                   <React.Fragment key={i3}>
-                    <button className={`b ${b.cls}`} style={{"transform": b.tf}} aria-label={b.label} onClick={b.pick} onMouseEnter={b.pick} onFocus={b.pick}>
+                    <button className={`b ${b.cls}`} style={{"transform": b.tf}} aria-label={b.label} onClick={b.open} onMouseEnter={b.pick} onFocus={b.pick}>
                       <span className={"t"}></span>
                       <span className={"s"}></span>
                       <span className={"w"}></span>
@@ -372,63 +490,7 @@ export default class Board extends Component {
             {" "}
             <img className={`sr-crown ${v.crownCls}`} src={"/v2/010c57e814787557949928c6eeae42f7.png"} alt={""} />
             {" "}
-            <div className={`pv ${v.pv.cls}`} style={{"--ac": v.pv.ac}} aria-hidden={"true"}>
-              {" "}
-              <img className={"shot"} src={v.pv.shot} alt={""} />
-              {" "}
-              <div className={"mk"}>
-                <div className={"bar"}></div>
-                <div className={"sr-hero"}></div>
-                <div className={"notes"}>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                </div>
-                <div className={"ph"}>
-                  <i></i>
-                  <i></i>
-                </div>
-                <div className={"sr-cards"}>
-                  <i></i>
-                  <i></i>
-                  <i></i>
-                </div>
-                <div className={"ttl"}>
-                  {`${v.pv.t}`}
-                </div>
-                <div className={"ln"}>
-                  <i style={{"width": v.pv.w1}}></i>
-                  <i style={{"width": v.pv.w2}}></i>
-                  <i style={{"width": v.pv.w3}}></i>
-                </div>
-                <div className={"term"}>
-                  {`${v.pv.cmd}`}
-                </div>
-              </div>
-              {" "}
-              <img className={"logo"} src={v.pv.logo} alt={""} />
-              {" "}
-              <span className={"lt"}>
-                {`${v.pv.client}`}
-              </span>
-              {" "}
-              <div className={"redact"}>
-                <b>
-                  {"REDACTED"}
-                </b>
-              </div>
-              {" "}
-              <div className={"cap"}>
-                {`${v.pv.cap}`}
-              </div>
-              {v.pv.loop ? <div className={"lp"} key={v.pv.t} dangerouslySetInnerHTML={{ __html: v.pv.loop }} /> : null}
-              {" "}
-            </div>
+            {this.renderPv(v)}
             {" "}
             <div className={"yr"}>
               {`${v.cardKicker}`}
@@ -842,6 +904,26 @@ export default class Board extends Component {
         {" "}
       </div>
       {" "}
+      {v.fx.on ? createPortal(
+        <div className={"sr srx"} role={"dialog"} aria-modal={"true"} aria-label={v.fx.label} style={{"--ox": v.fx.ox, "--oy": v.fx.oy}} onPointerDown={v.fx.down} onPointerUp={v.fx.up}>
+          <header className={"srx-top"}>
+            <span className={"yr"}>{v.cardKicker}</span>
+            <span className={"srx-n"}>{v.fx.count}</span>
+            <button className={"srx-x"} ref={(el) => { this.srX = el; }} onClick={v.fx.close} aria-label={"Close and go back to the map"}><span aria-hidden={"true"}>{"×"}</span></button>
+          </header>
+          <div className={"srx-body"} key={v.fx.key} aria-live={"polite"}>
+            {this.renderPv(v)}
+            <h3 className={"display"}>{v.pickTitle}</h3>
+            <p className={"srx-client"}>{v.pickSub}</p>
+            {v.fx.sum ? <p className={"srx-sum"}>{v.fx.sum}</p> : null}
+            {v.fx.href ? <a className={"srx-go"} href={v.fx.href}>{"Read the case study "}<span aria-hidden={"true"}>{"→"}</span></a> : null}
+          </div>
+          <footer className={"srx-nav"}>
+            <button onClick={v.fx.prev} aria-label={"Previous project"}><span aria-hidden={"true"}>{"←"}</span></button>
+            <button className={"srx-back"} onClick={v.fx.close}>{"Back to the map"}</button>
+            <button onClick={v.fx.next} aria-label={"Next project"}><span aria-hidden={"true"}>{"→"}</span></button>
+          </footer>
+        </div>, document.body) : null}
       </>
     );
   }

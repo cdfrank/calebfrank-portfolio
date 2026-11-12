@@ -43,7 +43,28 @@
 .dooane-note{font-size:10px;text-align:center;color:#b5afa6;margin:10px 12px 13px}
 .dooane-sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @keyframes dooane-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:480px){.dooane-widget{right:max(12px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom))}.dooane-panel{width:calc(100vw - 24px);bottom:114px;height:min(580px,calc(100dvh - 142px))}.dooane-launcher-label{font-size:10px;padding:10px 12px}.dooane-form input{font-size:16px}.dooane-head{padding-top:16px;padding-bottom:14px}}
+@media(max-width:480px){.dooane-widget{right:max(12px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom))}.dooane-launcher-label{font-size:10px;padding:10px 12px}.dooane-form input{font-size:16px}.dooane-head{padding-top:16px;padding-bottom:14px}}
+/* Phones: a full-screen sheet over the page and its menu. --dooane-top and --dooane-h track the visible viewport, so the keyboard never covers the field. */
+.dooane-panel:focus{outline:none}
+@media(max-width:520px){
+.dooane-widget:has(.dooane-panel){z-index:70}
+.dooane-widget:has(.dooane-panel) .dooane-launcher{display:none}
+.dooane-widget .dooane-panel{position:fixed;left:0;right:0;top:var(--dooane-top,0px);bottom:auto;width:auto;height:var(--dooane-h,100dvh);min-height:0;border:0;border-radius:0;box-shadow:none;animation-name:dooane-sheet}
+.dooane-head{padding-top:max(16px,env(safe-area-inset-top))}
+.dooane-close{width:48px;height:48px}
+.dooane-suggestions{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-top:10px}
+.dooane-suggestions::-webkit-scrollbar{display:none}
+.dooane-suggestions button{flex:none;min-height:44px;font-size:13px;padding-inline:14px}
+.dooane-form{margin-inline:12px}
+.dooane-form input{font-size:16px}
+.dooane-form button{width:44px;height:44px}
+.dooane-note{margin-bottom:max(13px,env(safe-area-inset-bottom))}
+.dooane-panel-keys .dooane-head{padding-top:10px;padding-bottom:8px}
+.dooane-panel-keys .dooane-head p,.dooane-panel-keys .dooane-eyebrow,.dooane-panel-keys .dooane-note{display:none}
+.dooane-panel-keys .dooane-head-art{height:44px}
+.dooane-panel-keys .dooane-form{margin-bottom:10px}
+}
+@keyframes dooane-sheet{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.dooane-panel{animation:none}}
 @media print{.dooane-widget{display:none}}
 /* Page navigation and filters stay above the companion. */
