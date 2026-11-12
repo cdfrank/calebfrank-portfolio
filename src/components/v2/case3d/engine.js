@@ -186,68 +186,86 @@ export function label(S, txt, o = {}) {
   if (o.billboard !== false) S.billboards.push(g);
   return g;
 }
-export const tag = (S, txt, o = {}) => label(S, txt, { mono: true, weight: 700, bg: '#fff', ...o, size: (o.size || 0.26) * 1.45 });
+export const tag = (S, txt, o = {}) => {
+  if (o.size && o.size <= 0.22) { const g = new THREE.Group(); g.set = () => g; return g; } // below the legibility floor: cut it
+  return label(S, txt, { mono: true, weight: 700, bg: '#fff', ...o, size: (o.size || 0.26) * 1.6 });
+};
 export const face = (S, txt, o = {}) => label(S, txt, { billboard: false, ...o });
 
 // ---------------------------------------------------------------- player
 const CSS = `.c3d{position:relative;aspect-ratio:16/10;background:#F4F1EC;border-radius:12px;overflow:hidden;container-type:inline-size;font-family:Inter,system-ui,sans-serif;color:#111;user-select:none;-webkit-user-select:none}
+.c3d.ink{color:#fff}
+.c3d-low,.c3d-pin{text-shadow:0 0 .6em rgba(244,241,236,.9),0 0 .2em rgba(244,241,236,.9)}
+.c3d.ink .c3d-low,.c3d.ink .c3d-pin{text-shadow:0 0 .6em rgba(0,0,0,.9),0 0 .2em rgba(0,0,0,.9)}
 .c3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .c3d-ui{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.c3d-act{position:absolute;left:3.75cqw;top:2.8cqw;display:flex;align-items:center;gap:1.4cqw;font:700 1.9cqw 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.02em}
-.c3d-act b{display:grid;place-items:center;width:4cqw;height:3.75cqw;border-radius:.6cqw;background:#FF2B2B;font-size:2cqw}
-.c3d-cap{position:absolute;left:0;right:0;bottom:5.4cqw;text-align:center;font-weight:700;font-size:2.5cqw;opacity:0;transform:translateY(1.2cqw);transition:opacity .35s,transform .45s cubic-bezier(.34,1.56,.64,1)}
-.c3d-cap.on{opacity:1;transform:none}
-.c3d-cap span{background:#fff;border:.25cqw solid #111;border-radius:99px;padding:.7cqw 2cqw;box-shadow:.5cqw .5cqw 0 #111}
-.c3d-bar{position:absolute;left:3.75cqw;right:3.75cqw;bottom:2.2cqw;height:.6cqw;border-radius:9px;background:rgba(17,17,17,.12)}
-.c3d-bar i{position:absolute;inset:0;background:#111;border-radius:9px;transform-origin:0 50%}
-.c3d-card{position:absolute;inset:-1px;display:flex;flex-direction:column;justify-content:center;padding:0 7.5cqw;visibility:hidden;will-change:transform}
-.c3d-card>*{opacity:0;transform:translateY(4cqw);transition:opacity .3s,transform .5s cubic-bezier(.34,1.56,.64,1)}
-.c3d-card.on>*{opacity:1;transform:none}
-.c3d-card.on>*:nth-child(2){transition-delay:.07s}.c3d-card.on>*:nth-child(3){transition-delay:.14s}.c3d-card.on>*:nth-child(4){transition-delay:.21s}
-.c3d-title{background:#FF2B2B}.c3d-title>*{opacity:1;transform:none;transition:none}
-.c3d-wipe{background:#FF2B2B}.c3d-result{background:#111;color:#fff}
-.c3d-k{font:700 2.2cqw 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase;margin:0 0 2.6cqw}
-.c3d-h{font-weight:800;font-size:6.6cqw;line-height:1.08;letter-spacing:-.02em;margin:0;max-width:74cqw}
-.c3d-pill{align-self:flex-start;margin-top:3.6cqw;background:#111;color:#fff;border-radius:99px;padding:.9cqw 2.4cqw;font:700 1.8cqw 'JetBrains Mono',ui-monospace,monospace}
-.c3d-n{font-weight:800;font-size:21cqw;line-height:.9;letter-spacing:-.04em}
-.c3d-rule{width:12cqw;height:.9cqw;background:#111;margin:2.4cqw 0 2cqw}
-.c3d-l{font:700 2.7cqw 'JetBrains Mono',ui-monospace,monospace}
-.c3d-result .c3d-k{color:#FF2B2B}.c3d-result .c3d-h{font-size:5.3cqw;max-width:80cqw}.c3d-result .c3d-pill{background:none;color:#B5AFA6;padding:0}`;
+.c3d-ui:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.13))}
+.c3d-pin{position:absolute;left:3.75cqw;top:3.2cqw;right:18cqw;opacity:0;transition:opacity .4s}
+.c3d-pin.on{opacity:1}
+.c3d-pin small{display:block;font:700 max(10px,2cqw) 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;opacity:.62;margin-bottom:.7cqw}
+.c3d-pin b{display:block;font-weight:700;font-size:max(12px,3.3cqw);line-height:1.15;letter-spacing:-.01em}
+.c3d-low{position:absolute;left:3.75cqw;right:6cqw;bottom:7.2cqw}
+.c3d-rise{overflow:hidden;padding-bottom:.08em}
+.c3d-rise>*{display:block;transform:translateY(112%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.on>.c3d-rise>*,.c3d-rise.on>*{transform:none}
+.c3d-rise:nth-child(2)>*{transition-delay:.08s}
+.c3d-q{font-weight:800;font-size:9.6cqw;line-height:1;letter-spacing:-.04em;max-width:82cqw;text-wrap:balance}
+.c3d-big{font-weight:800;font-size:17cqw;line-height:.92;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.c3d-big.line{font-size:8cqw;line-height:1;max-width:84cqw}
+.c3d-unit{font:700 max(12px,3.1cqw) 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase;margin-top:1.2cqw}
+.c3d-capt{font-weight:800;font-size:max(15px,5.2cqw);line-height:1.08;letter-spacing:-.02em;max-width:72cqw;text-wrap:balance}
+.c3d-layer{position:absolute;left:0;right:0;bottom:0}
+.c3d-ans{position:absolute;inset:-1px;background:#111;color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 7.5cqw;visibility:hidden}
+.c3d-ans small{font:700 max(11px,2.6cqw) 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.04em;color:#B5AFA6;margin-bottom:2.6cqw}
+.c3d-ans h3{font-weight:800;font-size:6.2cqw;line-height:1.06;letter-spacing:-.025em;margin:0;max-width:82cqw;text-wrap:balance}
+.c3d-ans i{display:block;width:10cqw;height:.9cqw;background:#FF2B2B;margin:0 0 3cqw}
+.c3d-ans em{font:700 max(10px,2cqw) 'JetBrains Mono',ui-monospace,monospace;font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:#B5AFA6;margin-top:3.4cqw}
+.c3d-bar{position:absolute;left:3.75cqw;right:3.75cqw;bottom:2.4cqw;height:max(2px,.5cqw);border-radius:9px;background:currentColor;opacity:.16}
+.c3d-fill{position:absolute;left:3.75cqw;right:3.75cqw;bottom:2.4cqw;height:max(2px,.5cqw);border-radius:9px;background:currentColor;transform-origin:0 50%}
+.c3d-pause{position:absolute;right:max(6px,1.6cqw);top:max(6px,1.6cqw);width:44px;height:44px;border:0;background:none;color:inherit;cursor:pointer;pointer-events:auto;display:grid;place-items:center;border-radius:50%}
+.c3d-pause:focus-visible{outline:2px solid #FF2B2B;outline-offset:-4px}
+.c3d-pause:before{content:"";width:12px;height:14px;border-left:4px solid currentColor;border-right:4px solid currentColor;box-sizing:border-box}
+.c3d-pause[aria-pressed=true]:before{width:0;height:0;border:8px solid transparent;border-left:13px solid currentColor;border-right:0}
+.c3d.ended{color:#fff}`;
 
 export function webglOK() {
   try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'))); } catch (e) { return false; }
 }
+export const ANSWER_AT = 25.6;
+const SETS = { paper: { bg: C.paper, fog: [17, 50], hemi: 2.3, sun: 2.4, shadow: 0.3 }, ink: { bg: 0x0d0d0d, fog: [11, 36], hemi: 1.25, sun: 2.7, shadow: 0 } };
 
 export function createPlayer(el, scenes) {
   if (!document.getElementById('c3d-css')) { const s = document.createElement('style'); s.id = 'c3d-css'; s.textContent = CSS; document.head.appendChild(s); }
-  el.classList.add('c3d');
-  el.innerHTML = `<canvas></canvas><div class="c3d-ui"><div class="c3d-act"><b></b><span></span></div><div class="c3d-cap"><span></span></div>
-<div class="c3d-card c3d-wipe"><div class="c3d-n"></div><div class="c3d-rule"></div><div class="c3d-l"></div></div>
-<div class="c3d-card c3d-result"><p class="c3d-k">Result</p><h3 class="c3d-h"></h3><div class="c3d-pill"></div></div>
-<div class="c3d-card c3d-title"><p class="c3d-k"></p><h3 class="c3d-h"></h3><div class="c3d-pill">CASE STUDY</div></div>
-<div class="c3d-bar"><i></i></div></div>`;
+  el.classList.add('c3d'); el.setAttribute('role', 'img');
+  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="c3d-ui">
+<div class="c3d-pin"><small></small><b></b></div>
+<div class="c3d-low"><div class="c3d-layer c3d-lq"><div class="c3d-rise"><span class="c3d-q"></span></div></div>
+<div class="c3d-layer c3d-lh"><div class="c3d-rise"><span class="c3d-big"></span></div><div class="c3d-rise"><span class="c3d-unit"></span></div></div>
+<div class="c3d-layer c3d-lc"><div class="c3d-rise"><span class="c3d-capt"></span></div></div></div>
+<div class="c3d-ans"><small></small><i></i><h3></h3><em></em></div>
+<div class="c3d-bar"></div><div class="c3d-fill"></div><button class="c3d-pause" type="button" aria-label="Pause animation" aria-pressed="false"></button></div>`;
   const q = (s) => el.querySelector(s);
-  const ui = { act: q('.c3d-act'), cap: q('.c3d-cap'), wipe: q('.c3d-wipe'), result: q('.c3d-result'), title: q('.c3d-title'), bar: q('.c3d-bar i') };
+  const ui = { pin: q('.c3d-pin'), lq: q('.c3d-lq'), lh: q('.c3d-lh'), lc: q('.c3d-lc'), q: q('.c3d-q'), big: q('.c3d-big'), unit: q('.c3d-unit'), capt: q('.c3d-capt'), ans: q('.c3d-ans'), fill: q('.c3d-fill'), pause: q('.c3d-pause') };
+  const touch = window.matchMedia('(pointer: coarse)').matches;
   const renderer = new THREE.WebGLRenderer({ canvas: q('canvas'), antialias: true, powerPreference: 'high-performance' });
-  renderer.setClearColor(C.paper); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  const scene = new THREE.Scene(); scene.fog = new THREE.Fog(C.paper, 26, 60);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = touch ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene(); scene.fog = new THREE.Fog(C.paper, 17, 50);
   const camera = new THREE.PerspectiveCamera(35, 1.6, 0.1, 200);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xe4ddd2, 2.7));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.9); sun.position.set(7, 14, 9); sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 50 }); sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xe4ddd2, 2.3); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 2.4); sun.castShadow = true;
+  const sm = touch ? 1024 : 2048; sun.shadow.mapSize.set(sm, sm); Object.assign(sun.shadow.camera, { left: -17, right: 17, top: 17, bottom: -17, near: 1, far: 60 }); sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03; sun.shadow.radius = 2;
   scene.add(sun); scene.add(sun.target);
-  // ground: drifting dot grid plus a shadow catcher
-  const dots = document.createElement('canvas'); dots.width = dots.height = 64;
-  const dc = dots.getContext('2d'); dc.fillStyle = '#F4F1EC'; dc.fillRect(0, 0, 64, 64); dc.fillStyle = '#C9C3B9'; dc.beginPath(); dc.arc(32, 32, 4.5, 0, 7); dc.fill();
-  const dotTex = new THREE.CanvasTexture(dots); dotTex.wrapS = dotTex.wrapT = THREE.RepeatWrapping; dotTex.repeat.set(160, 160); dotTex.colorSpace = THREE.SRGBColorSpace; dotTex.anisotropy = 8;
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshBasicMaterial({ map: dotTex })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.01; scene.add(ground);
-  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.ShadowMaterial({ opacity: 0.26 })); shadow.rotation.x = -Math.PI / 2; shadow.receiveShadow = true; scene.add(shadow);
+  const dotTex = (bg, fg) => { const d = document.createElement('canvas'); d.width = d.height = 64; const c = d.getContext('2d'); c.fillStyle = bg; c.fillRect(0, 0, 64, 64); c.fillStyle = fg; c.beginPath(); c.arc(32, 32, 4.5, 0, 7); c.fill(); const t = new THREE.CanvasTexture(d); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(160, 160); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+  const tex = { paper: dotTex('#F4F1EC', '#C9C3B9'), ink: dotTex('#0d0d0d', '#2a2927') };
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshBasicMaterial({ map: tex.paper })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.01; scene.add(ground);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.ShadowMaterial({ opacity: 0.3 })); shadow.rotation.x = -Math.PI / 2; shadow.receiveShadow = true; scene.add(shadow);
   const root = new THREE.Group(); scene.add(root);
 
-  let S = null, def = null, update = null, raf = 0, t0 = performance.now(), visible = true, frozen = null, wipeAct = -1;
+  let S = null, def = null, update = null, raf = 0, clock = 0, last = performance.now(), visible = true, frozen = null, paused = false, curSet = '', camKeys = null, gen = 0;
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  const onMove = (e) => { const r = el.getBoundingClientRect(); pointer.tx = ((e.clientX - r.left) / r.width - 0.5) * 2; pointer.ty = ((e.clientY - r.top) / r.height - 0.5) * 2; };
-  el.addEventListener('pointermove', onMove); el.addEventListener('pointerleave', () => { pointer.tx = pointer.ty = 0; });
+  el.addEventListener('pointermove', (e) => { const r = el.getBoundingClientRect(); pointer.tx = ((e.clientX - r.left) / r.width - 0.5) * 2; pointer.ty = ((e.clientY - r.top) / r.height - 0.5) * 2; });
+  el.addEventListener('pointerleave', () => { pointer.tx = pointer.ty = 0; });
+  ui.pause.addEventListener('click', () => { paused = !paused; ui.pause.setAttribute('aria-pressed', String(paused)); ui.pause.setAttribute('aria-label', paused ? 'Play animation' : 'Pause animation'); });
 
   function resize() {
     const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
@@ -261,68 +279,91 @@ export function createPlayer(el, scenes) {
     root.traverse((o) => { if (o.geometry && !Object.values(shapesCache).includes(o.geometry) && !Object.values(edgeCache).includes(o.geometry)) o.geometry.dispose(); if (o.isInstancedMesh) o.dispose(); });
     root.clear(); if (S) S.tex.forEach((x) => x.dispose());
   }
-  function load(slug) {
-    clear(); def = scenes[slug]; if (!def) return;
-    S = { tex: new Map(), billboards: [], groups: [], fx: [], caps: [], root, camera, cam: null,
+  function setSet(name) {
+    if (name === curSet) return; curSet = name; const s = SETS[name];
+    renderer.setClearColor(s.bg); scene.fog.color.set(s.bg); scene.fog.near = s.fog[0]; scene.fog.far = s.fog[1];
+    ground.material.map = tex[name]; ground.material.needsUpdate = true; shadow.material.opacity = s.shadow; hemi.intensity = s.hemi; sun.intensity = s.sun;
+    el.classList.toggle('ink', name === 'ink');
+  }
+  async function load(slug) {
+    const mine = ++gen; clear(); def = null; if (!scenes[slug]) return;
+    try { if (document.fonts) await Promise.race([Promise.all([document.fonts.load('800 96px Inter'), document.fonts.load('700 96px "JetBrains Mono"')]), new Promise((r) => setTimeout(r, 900))]); } catch (e) { /* use fallback fonts */ }
+    if (mine !== gen) return;
+    def = scenes[slug];
+    const lastAct = def.acts[def.acts.length - 1][0];
+    S = { tex: new Map(), billboards: [], groups: [], fx: [], caps: [], heroes: [], kicks: [], root, camera, cam: null,
       group(a, b) { const g = new THREE.Group(); root.add(g); S.groups.push([g, a, b]); return g; },
       act(i) { return S.group(def.acts[i][0], i + 1 < def.acts.length ? def.acts[i + 1][0] : D + 1); },
       caption(text, a, b) { S.caps.push([text, a, b]); },
-      burst(p, time, n = 16, color = C.red) {
-        const m = inst(new THREE.BoxGeometry(0.13, 0.13, 0.13), n, color); m.castShadow = false; root.add(m);
+      hero(big, unit, a, b) { S.heroes.push([big, unit, a, b]); },
+      // Red is held for the payoff: bursts only fire in the last act.
+      burst(p, time, n = 14, color = C.red) {
+        if (time < lastAct) return;
+        S.kicks.push(time);
+        const m = inst(new THREE.BoxGeometry(0.26, 0.26, 0.26), n, color); m.castShadow = false; root.add(m);
         S.fx.push((t) => {
-          const dt = t - time; m.visible = dt > 0 && dt < 1.1; if (!m.visible) return;
+          const dt = t - time; m.visible = dt > 0 && dt < 1.2; if (!m.visible) return;
           for (let i = 0; i < n; i++) {
-            const a = rnd(i, time) * Math.PI * 2, b = rnd(i, time + 1) * 1.2 + 0.3, sp = 2.4 + rnd(i, time + 2) * 2.6;
-            dummy.position.set(p[0] + Math.cos(a) * Math.cos(b) * sp * dt, p[1] + Math.sin(b) * sp * dt - 3.2 * dt * dt, p[2] + Math.sin(a) * Math.cos(b) * sp * dt);
-            dummy.rotation.set(dt * 6 + i, dt * 5, i); dummy.scale.setScalar(1 - dt / 1.1); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix);
+            const a = rnd(i, time) * Math.PI * 2, b = rnd(i, time + 1) * 1.2 + 0.3, sp = 3 + rnd(i, time + 2) * 3.4;
+            dummy.position.set(p[0] + Math.cos(a) * Math.cos(b) * sp * dt, p[1] + Math.sin(b) * sp * dt - 3.6 * dt * dt, p[2] + Math.sin(a) * Math.cos(b) * sp * dt);
+            dummy.rotation.set(dt * 6 + i, dt * 5, i); dummy.scale.setScalar(1 - dt / 1.2); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix);
           }
           m.instanceMatrix.needsUpdate = true;
         });
       } };
     update = def.build(S);
-    ui.title.querySelector('.c3d-k').textContent = def.client; ui.title.querySelector('.c3d-h').textContent = def.title;
-    ui.result.querySelector('.c3d-h').textContent = def.result; ui.result.querySelector('.c3d-pill').textContent = def.client.toUpperCase();
-    wipeAct = -1; t0 = performance.now(); resize();
+    // Keyframes less than half a second apart are a cut, not a move.
+    camKeys = def.cam.map((kk) => kk.slice());
+    for (let i = 0; i + 1 < camKeys.length; i++) if (camKeys[i + 1][0] - camKeys[i][0] <= 0.45) camKeys[i][0] = camKeys[i + 1][0] - 0.001;
+    ui.pin.firstElementChild.textContent = def.client; ui.pin.lastElementChild.textContent = def.question; ui.q.textContent = def.question;
+    ui.ans.querySelector('small').textContent = def.question; ui.ans.querySelector('h3').textContent = def.result; ui.ans.querySelector('em').textContent = def.client;
+    el.setAttribute('aria-label', `${def.client}. ${def.question} ${def.result}`);
+    curSet = ''; clock = 0; last = performance.now(); resize();
   }
 
-  const X = (n, x) => { if (x === null) { n.style.visibility = 'hidden'; } else { n.style.visibility = 'visible'; n.style.transform = `translateX(${x}%)`; } };
-  function drawUI(t) {
-    X(ui.title, t < 1.1 ? 0 : t < 1.42 ? eio((t - 1.1) / 0.32) * 101 : null);
-    let w = null, wi = -1;
-    def.acts.forEach(([a], i) => { if (i && t >= a - 0.52 && t < a + 0.67) { wi = i; w = t < a - 0.2 ? -101 + 101 * eio(k(t, a - 0.52, a - 0.2)) : t < a + 0.35 ? 0 : 101 * eio(k(t, a + 0.35, a + 0.67)); } });
-    if (wi > 0 && wi !== wipeAct) { wipeAct = wi; ui.wipe.querySelector('.c3d-n').textContent = '0' + (wi + 1); ui.wipe.querySelector('.c3d-l').textContent = def.acts[wi][1]; }
-    X(ui.wipe, w); ui.wipe.classList.toggle('on', wi > 0 && t > def.acts[wi][0] - 0.3);
-    X(ui.result, t >= 28.95 ? -101 + 101 * eio(k(t, 28.95, 29.27)) : null); ui.result.classList.toggle('on', t > 29.15);
-    let ai = 0; def.acts.forEach(([a], i) => { if (t >= a) ai = i; });
-    if (ui.act.dataset.i !== String(ai) + def.title) { ui.act.dataset.i = String(ai) + def.title; ui.act.firstChild.textContent = ai + 1; ui.act.lastChild.textContent = def.acts[ai][1]; }
-    const cap = S.caps.find(([, a, b]) => t >= a && t < b);
-    if (cap && ui.cap.firstChild.textContent !== cap[0]) ui.cap.firstChild.textContent = cap[0];
-    ui.cap.classList.toggle('on', !!cap);
-    ui.bar.style.transform = `scaleX(${t / D})`;
+  const setLayer = (n, on) => { if (n.classList.contains('on') !== on) n.classList.toggle('on', on); };
+  function drawUI(t, ts) {
+    const open = t < 3.3, ended = t >= ANSWER_AT;
+    setLayer(ui.lq, open && t > 0.12); setLayer(ui.pin, !open && !ended);
+    const h = !open && !ended && S.heroes.find(([, , a, b]) => ts >= a && ts < b);
+    if (h) { if (ui.big.textContent !== h[0]) { ui.big.textContent = h[0]; ui.big.classList.toggle('line', h[0].length > 7); } if (ui.unit.textContent !== h[1]) ui.unit.textContent = h[1]; }
+    setLayer(ui.lh, !!h);
+    const cap = !open && !ended && !h && S.caps.find(([, a, b]) => ts >= a && ts < b);
+    if (cap && ui.capt.textContent !== cap[0]) ui.capt.textContent = cap[0];
+    setLayer(ui.lc, !!cap);
+    ui.ans.style.visibility = ended ? 'visible' : 'hidden'; el.classList.toggle('ended', ended);
+    ui.fill.style.transform = `scaleX(${t / D})`;
   }
   const v1 = new THREE.Vector3(), q1 = new THREE.Quaternion();
   function frame(t) {
     if (!def) return;
+    const real = t; t = real * (def.warp ?? 1.14); // legacy scenes were timed to 30 s; compress them so they finish before the answer card
+    let ai = 0; def.acts.forEach(([a], i) => { if (t >= a) ai = i; });
+    setSet((def.sets && def.sets[ai]) || 'paper');
     for (const [g, a, b] of S.groups) g.visible = t >= a && t < b;
     S.cam = null; update(t);
-    const pose = S.cam || [kf(t, def.cam.map(([tt, p]) => [tt, p])), kf(t, def.cam.map(([tt, , g]) => [tt, g]))];
+    const pose = S.cam || [kf(t, camKeys.map(([tt, p]) => [tt, p])), kf(t, camKeys.map(([tt, , g]) => [tt, g]))];
+    const fov = kf(t, camKeys.map(([tt, , , f]) => [tt, f || 35]));
+    if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
     pointer.x += (pointer.tx - pointer.x) * 0.06; pointer.y += (pointer.ty - pointer.y) * 0.06;
-    camera.position.set(pose[0][0] + Math.sin(t * 0.5) * 0.12 + pointer.x * 0.9, pose[0][1] + Math.cos(t * 0.37) * 0.08 - pointer.y * 0.5, pose[0][2]);
+    let kick = 0; for (const kt of S.kicks) { const d = t - kt; if (d > 0 && d < 0.25) kick = Math.max(kick, (1 - d / 0.25)); }
+    camera.position.set(pose[0][0] + Math.sin(t * 0.5) * 0.12 + pointer.x * 0.9 + Math.sin(t * 90) * 0.07 * kick, pose[0][1] + Math.cos(t * 0.37) * 0.08 - pointer.y * 0.5 + Math.cos(t * 70) * 0.07 * kick, pose[0][2]);
     camera.lookAt(v1.set(pose[1][0], pose[1][1], pose[1][2]));
-    sun.position.set(pose[1][0] + 7, 14, pose[1][2] + 9); sun.target.position.set(pose[1][0], 0, pose[1][2]);
-    dotTex.offset.set(t * 0.004, t * 0.004);
+    sun.position.set(pose[1][0] + 9, 10, pose[1][2] + 7); sun.target.position.set(pose[1][0], 0, pose[1][2]);
+    tex.paper.offset.set(t * 0.004, t * 0.004);
     for (const b of S.billboards) { if (b.parent) { b.parent.getWorldQuaternion(q1); b.quaternion.copy(q1.invert()).multiply(camera.quaternion); } }
     for (const f of S.fx) f(t);
-    drawUI(t); renderer.render(scene, camera);
+    drawUI(real, t); renderer.render(scene, camera);
   }
   function tick(now) {
     raf = requestAnimationFrame(tick);
-    if (frozen !== null || !visible || document.hidden) return;
-    frame(((now - t0) / 1000) % D);
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (frozen !== null || !visible || document.hidden || paused) return;
+    clock = (clock + dt) % D; frame(clock);
   }
   raf = requestAnimationFrame(tick);
   return {
-    load, seek(t) { frozen = t; frame(t); }, play() { frozen = null; t0 = performance.now(); },
+    load, seek(t) { frozen = t; frame(t); }, play() { frozen = null; last = performance.now(); },
     destroy() { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); clear(); renderer.dispose(); el.innerHTML = ''; },
   };
 }

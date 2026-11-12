@@ -35,7 +35,6 @@ A['basf-agriculture-customer-portal'] = {
     const ball = at(sphere(0.34, C.red), 0, 0, 0, g1);
     const waits = [at(tag(S, 'WAIT'), -2, 4.1, 0, g1), at(tag(S, 'WAIT'), 2, 4.1, 0, g1)];
     const qs = [at(label(S, '?', { size: 1.5, color: '#FF2B2B' }), -6, 4.6, 0, g1), at(label(S, '?', { size: 1.5, color: '#FF2B2B' }), 6, 4.6, 0, g1)];
-    S.caption('Who bought what? Nobody sees it all.', 8.4, 9.7);
     // act 2
     const scr = at(screen(S, 6.4, 4.4, 'PARTNER PORTAL'), 0, 2.7, 0, g2);
     const rows = [0, 1, 2, 3].map((i) => { const r = row(5.8, 0.75 - i * 0.55); r.position.z = 0.1; scr.add(r); at(row([2.6, 2, 3, 2.3][i], 0, C.mid, 0.12), -1.3 + [0, -0.3, 0.2, -0.15][i], 0, 0.04, r); return r; });

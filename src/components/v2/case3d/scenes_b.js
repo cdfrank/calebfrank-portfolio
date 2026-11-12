@@ -106,7 +106,7 @@ B['new-york-lottery-single-sign-on'] = {
     const me = at(pawn(C.white, 1.3), 0, 0, 4, g);
     const junk = [0, 1, 2, 3, 4, 5].map((i) => { const kk = at(key3d([C.white, C.dim, C.mid][i % 3]), 0, 0, 0, g); kk.scale.setScalar(0.55); return kk; });
     const key = at(key3d(C.red), 0, 0, 0, g); key.scale.setScalar(0.9);
-    S.caption('Which password was this one?', 5.6, 9.6); xs.forEach((x, i) => S.burst([x + 0.7, 2.2, 0.6], 11.9 + i * 2, 18));
+ xs.forEach((x, i) => S.burst([x + 0.7, 2.2, 0.6], 11.9 + i * 2, 18));
     const stops = [[10.3, [0.6, 2, 4.4]]]; xs.forEach((x, i) => { stops.push([11.2 + i * 2, [x + 0.35, 2, 0.6]], [12.3 + i * 2, [x + 0.35, 2, 0.6]]); }); stops.push([19.4, [0.6, 2, 4.4]]);
     // act 3
     const hubM = own(C.white), hub = at(cyl(2.3, 0.4, C.white, { material: hubM }), 0, 0.2, 0, g3);
@@ -168,7 +168,7 @@ B['mrm-agent-relationship-management'] = {
 
 // ================================================================ STELLA alert rework
 B['stella-alert-rework'] = {
-  client: 'STELLA Automotive AI', title: 'Strip, tile, button: alerts that say what to do next', result: 'Every alert says what to do next. A design study for leadership review.',
+  client: 'STELLA Automotive AI', title: 'Strip, tile, button: alerts that say what to do next', result: 'Every alert says what to do next. A design study, not yet shipped.',
   acts: [[0, 'AFTER THE CALL'], [10, 'STRIP · TILE · BUTTON'], [20, 'WORK THE QUEUE']],
   cam: [[0, [-3, 3.4, 15], [0, 2.2, 0]], [9.6, [2.5, 3.2, 15], [0.4, 2.2, 0]], [10, [-4.5, 4, 15.5], [0, 3.1, 0]], [19.6, [3, 3.4, 13.5], [0, 3.1, 0]], [20, [4.5, 3.6, 14], [0.4, 3.1, 0]], [28.9, [-2, 3.2, 12.5], [0, 3.1, 0]]],
   build(S) {
@@ -177,7 +177,6 @@ B['stella-alert-rework'] = {
     const dot = at(cyl(0.34, 0.12, C.red), -2, 1.1, 0.2, dev); dot.rotation.x = PI / 2; at(face(S, 'AI VOICE AGENT', { size: 0.24, mono: true, align: 'left' }), -1.4, 1.1, 0.17, dev);
     const wave = Array.from({ length: 18 }, (_, i) => at(box(0.14, 1.6, 0.14, C.ink), -2.2 + i * 0.26, -0.5, 0.25, dev));
     const pile = Array.from({ length: 7 }, (_, i) => { const b = at(box(3.6, 0.7, 0.24, C.white), 0, 0, 0, g1); at(sphere(0.14, C.red), -1.5, 0, 0.14, b); at(row(1.6 + rnd(i) * 1, 0, C.mid, 0.12), 0.1, 0, 0.13, b); b.to = [3.4 + (rnd(i, 1) - 0.5) * 1.6, 0.4 + i * 0.5, (rnd(i, 2) - 0.5) * 1.6]; b.r = [(rnd(i, 3) - 0.5) * 0.5 - 1.4, (rnd(i, 4) - 0.5) * 1.2, (rnd(i, 5) - 0.5) * 0.5]; return b; });
-    S.caption('Seven follow-ups. Which first?', 7.6, 9.6);
     const sm = own(C.red), strip = at(box(10.4, 0.8, 0.5, C.red, { material: sm }), 0, 5.5, 0, g), sl = at(label(S, '3 FOLLOW-UPS NEED YOU', { size: 0.34, mono: true, billboard: false, align: 'left' }), -4.9, 0, 0.27, strip);
     const slotY = [3.95, 2.45, 0.95], info = [['ADVISOR CALLBACK', 'CALL BACK', C.red, 2, 21.6], ['CONFIRM APPOINTMENT', 'CONFIRM', C.mid, 0, 24.6], ['SEND RECALL TEXT', 'TEXT', C.dim, 1, 27.6]];
     const tiles = info.map(([title, btn, col, start, done], i) => {
@@ -188,7 +187,7 @@ B['stella-alert-rework'] = {
     });
     const cur = at(cursor3d(), 0, 0, 0, g); S.billboards.push(cur);
     const fin = at(new THREE.Group(), 0, 2.6, 0.5, g), fc = cyl(1.5, 0.3, C.white); fc.rotation.x = PI / 2; fin.add(fc); at(box(0.9, 0.24, 0.1, C.ink), -0.45, -0.25, 0.2, fin).rotation.z = -0.8; at(box(1.7, 0.24, 0.1, C.ink), 0.3, 0.1, 0.2, fin).rotation.z = 0.9;
-    S.caption('Each alert says what to do next', 16, 19.6); S.burst([0, 2.6, 1], 28.4, 30);
+     S.burst([0, 2.6, 1], 28.4, 30);
     return (t) => {
       pop(dev, t, 0.3, 0.6); wave.forEach((b, i) => { b.scale.y = t < 5.6 ? 0.2 + Math.abs(Math.sin(t * 5 + i * 0.9) * Math.sin(t * 1.7 + i * 0.4)) * 0.9 : 0.1; }); dot.scale.setScalar(1 + (t < 5.6 ? Math.sin(t * 8) * 0.12 : 0));
       pile.forEach((b, i) => { const a = 5 + i * 0.45, q = k(t, a, a + 0.7), bo = q < 1 ? eo(q) : 1; b.visible = t > a; b.position.set(b.to[0], lerp(11, b.to[1], bo) + (q >= 1 ? Math.abs(Math.sin(k(t, a + 0.7, a + 1.1) * PI)) * 0.25 : 0), b.to[2]); b.rotation.set(b.r[0] * bo + (1 - bo) * 4, b.r[1], b.r[2] + (1 - bo) * 3); });
@@ -209,13 +208,13 @@ B['stella-alert-rework'] = {
 
 // ================================================================ Valero audit
 B['valero-digital-ecosystem-audit'] = {
-  client: 'Valero', title: 'What is this website for?', result: '3-phase audit, 6 personas, findings well received by Valero.',
+  client: 'Valero', title: 'What is this website for?', result: '3-phase audit, 6 personas, findings well received by Valero stakeholders.',
   acts: [[0, 'WHAT IS THIS SITE FOR?'], [10, 'THREE-PHASE AUDIT'], [20, 'SIX PERSONAS']],
   cam: [[0, [0, 3.4, 18], [0, 2.8, 0]], [9.6, [0, 3.2, 15.5], [0, 2.8, 0]], [10, [-4, 3.8, 18], [-1, 2.4, 0]], [19.6, [4, 3.8, 17], [1, 2.4, 0]], [20, [-4, 5, 17], [0, 1.8, 0]], [29, [2.5, 4.4, 15.5], [0, 1.8, 0]]],
   build(S) {
     const g1 = S.act(0), g2 = S.act(1), g3 = S.act(2);
     const sites = [-1, 1].map((s) => { const w = at(new THREE.Group(), s * 3.7, 2.9, 0, g1), sc = screen(S, 5.4, 4.2, s < 0 ? 'SITE A' : 'SITE B'); w.add(sc); w.s = s; at(box(4.8, 1.3, 0.06, C.raised, { edge: false }), 0, 0.3, 0.1, sc); const fr = at(box(4.9, 1.4, 0.04, C.red, { edge: false }), 0, 0.3, 0.07, sc); w.fr = fr; [0, 1, 2].forEach((i) => at(row([3.4, 2.6, 3][i], 0, C.dim, 0.12), -0.6 + [0, -0.4, -0.2][i], -0.75 - i * 0.3, 0.1, sc)); at(box(1.5, 0.4, 0.08, C.mid), -1.6, -1.75, 0.1, sc); return w; });
-    const q = at(label(S, '?', { size: 3, color: '#FF2B2B' }), 0, 3.2, 1.6, g1); S.burst([0, 3.2, 1.8], 4.4, 26); S.caption('Two sites, one job?', 5.4, 9.6);
+    const q = at(label(S, '?', { size: 3, color: '#FF2B2B' }), 0, 3.2, 1.6, g1); S.burst([0, 3.2, 1.8], 4.4, 26); 
     const xs = [-6.5, -3.9, -1.3, 1.3, 3.9, 6.5], names = ['PUMP', 'CAR', 'FLEET', 'APP', 'CARD', 'WEB'], finds = [3, 1, 4, 2, 2, 5];
     const tps = xs.map((x, i) => {
       const g = at(new THREE.Group(), x, 0, 0, g2); at(cyl(1, 0.2, C.white), 0, 0.1, 0, g); let o;
