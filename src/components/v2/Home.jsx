@@ -1,7 +1,14 @@
 // Generated from the Claude Design board Main-egx9.dc.html. The logic class is the board's own code.
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { LOOPS } from '../../data/hover-loops.js';
+import { LOOP_SLUGS } from '../../data/loop-slugs.js';
+
+// Loop files load on demand, once each.
+const loopCache = new Map();
+const loadLoop = (slug) => {
+  if (!loopCache.has(slug)) loopCache.set(slug, fetch('/loops/' + slug + '.svg').then((r) => (r.ok ? r.text() : '')).catch(() => ''));
+  return loopCache.get(slug);
+};
 
 class DCLogic extends React.Component {
   constructor(props) { super(props); this.state = {}; }
@@ -17,6 +24,7 @@ class Component extends DCLogic {
   }
   // Street Signal hero: the character loop on wide screens, the skate-away clip on phones. Video starts after mount so only one file loads.
   componentDidMount() {
+    this.srLoops();
     const mq = window.matchMedia('(max-width: 860px)');
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.ssPick = () => {
@@ -80,6 +88,24 @@ class Component extends DCLogic {
       const to = this.state.full ? this.srX : document.querySelectorAll('#numbers .b')[this.state.sel];
       if (to) to.focus({ preventScroll: true });
     }
+    this.srLoops();
+  }
+  // Fill any empty preview slot with its loop file, then start it.
+  srLoops() {
+    document.querySelectorAll('.sr .pv .lp[data-loop]').forEach((box) => {
+      const slug = box.dataset.loop;
+      if (box.dataset.filled === slug) return;
+      box.dataset.filled = slug;
+      loadLoop(slug).then((svg) => {
+        if (!svg || box.dataset.loop !== slug) return;
+        box.innerHTML = svg;
+        const el = box.querySelector('svg.hl'); if (el) { el.removeAttribute('role'); el.setAttribute('aria-hidden', 'true'); }
+        this.srStart();
+      });
+    });
+    this.srStart();
+  }
+  srStart() {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('.sr .pv .lp svg.hl').forEach((el) => {
       if (el.dataset.state || !el.getAnimations) return;
@@ -162,7 +188,7 @@ class Component extends DCLogic {
     else cam = 'scale(' + (cur.y ? 0.68 : cur.x === 'year' ? 0.82 : 1) + ') rotateX(' + (58 + pitch) + 'deg) rotateZ(' + (-22 + yaw) + 'deg) translate3d(0,0,-30px)';
     const picked = sel === null ? null : DATA[sel];
     const pvOf = (d, n) => {
-      const nda = d[4] === 3, own = d[6] === 'Self-initiated', sh = this.SHOT[d[5]], lp = nda ? '' : LOOPS[d[5]] || '';
+      const nda = d[4] === 3, own = d[6] === 'Self-initiated', sh = this.SHOT[d[5]], lp = nda ? '' : LOOP_SLUGS[d[5]] || '';
       const lg = own ? '/v2/e295297c792a99090470f555e3216f0a.png' : this.LOGO[d[6]];
       const w = (k) => (40 + Math.round(rnd(n, k) * 50)) + '%';
       return {
@@ -304,7 +330,7 @@ export default class Board extends Component {
               <div className={"cap"}>
                 {`${v.pv.cap}`}
               </div>
-              {v.pv.loop ? <div className={"lp"} key={v.pv.t} dangerouslySetInnerHTML={{ __html: v.pv.loop }} /> : null}
+              {v.pv.loop ? <div className={"lp"} key={v.pv.loop} data-loop={v.pv.loop} /> : null}
               {" "}
             </div>
     );
