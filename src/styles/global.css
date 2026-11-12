@@ -227,6 +227,10 @@ button, input, select { font: inherit; color: inherit; }
 .case-facts dt { color: var(--quiet); font-size: 0.88rem; }
 .case-cover { max-width: var(--wide); margin-inline: auto; padding-inline: var(--gutter); }
 .case-cover img { width: 100%; }
+.case-cover.case-loop { max-width: 1040px; }
+.case-cover.case-loop .hl { border-radius: 12px; }
+.case-cover.case-loop .hl * { animation-play-state: running; animation-delay: 0s; }
+@media (prefers-reduced-motion: reduce) { .case-cover.case-loop .hl * { animation-play-state: paused; animation-delay: calc(var(--poster, 5s) * -1); } }
 .prose { max-width: calc(var(--measure) + var(--gutter) * 2); margin-inline: auto; padding: clamp(40px, 6vw, 80px) var(--gutter) 24px; }
 .prose > p { margin-bottom: 1.15em; }
 .prose h2 { font-size: clamp(1.7rem, 3.3vw, 2.5rem); margin-top: 2em; margin-bottom: 0.55em; }
