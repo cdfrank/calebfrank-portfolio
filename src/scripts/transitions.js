@@ -4,10 +4,12 @@
 const d = document.documentElement;
 const OUT = { about: 320, work: 380, process: 320, play: 420, contact: 300 };
 const HOLD = 2200; // matches --hold in transitions.css: the pause after DOOANE's antics
-const IN = { about: 1250 + HOLD, work: 900 + HOLD, process: 860 + HOLD, play: 980 + HOLD, contact: 840 + HOLD };
-const ART = { about: '/dooane/spray-can.webp', work: '/dooane/pointing.webp', process: '/dooane/crouch.png', play: '/dooane/skating.png', contact: '/dooane/cap-tip.png' };
+const IN = { about: 1250 + HOLD, work: 760 + HOLD, process: 860 + HOLD, play: 980 + HOLD, contact: 840 + HOLD };
+const ART = { about: '/dooane/spray-can.webp', work: '/dooane/spray-can.webp', process: '/dooane/crouch.png', play: '/dooane/skating.png', contact: '/dooane/cap-tip.png' };
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 let timer = 0;
+let tag = null; // the Work transition's Three.js scene while it plays
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function kind(url) {
   if (url.origin !== location.origin) return null;
@@ -27,7 +29,18 @@ function repeat(t) {
 
 function end() {
   clearTimeout(timer);
-  delete d.dataset.tx; delete d.dataset.txP; delete d.dataset.txQ;
+  tag?.stop(); tag = null;
+  delete d.dataset.tx; delete d.dataset.txP; delete d.dataset.txQ; delete d.dataset.txFb;
+}
+
+// Work, first visit: DOOANE sprays the tag in WebGL. If that can't start in time, data-tx-fb
+// switches the overlay to the still pointing DOOANE instead.
+async function sprayTag() {
+  const host = document.getElementById('tx');
+  const p = import('./tx-tag.js').then((m) => m.play(host));
+  const r = await Promise.race([p, wait(1600)]).catch(() => null);
+  if (!r) p.then((x) => x.stop()).catch(() => {});
+  return r || null;
 }
 
 function pulse() {
@@ -37,7 +50,13 @@ function pulse() {
   setTimeout(() => b.classList.remove('tx-pulse'), 1300);
 }
 
-function reveal(t, q) {
+async function reveal(t, q) {
+  if (t === 'work' && !q) {
+    const r = await sprayTag();
+    if (d.dataset.tx !== 'work') { r?.stop(); return; } // skipped while it loaded
+    tag = r;
+    if (!r) d.dataset.txFb = '';
+  }
   d.dataset.txP = 'in';
   timer = setTimeout(() => { end(); if (t === 'contact') pulse(); }, q ? 260 : IN[t]);
 }
@@ -53,6 +72,7 @@ document.addEventListener('click', (e) => {
   e.preventDefault();
   const q = repeat(t);
   if (!q) new Image().src = ART[t];
+  if (!q && t === 'work') import('./tx-tag.js').catch(() => {}); // warm the scene's code before leaving
   clearTimeout(timer);
   d.dataset.tx = t;
   if (q) d.dataset.txQ = ''; else delete d.dataset.txQ;
