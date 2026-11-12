@@ -30,3 +30,4 @@ a{color:inherit;text-decoration:none}
 .cols ul{list-style:none;margin:0;padding:0}
 .cols li{padding:8px 0;border-top:1px solid #333}
 @media (max-width:860px){.intro{grid-template-columns:minmax(0,1fr)}.job{grid-template-columns:minmax(0,1fr)}.nav img{height:46px}.links a{padding:0 11px}}
+.brands{font-size:15px;color:#3a3a3a}
