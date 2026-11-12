@@ -14,24 +14,58 @@ export default function DooaneChat({ portfolio }) {
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [hover, setHover] = useState(false);
+  const [keys, setKeys] = useState(false);
   const launcher = useRef(null);
+  const panel = useRef(null);
   const input = useRef(null);
   const transcript = useRef(null);
   const pending = useRef(null);
 
   useEffect(() => () => clearTimeout(pending.current), []);
+  // Touch screens: opening the guide must not summon the keyboard. The field takes focus only when the visitor taps it.
   useEffect(() => {
-    if (open) input.current?.focus();
+    if (!open) return;
+    const typist = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    (typist ? input : panel).current?.focus({ preventScroll: true });
+  }, [open]);
+  // Phones: the guide is a full-screen sheet sized to the visible viewport, so the header and the field stay in view above the keyboard.
+  useEffect(() => {
+    if (!open) return;
+    const phone = window.matchMedia('(max-width: 520px)');
+    const view = window.visualViewport;
+    const root = document.documentElement;
+    const fit = () => {
+      const box = panel.current;
+      if (!box) return;
+      const sheet = phone.matches && view && view.scale < 1.05;
+      root.style.overflow = phone.matches ? 'hidden' : '';
+      if (sheet) { box.style.setProperty('--dooane-top', `${view.offsetTop}px`); box.style.setProperty('--dooane-h', `${view.height}px`); }
+      else { box.style.removeProperty('--dooane-top'); box.style.removeProperty('--dooane-h'); }
+      setKeys(Boolean(sheet) && window.innerHeight - view.height > 120);
+    };
+    fit();
+    phone.addEventListener('change', fit);
+    view?.addEventListener('resize', fit);
+    view?.addEventListener('scroll', fit);
+    return () => {
+      phone.removeEventListener('change', fit);
+      view?.removeEventListener('resize', fit);
+      view?.removeEventListener('scroll', fit);
+      root.style.overflow = '';
+      setKeys(false);
+    };
   }, [open]);
   useEffect(() => {
     const box = transcript.current;
     if (box) box.scrollTop = box.scrollHeight;
-  }, [messages, busy, open]);
+  }, [messages, busy, open, keys]);
 
   function close() { setHover(false); setOpen(false); requestAnimationFrame(() => launcher.current?.focus()); }
   function ask(value) {
     const question = value.trim().slice(0, 400);
     if (!question || pending.current !== null) return;
+    // Keep typing where the visitor was typing; a tapped suggestion leaves the keyboard down.
+    const typing = document.activeElement === input.current || window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     setMessages((history) => [...history.slice(-27), { role: 'user', text: question, links: [] }]);
     setDraft('');
     setBusy(true);
@@ -40,12 +74,12 @@ export default function DooaneChat({ portfolio }) {
       pending.current = null;
       setMessages((history) => [...history, { role: 'assistant', ...answerQuestion(question, portfolio) }]);
       setBusy(false);
-      input.current?.focus();
+      (typing ? input : panel).current?.focus({ preventScroll: true });
     }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420);
   }
 
   return <aside className="dooane-widget" aria-label="DOOANE portfolio guide">
-    {open && <section className="dooane-panel" id="dooane-chat" role="dialog" aria-label="Chat with DOOANE" onKeyDown={(event) => { if (event.key === 'Escape') { event.stopPropagation(); close(); } }}>
+    {open && <section className={`dooane-panel${keys ? ' dooane-panel-keys' : ''}`} id="dooane-chat" ref={panel} tabIndex={-1} role="dialog" aria-label="Chat with DOOANE" onKeyDown={(event) => { if (event.key === 'Escape') { event.stopPropagation(); close(); } }}>
       <header className="dooane-head">
         <div className="dooane-head-art"><Mascot small state={busy ? 'thinking' : 'idle'} /></div>
         <div><span className="dooane-eyebrow">YOUR INSIDE GUIDE</span><h2>ASK DOOANE<span>.</span></h2><p>Caleb’s work. A little personality.</p></div>
