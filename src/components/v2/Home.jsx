@@ -1,7 +1,7 @@
 // Generated from the Claude Design board Main-egx9.dc.html. The logic class is the board's own code.
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { LOOP_SLUGS } from '../../data/loop-slugs.js';
+import { LOOP_SLUGS, NDA_LOOPS } from '../../data/loop-slugs.js';
 
 // Loop files load on demand, once each.
 const loopCache = new Map();
@@ -188,7 +188,7 @@ class Component extends DCLogic {
     else cam = 'scale(' + (cur.y ? 0.68 : cur.x === 'year' ? 0.82 : 1) + ') rotateX(' + (58 + pitch) + 'deg) rotateZ(' + (-22 + yaw) + 'deg) translate3d(0,0,-30px)';
     const picked = sel === null ? null : DATA[sel];
     const pvOf = (d, n) => {
-      const nda = d[4] === 3, own = d[6] === 'Self-initiated', sh = this.SHOT[d[5]], lp = nda ? '' : LOOP_SLUGS[d[5]] || '';
+      const nda = d[4] === 3, own = d[6] === 'Self-initiated', sh = this.SHOT[d[5]], lp = (nda ? NDA_LOOPS[n] : LOOP_SLUGS[d[5]]) || '';
       const lg = own ? '/v2/e295297c792a99090470f555e3216f0a.png' : this.LOGO[d[6]];
       const w = (k) => (40 + Math.round(rnd(n, k) * 50)) + '%';
       return {
@@ -198,7 +198,7 @@ class Component extends DCLogic {
         shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
         t: nda ? 'Under NDA' : d[5], client: nda ? '' : d[6], cmd: nda ? '> under nda_' : '> ' + d[5].toLowerCase() + '_',
         w1: w(11), w2: w(12), w3: w(13),
-        cap: nda ? 'Under NDA' : lp ? 'Concept loop' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
+        cap: lp ? 'Concept loop' : nda ? 'Under NDA' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
       };
     };
     const pv = picked ? pvOf(picked, sel) : { cls: '', ac: 'transparent', shot: '/dooane/pointing.webp', logo: '/dooane/pointing.webp', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '', loop: '' };

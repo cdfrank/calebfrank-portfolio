@@ -81,3 +81,13 @@ export const LOOP_SLUGS = {
 "Street Signal and SkateGO": "self-initiated-scan-skate-and-skatego",
 "Shred & Dice": "self-initiated-shred-dice"
 };
+
+// NDA boxes on the home map (by DATA index) -> the concept loop for that confidential project, matched on employer and year.
+export const NDA_LOOPS = {
+31: "gm-lab313-vehicle-add-ons-pilot",
+35: "gm-lab313-affordability-check-pilot", 36: "gm-lab313-carveau", 37: "gm-lab313-disruptive-innovation-workshop",
+38: "gm-lab313-put-a-t1-anywhere", 39: "gm-lab313-center-of-learning", 40: "gm-lab313-gm-card-ideation",
+41: "gm-lab313-rent-accessories-pilot", 42: "gm-lab313-test-drive-scheduler", 43: "gm-lab313-vehicle-venmo",
+46: "general-motors-onstar-adapter-experience", 47: "general-motors-onstar-experience-transformation",
+48: "gm-lab313-carcontrol", 49: "gm-lab313-personalize-my-price",
+};

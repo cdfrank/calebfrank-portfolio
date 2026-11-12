@@ -112,7 +112,7 @@ class Component extends DCLogic {
       shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
       t: nda ? '' : d[5], client: nda ? '' : d[6], cmd: nda ? '' : '> ' + d[5].toLowerCase() + '_',
       w1: w(11), w2: w(12), w3: w(13),
-      cap: nda ? 'Under NDA' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
+      cap: nda ? 'Confidential' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
     };
   }
   ramp(y) { return 'oklch(' + (0.34 + y * 0.05).toFixed(3) + ' 0.008 80)'; }
