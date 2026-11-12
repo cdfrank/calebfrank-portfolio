@@ -1,0 +1,133 @@
+/* Case study pages (work/[id].astro) in the Dooane look: paper hero, dark reading column, red accents. */
+body{margin:0;background:#111}
+a{color:inherit;text-decoration:none}
+.site{font-family:Inter,system-ui,sans-serif;color:#F4F1EC;background:#111 url(/v2/20b9d21952dd7b71faf4b1152907f876.jpg);overflow-x:clip;font-size:18px;line-height:1.65}
+.wrap{max-width:1280px;margin:0 auto;padding:0 clamp(16px,5vw,80px);box-sizing:border-box}
+.display{font-family:Anton,Impact,sans-serif;font-weight:400;text-transform:uppercase;line-height:1;margin:0}
+.paper{position:relative;background:#E9E4DA url(/v2/a47cf5cdee5bff56e4086ff608897d1b.jpg);color:#111}
+.torn-b{clip-path:polygon(0 0,100% 0,100% 95%,93% 98%,86% 95.4%,78% 99%,70% 96%,61% 98.6%,52% 95.4%,44% 99%,35% 96%,27% 98.6%,18% 95.4%,9% 99%,0 96%)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;padding-top:24px;padding-bottom:24px}
+.nav img{height:58px;display:block}
+.links{display:flex;gap:2px;flex-wrap:wrap;background:#111;color:#F4F1EC;border-radius:10px;padding:4px}
+.links a{display:flex;align-items:center;min-height:44px;padding:0 16px;font-size:14px;font-weight:600;border-radius:7px}
+.links a:hover,.links a.on{background:#2C2C2C}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:999px;font-weight:700;font-size:15px;box-sizing:border-box}
+.btn-red{background:#FF2B2B;color:#111}
+.btn-ink{background:#111;color:#F4F1EC}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.case a:focus-visible{outline:3px solid #FF2B2B;outline-offset:3px}
+
+/* Private draft banner (only on unapproved pages) */
+.review{margin-top:32px;background:#EEFF00;color:#111;padding:18px 0 20px;font-size:16px;line-height:1.45}
+.review h2{margin:0 0 4px;font:400 24px/1.1 Anton,Impact,sans-serif;text-transform:uppercase}
+.review p,.review ul{margin:0;max-width:86ch}
+.review ul{padding-left:1.2em;margin-top:8px}
+.review code{font-family:"JetBrains Mono",monospace;font-size:.9em}
+
+/* Hero */
+/* The bottom 160px of a torn paper section is the spray-paint edge (paint-edges.css); keep content clear of it. */
+.case-hero{padding-bottom:200px}
+.case-head{padding-top:clamp(16px,3vw,40px)}
+.back{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:15px;font-weight:600}
+.back:hover{text-decoration:underline;text-decoration-color:#FF2B2B;text-underline-offset:.25em}
+.tag{display:inline-block;margin:18px 0 14px;padding:4px 16px;font:400 18px/1.3 "Sedgwick Ave",cursive;color:#F4F1EC;background:#111;transform:rotate(-2deg)}
+.case-head h1{font-size:clamp(52px,8vw,118px);max-width:14ch;line-height:.92}
+.case-head .stroke{display:block;width:300px;max-width:70%;margin:6px 0 20px}
+.lede{max-width:640px;margin:0;font-size:clamp(19px,1.8vw,22px);line-height:1.5;font-weight:600}
+.case-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px 32px;margin:36px 0 0;padding-top:18px;border-top:2px solid #111;font-size:16px;line-height:1.4}
+.case-facts dt{font:700 12px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B655E}
+.case-facts dd{margin:4px 0 0;font-weight:600}
+.case-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 0}
+.case-meta .read{margin-right:6px;font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+.case-meta .chip{padding:5px 11px;border:1.5px solid #111;border-radius:999px;font-size:13px;font-weight:600;line-height:1.2}
+
+/* Cover or coded loop */
+.case-cover{margin-top:clamp(40px,6vw,72px)}
+.case-cover img,.case-cover>.hl{display:block;width:100%;height:auto;border-radius:12px;border:3px solid #F4F1EC;box-shadow:10px 10px 0 #FF2B2B;box-sizing:border-box}
+.case-cover.case-loop{max-width:1120px}
+.case-loop .hl *{animation-play-state:running;animation-delay:0s}
+.case-loop>div{border-radius:12px;overflow:hidden;box-shadow:10px 10px 0 #FF2B2B}
+@media (prefers-reduced-motion:reduce){.case-loop .hl *{animation-play-state:paused;animation-delay:calc(var(--poster,5s) * -1)}}
+
+/* Reading column */
+.case-body{max-width:1180px;margin:0 auto;padding:clamp(48px,7vw,96px) clamp(16px,5vw,40px) 24px;box-sizing:border-box}
+.prose{max-width:700px;margin:0 auto;color:#D9D4CC;counter-reset:ch}
+
+/* Chapters: a sticky rail beside the story on wide screens, a fold-out list above it on smaller ones */
+.toc{max-width:700px;margin:0 auto 40px}
+.toc details{border:1px solid #333;border-radius:10px;background:#1A1A1A}
+.toc summary{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 16px;cursor:pointer;list-style:none;font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#B5AFA6}
+.toc summary::-webkit-details-marker{display:none}
+.toc summary::after{content:"+";font:400 22px/1 Inter,sans-serif;color:#FF2B2B}
+.toc details[open] summary::after{content:"\2212"}
+.toc ol{list-style:none;margin:0;padding:4px 8px 10px}
+.toc a{display:flex;gap:12px;align-items:baseline;padding:9px 8px;border-radius:6px;font-size:15px;line-height:1.3;color:#B5AFA6}
+.toc a:hover{color:#F4F1EC;background:#222}
+.toc a[aria-current]{color:#F4F1EC}
+.toc a[aria-current] .n{color:#FF2B2B}
+.toc .n{flex:none;font:700 12px/1 "JetBrains Mono",monospace;color:#6B655E}
+@media (min-width:1100px){
+  .case-body{display:grid;grid-template-columns:220px minmax(0,700px);gap:clamp(40px,5vw,80px);justify-content:center;align-items:start}
+  .toc{position:sticky;top:96px;margin:0;max-height:calc(100vh - 120px);overflow:auto}
+  .toc details{border:0;background:none}
+  .toc summary{padding:0 8px;cursor:default;pointer-events:none}
+  .toc summary::after{display:none}
+  .toc ol{padding:4px 0 0;border-left:2px solid #333}
+  .toc a{border-radius:0 6px 6px 0;margin-left:-2px;border-left:2px solid transparent}
+  .toc a[aria-current]{border-left-color:#FF2B2B;background:#1A1A1A}
+  .prose{margin:0}
+  /* Wide media start at the story's left edge and run into the open space on the right, clear of the rail. */
+  .prose img,.prose .cap,.prose .hypo,.prose .thread{left:0;transform:none;width:min(960px,calc(700px + (100vw - 1000px) / 2 - 24px))}
+  .prose .cap{text-align:left}
+}
+.prose>p{margin:0 0 1.15em}
+.prose strong,.prose b{color:#F4F1EC}
+.prose a{color:#F4F1EC;text-decoration:underline;text-decoration-color:#FF2B2B;text-underline-offset:.2em}
+.prose h2{margin:2.2em 0 .5em;font:400 clamp(36px,4.4vw,58px)/.98 Anton,Impact,sans-serif;text-transform:uppercase;color:#F4F1EC}
+.prose h2{counter-increment:ch}
+.prose h2::before{content:counter(ch,decimal-leading-zero);display:block;margin-bottom:10px;font:700 13px/1 "JetBrains Mono",monospace;letter-spacing:.08em;color:#FF2B2B}
+.prose h3{color:#F4F1EC}
+.prose ul,.prose ol{padding-left:1.2em;margin:0 0 1.15em}
+.prose li{margin:.35em 0}
+.prose li::marker{color:#FF2B2B}
+.prose blockquote{position:relative;margin:1.6em 0;padding:6px 0 0 44px;font:400 clamp(23px,2.3vw,28px)/1.3 "Sedgwick Ave",cursive;color:#F4F1EC;transform:rotate(-.6deg)}
+.prose blockquote::before{content:"\201C";position:absolute;left:0;top:-6px;font:400 64px/1 "Sedgwick Ave",cursive;color:#FF2B2B}
+.prose blockquote p{margin:0}
+.prose img{position:relative;left:50%;transform:translateX(-50%);display:block;width:min(1180px,calc(100vw - 32px));max-width:none;height:auto;max-height:88vh;object-fit:contain;margin:1.8em 0;background:#1A1A1A;border-radius:10px;border:1px solid #333}
+.prose p:has(>img){margin:0}
+.prose .cap{position:relative;left:50%;transform:translateX(-50%);width:min(1180px,calc(100vw - 32px));margin:-1.1em 0 2em;font:400 13px/1.45 "JetBrains Mono",monospace;color:#B5AFA6;text-align:center}
+.prose .phones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2vw,28px);margin:1.8em 0}
+.prose .phones img{width:100%;max-width:100%;max-height:none;left:0;transform:none;margin:0}
+.prose .hypo,.prose .thread{position:relative;left:50%;transform:translateX(-50%);width:min(1180px,calc(100vw - 32px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px clamp(16px,2vw,28px);margin:2.2em 0}
+.prose .hypo h3{margin:0;padding-bottom:10px;border-bottom:3px solid #FF2B2B;font:400 22px/1.1 Anton,Impact,sans-serif;text-transform:uppercase}
+.prose .hypo ul{list-style:none;margin:0;padding:0}
+.prose .hypo li{margin:0;padding:11px 0;border-bottom:1px solid #333;font-size:16px;line-height:1.35}
+.prose .hypo li span{display:block}
+.prose .hypo li b{display:inline-block;margin-top:6px;padding:2px 8px;font:700 12px/1.3 "JetBrains Mono",monospace;text-transform:uppercase;border:1px solid #FF2B2B;color:#FF2B2B}
+.prose .hypo li.yes b{background:#FF2B2B;color:#111}
+.prose .thread>div{padding:16px 18px 18px;background:#1A1A1A;border:1px solid #333;border-top:4px solid #FF2B2B;border-radius:8px}
+.prose .thread h3{margin:4px 0 8px;font:400 24px/1.05 Anton,Impact,sans-serif;text-transform:uppercase}
+.prose .thread p{margin:0;font-size:16px;line-height:1.45;color:#B5AFA6}
+.prose .thread .thread-then{font:700 12px/1.4 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:#FF2B2B}
+@media (max-width:1000px){.prose .hypo,.prose .thread{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.prose .hypo,.prose .thread{grid-template-columns:minmax(0,1fr)}.prose .phones{gap:8px}}
+
+/* Next case study */
+.case-next-wrap{max-width:960px;padding-top:40px;padding-bottom:clamp(64px,8vw,104px)}
+.case-next{position:relative;display:flex;flex-direction:column;gap:6px;padding:28px 32px;border:3px solid #F4F1EC;background:#111;box-shadow:8px 8px 0 #FF2B2B;transform:rotate(-.5deg);transition:box-shadow .15s,transform .15s}
+.case-next:hover{box-shadow:8px 8px 0 #F4F1EC;transform:rotate(0)}
+.case-next .k{font:700 12px/1.4 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#B5AFA6}
+.case-next b{font:400 clamp(32px,4vw,52px)/1 Anton,Impact,sans-serif;text-transform:uppercase;max-width:16ch}
+.case-next .c{font-weight:600;color:#FF2B2B}
+.case-next .bot{position:absolute;right:20px;bottom:100%;width:72px;margin-bottom:-6px}
+
+/* Closing call to action */
+.case-cta{padding:clamp(56px,7vw,96px) 0}
+.case-cta h2{font-size:clamp(46px,6.4vw,96px);margin-bottom:28px}
+
+@media (max-width:600px){.case-hero{padding-bottom:150px}}
+@media (max-width:860px){
+  .nav img{height:46px}.links a{padding:0 11px}
+  .case-next{padding:22px}
+  .case-next .bot{width:56px}
+}

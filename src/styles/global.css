@@ -1,4 +1,4 @@
-@import '@fontsource/permanent-marker/latin-400.css';
+@import '@fontsource/sedgwick-ave/latin-400.css';
 @import '@fontsource-variable/bricolage-grotesque/index.css';
 @import '@fontsource-variable/hanken-grotesk/index.css';
 @import '@fontsource-variable/jetbrains-mono/index.css';
@@ -12,7 +12,7 @@
   --lime: oklch(0.93 0.19 118);
   --on-lime: oklch(0.17 0.03 118);
 
-  --marker: 'Permanent Marker', 'Bricolage Grotesque Variable', sans-serif;
+  --marker: 'Sedgwick Ave', 'Bricolage Grotesque Variable', sans-serif;
   --display: 'Bricolage Grotesque Variable', 'Hanken Grotesk Variable', sans-serif;
   --body: 'Hanken Grotesk Variable', system-ui, sans-serif;
   --mono: 'JetBrains Mono Variable', ui-monospace, monospace;

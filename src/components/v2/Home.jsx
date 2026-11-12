@@ -1,6 +1,7 @@
 // Generated from the Claude Design board Main-egx9.dc.html. The logic class is the board's own code.
 import React from 'react';
 import { createPortal } from 'react-dom';
+import Scrubber from './Scrubber.jsx';
 import { LOOP_SLUGS, NDA_LOOPS } from '../../data/loop-slugs.js';
 
 // Loop files load on demand, once each.
@@ -931,6 +932,7 @@ export default class Board extends Component {
             <span className={"srx-n"}>{v.fx.count}</span>
             <button className={"srx-x"} ref={(el) => { this.srX = el; }} onClick={v.fx.close} aria-label={"Close and go back to the map"}><span aria-hidden={"true"}>{"×"}</span></button>
           </header>
+          <Scrubber rows={this.DATA} sel={this.state.sel} onPick={(n) => this.setState({ sel: n, origin: null })} />
           <div className={"srx-body"} key={v.fx.key} aria-live={"polite"}>
             {this.renderPv(v)}
             <h3 className={"display"}>{v.pickTitle}</h3>

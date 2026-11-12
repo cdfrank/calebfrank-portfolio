@@ -45,7 +45,7 @@ a{color:inherit;text-decoration:none}
 .step-h img{grid-row:span 3;width:56px;height:56px;object-fit:contain}
 .step-h .n{color:#B5AFA6;font-size:14px}
 .step-h h3{font-size:clamp(34px,3.4vw,48px)}
-.step-h .q{margin:0;font-family:"Permanent Marker",cursive;color:#FF2B2B;font-size:17px;line-height:1.3}
+.step-h .q{margin:0;font-family:"Sedgwick Ave",cursive;color:#FF2B2B;font-size:17px;line-height:1.3}
 .step-t{margin:0;font-size:18px}
 .step-l{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .step-l h4{margin:0 0 6px;font:700 12px/1.2 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#B5AFA6}
@@ -57,7 +57,7 @@ a{color:inherit;text-decoration:none}
 .hat{display:flex;flex-direction:column;gap:12px;background:#1A1A1A;border:1px solid #333;border-radius:12px;padding:24px;transition:transform .15s,border-color .15s}
 .hat:hover{transform:translateY(-4px);border-color:#FF2B2B}
 .hat-top{display:flex;justify-content:space-between;align-items:center}
-.st{align-self:flex-start;font-family:"Permanent Marker",cursive;font-size:15px;background:#FF2B2B;color:#111;padding:1px 10px;transform:rotate(-2deg)}
+.st{align-self:flex-start;font-family:"Sedgwick Ave",cursive;font-size:15px;background:#FF2B2B;color:#111;padding:1px 10px;transform:rotate(-2deg)}
 .hn{font:700 13px 'JetBrains Mono',monospace;color:#6b655e}
 .hat h3{font-size:clamp(32px,3vw,42px)}
 .when{margin:0;color:#F4F1EC;font-weight:600}
@@ -109,7 +109,7 @@ a{color:inherit;text-decoration:none}
 .fw-cv rect{fill:#FF2B2B}.fw-cv text{fill:#111}
 .fw-dv rect{fill:#173DF4}.fw-dv text{fill:#F4F1EC}
 .fw-handoff rect{fill:#111;stroke:#FF2B2B;stroke-width:2}
-.fw-handoff text{font:400 15px "Permanent Marker",cursive;fill:#FF2B2B;text-anchor:middle;dominant-baseline:central}
+.fw-handoff text{font:400 15px "Sedgwick Ave",cursive;fill:#FF2B2B;text-anchor:middle;dominant-baseline:central}
 .fw-handoff-line{stroke:#FF2B2B;stroke-width:2;stroke-dasharray:3 4}
 .fw-handoff-dot{fill:#FF2B2B;stroke:#151515;stroke-width:3}
 .fw-bar rect{fill:#222;stroke:#3a3a3a}
@@ -117,7 +117,7 @@ a{color:inherit;text-decoration:none}
 .fw-bar-red rect{fill:#FF2B2B;stroke:none}.fw-bar-red text{fill:#111}
 .fw-bar-paper rect{fill:#E9E4DA;stroke:none}.fw-bar-paper text{fill:#111}
 .fw-notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:24px 40px;margin-top:28px}
-.fw-notes h3{margin:0 0 6px;font:400 17px/1.3 "Permanent Marker",cursive;color:#FF2B2B}
+.fw-notes h3{margin:0 0 6px;font:400 17px/1.3 "Sedgwick Ave",cursive;color:#FF2B2B}
 .fw-notes p{margin:0;color:#D9D4CC;font-size:15px}
 
 @media (max-width:860px){

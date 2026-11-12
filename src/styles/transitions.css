@@ -7,7 +7,7 @@ html[data-tx] #tx{visibility:visible;pointer-events:auto;cursor:pointer}
 .tx-bg{inset:0;background:#111}
 .tx-bars,.tx-tag,.tx-guy,.tx-word{display:none}
 .tx-guy{bottom:0;background:center bottom/contain no-repeat;transform:translateY(105%)}
-.tx-word{margin:0;font:400 clamp(30px,4.4vw,60px)/1 "Permanent Marker",cursive;color:#111;white-space:nowrap;opacity:0}
+.tx-word{margin:0;font:400 clamp(30px,4.4vw,60px)/1 "Sedgwick Ave",cursive;color:#111;white-space:nowrap;opacity:0}
 html[data-tx-p=in] .tx-guy{animation:tx-pop .32s cubic-bezier(.3,1.5,.5,1) both,tx-bob .55s ease-in-out .4s 4 alternate}
 html[data-tx-p=in] .tx-word{animation:tx-word .28s cubic-bezier(.3,1.6,.5,1) .12s both}
 @keyframes tx-pop{from{transform:translateY(105%)}to{transform:none}}

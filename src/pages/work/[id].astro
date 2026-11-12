@@ -1,11 +1,12 @@
 ---
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
+import V2 from '../../layouts/V2.astro';
 import { allWork, years, type Work } from '../../lib/data';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import '../../styles/v2/loops.css';
+import '../../styles/v2/Case.css';
 
 export async function getStaticPaths() {
   const work = await allWork();
@@ -17,47 +18,117 @@ export async function getStaticPaths() {
 interface Props { entry: Work; next: Work; }
 const { entry, next } = Astro.props;
 const d = entry.data;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 // No cover yet: the project's coded loop stands in, playing on its own (still frame for reduced motion).
 const loopFile = join(process.cwd(), 'public', 'loops', `${entry.id}.svg`);
 const loop = !d.cover && existsSync(loopFile) ? readFileSync(loopFile, 'utf8') : '';
+const nav = [['Work', '/work/'], ['About', '/about/'], ['Process', '/process/'], ['Play', '/play/'], ['Contact', '/#contact']];
+const facts = [['Role', d.role], ['Years', years(entry)], ['At', d.employer], ['Result', d.outcome]].filter(([, v]) => v);
+// Reading aids: chapters from the story's own section headings, and a reading time from its word count.
+const chapters = headings.filter((h) => h.depth === 2);
+const minutes = Math.max(1, Math.round((entry.body ?? '').replace(/<[^>]+>|!\[[^\]]*\]\([^)]*\)/g, ' ').split(/\s+/).filter(Boolean).length / 230));
+const chips = [d.industry, ...d.disciplines].filter((c, i, a) => c && a.indexOf(c) === i);
 ---
-<Base title={`${d.client}: ${d.title}`} description={d.summary}>
-  {!d.approved && (
-    <aside class="review" aria-label="Private review notes">
-      <div class="wrap">
-        <h2>Private draft. Not approved to publish.</h2>
-        <p>Only you can see this. To publish it, set <code>approved: true</code> in this project's file. Until then, this page stays off the live site.</p>
-        {d.reviewNotes.length > 0 && <ul>{d.reviewNotes.map((n) => <li>{n}</li>)}</ul>}
+<V2 title={`${d.client}: ${d.title}`} description={d.summary}>
+  <div class="site case">
+    <section class="paper torn-b case-hero">
+      <div class="wrap nav">
+        <a href="/" aria-label="Dooane, home"><img src="/v2/fbe450132c9926658233b780d325d119.png" alt="Dooane" /></a>
+        <nav class="links" aria-label="Main">
+          {nav.map(([t, h]) => <a class={t === 'Work' ? 'on' : undefined} href={h}>{t}</a>)}
+        </nav>
       </div>
-    </aside>
-  )}
-  <div class="wrap">
-    <header class="case-head">
-      <p class="feature-client">{d.client}</p>
-      <h1>{d.title}</h1>
-      <p>{d.summary}</p>
-      <dl class="case-facts">
-        <div><dt>Role</dt><dd>{d.role}</dd></div>
-        <div><dt>Years</dt><dd>{years(entry)}</dd></div>
-        <div><dt>At</dt><dd>{d.employer}</dd></div>
-        {d.outcome && <div><dt>Result</dt><dd>{d.outcome}</dd></div>}
-      </dl>
-    </header>
-  </div>
-  {d.cover && (
-    <div class="case-cover">
-      <Image src={d.cover} alt={d.coverAlt ?? ''} widths={[800, 1400, 2000]} sizes="100vw" loading="eager" />
+      <header class="wrap case-head">
+        <a class="back" href="/work/"><span aria-hidden="true">←</span> All work</a>
+        <p class="tag">{d.client}</p>
+        <h1 class="display">{d.title}</h1>
+        <img class="stroke" src="/v2/73f5db1a7934994f4a806442391f3084.png" alt="" aria-hidden="true" />
+        <p class="lede">{d.summary}</p>
+        <dl class="case-facts">
+          {facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
+        <p class="case-meta">
+          <span class="read">{minutes} min read</span>
+          {chips.map((c) => <span class="chip">{c}</span>)}
+        </p>
+      </header>
+    </section>
+    {!d.approved && (
+      <aside class="review" aria-label="Private review notes">
+        <div class="wrap">
+          <h2>Private draft. Not approved to publish.</h2>
+          <p>Only you can see this. To publish it, set <code>approved: true</code> in this project's file. Until then, this page stays off the live site.</p>
+          {d.reviewNotes.length > 0 && <ul>{d.reviewNotes.map((n) => <li>{n}</li>)}</ul>}
+        </div>
+      </aside>
+    )}
+    {d.cover && (
+      <div class="wrap case-cover">
+        <Image src={d.cover} alt={d.coverAlt ?? ''} widths={[800, 1400, 2000]} sizes="(min-width: 1280px) 1120px, 100vw" loading="eager" />
+      </div>
+    )}
+    {loop && <div class="wrap case-cover case-loop" data-c3d={entry.id} set:html={loop} />}
+    <div class="case-body">
+      {chapters.length > 2 && (
+        <nav class="toc" aria-label="In this case study">
+          <details open>
+            <summary>In this case study</summary>
+            <ol>
+              {chapters.map((h, i) => <li><a href={`#${h.slug}`}><span class="n">{String(i + 1).padStart(2, '0')}</span>{h.text}</a></li>)}
+            </ol>
+          </details>
+        </nav>
+      )}
+      <article class="prose">
+        <Content />
+      </article>
     </div>
-  )}
-  {loop && <div class="case-cover case-loop" data-c3d={entry.id} set:html={loop} />}
-  <article class="prose">
-    <Content />
-    {next.id !== entry.id && <p class="case-next"><a href={`/work/${next.id}/`}>Next: {next.data.client}</a></p>}
-  </article>
-</Base>
+    {next.id !== entry.id && (
+      <div class="wrap case-next-wrap">
+        <a class="case-next" href={`/work/${next.id}/`}>
+          <span class="k">Next case study</span>
+          <b>{next.data.title}</b>
+          <span class="c">{next.data.client} <span aria-hidden="true">→</span></span>
+          <img class="bot" src="/dooane/pointing.webp" alt="" aria-hidden="true" />
+        </a>
+      </div>
+    )}
+    <section class="paper case-cta">
+      <div class="wrap">
+        <h2 class="display">Have something<br />complicated?</h2>
+        <div class="ctas">
+          <a class="btn btn-red" href="/#contact">Get in touch <span aria-hidden="true">→</span></a>
+          <a class="btn btn-ink" href="/work/">See all the work</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</V2>
 
 <script>
+  // Chapters: mark the section being read, and close the list on phones so it starts compact.
+  const toc = document.querySelector<HTMLElement>('.toc');
+  if (toc) {
+    const det = toc.querySelector('details');
+    if (det && window.matchMedia('(max-width: 1099px)').matches) det.open = false;
+    const links = new Map([...toc.querySelectorAll<HTMLAnchorElement>('a')].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      links.forEach((a) => a.removeAttribute('aria-current'));
+      links.get(e.target.id)?.setAttribute('aria-current', 'true');
+    }), { rootMargin: '-20% 0px -70% 0px' });
+    links.forEach((_, id) => { const h = document.getElementById(id); if (h) io.observe(h); });
+    toc.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a') && det && window.matchMedia('(max-width: 1099px)').matches) det.open = false; });
+  }
+  // Captions: show each screenshot's description under it (screen readers already get it as alt text).
+  document.querySelectorAll<HTMLImageElement>('.prose img[alt]').forEach((img) => {
+    if (!img.alt || img.closest('.phones')) return;
+    const cap = document.createElement('p');
+    cap.className = 'cap';
+    cap.setAttribute('aria-hidden', 'true');
+    cap.textContent = img.alt;
+    (img.parentElement?.tagName === 'P' ? img.parentElement : img).after(cap);
+  });
   // Case studies with a 3D scene: swap the coded loop for the WebGL stage. The loop stays as the
   // fallback for reduced motion, no WebGL, or any failure while loading.
   const host = document.querySelector<HTMLElement>('[data-c3d]');

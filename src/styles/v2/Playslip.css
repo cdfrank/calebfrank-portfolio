@@ -10,7 +10,7 @@ a{color:inherit;text-decoration:none}
 .btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:999px;font-weight:700;font-size:15px;box-sizing:border-box}
 .btn-red{background:#FF2B2B;color:#111}
 .btn-line{border:1.5px solid #F4F1EC;color:#F4F1EC}
-.tag{position:relative;display:inline-flex;align-items:center;min-height:38px;padding:0 20px;font:400 17px "Permanent Marker",cursive;color:#F4F1EC;background:radial-gradient(closest-side,#111 66%,rgba(17,17,17,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(17,17,17,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(17,17,17,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;transform:rotate(-2deg)}
+.tag{position:relative;display:inline-flex;align-items:center;min-height:38px;padding:0 20px;font:400 17px "Sedgwick Ave",cursive;color:#F4F1EC;background:radial-gradient(closest-side,#111 66%,rgba(17,17,17,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(17,17,17,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(17,17,17,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;transform:rotate(-2deg)}
 .tag:nth-child(2){transform:rotate(1.5deg) translateY(2px);background:radial-gradient(closest-side,#FF2B2B 66%,rgba(255,43,43,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(255,43,43,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(255,43,43,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;color:#111}
 .tag:nth-child(3){transform:rotate(-.5deg)}
 .tag:nth-child(4){transform:rotate(2.5deg) translateY(-1px);font-family:Anton,sans-serif;letter-spacing:.03em;text-transform:uppercase;font-size:15px}
@@ -33,9 +33,9 @@ a{color:inherit;text-decoration:none}
 .tall{max-height:640px;object-fit:cover;object-position:top}
 .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:20px}
 .phones img{display:block;width:100%;aspect-ratio:9/17;object-fit:cover;object-position:top;border-radius:12px;border:3px solid #111}
-.quote{font-family:"Permanent Marker",cursive;font-size:clamp(28px,3.4vw,46px);line-height:1.25;color:#FF2B2B;margin:0;max-width:980px;transform:rotate(-1deg)}
+.quote{font-family:"Sedgwick Ave",cursive;font-size:clamp(28px,3.4vw,46px);line-height:1.25;color:#FF2B2B;margin:0;max-width:980px;transform:rotate(-1deg)}
 @media (max-width:860px){.hero,.block{grid-template-columns:minmax(0,1fr)}.block.flip>div:first-child{order:0}}
-.stepn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:1.3em;height:1.3em;margin:0 .22em 0 -.08em;background:radial-gradient(closest-side,#FF2B2B 66%,rgba(255,43,43,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(255,43,43,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(255,43,43,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;color:#111;font:400 .62em/1 "Permanent Marker",cursive;vertical-align:.1em;transform:rotate(-8deg)}
+.stepn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:1.3em;height:1.3em;margin:0 .22em 0 -.08em;background:radial-gradient(closest-side,#FF2B2B 66%,rgba(255,43,43,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(255,43,43,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(255,43,43,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;color:#111;font:400 .62em/1 "Sedgwick Ave",cursive;vertical-align:.1em;transform:rotate(-8deg)}
 .paper .stepn{background:radial-gradient(closest-side,#111 66%,rgba(17,17,17,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(17,17,17,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(17,17,17,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;color:#F4F1EC}
 .paper .stepn .drip{background:linear-gradient(#111 60%,transparent)}
 .shot .cr{position:absolute;right:-4%;top:-14%;width:16%;transform:rotate(14deg)}
@@ -48,7 +48,7 @@ a{color:inherit;text-decoration:none}
 .next:hover{box-shadow:8px 8px 0 #F4F1EC}
 .slip{position:sticky;bottom:12px;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;width:max-content;max-width:calc(100% - 32px);margin:0 auto 32px;padding:8px 12px;background:#F4F1EC;color:#111;border:3px solid #111;box-shadow:0 6px 0 #FF2B2B}
 .slip .sk{font:400 16px Anton,sans-serif;text-transform:uppercase;margin-right:4px}
-.slip a{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;font:400 19px "Permanent Marker",cursive;color:#F4F1EC;background:radial-gradient(closest-side,#111 66%,rgba(17,17,17,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(17,17,17,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(17,17,17,.5) 1px,transparent 1.5px) 3px 4px/9px 9px}
+.slip a{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;font:400 19px "Sedgwick Ave",cursive;color:#F4F1EC;background:radial-gradient(closest-side,#111 66%,rgba(17,17,17,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(17,17,17,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(17,17,17,.5) 1px,transparent 1.5px) 3px 4px/9px 9px}
 .slip a:nth-of-type(even){transform:rotate(6deg)}.slip a:nth-of-type(odd){transform:rotate(-5deg)}
 .slip a:hover,.slip a:focus-visible{background:radial-gradient(closest-side,#FF2B2B 66%,rgba(255,43,43,.55) 82%,transparent 100%) 50% 50%/100% 100% no-repeat,radial-gradient(circle,rgba(255,43,43,.75) 1px,transparent 1.7px) 0 0/6px 6px,radial-gradient(circle,rgba(255,43,43,.5) 1px,transparent 1.5px) 3px 4px/9px 9px;color:#111;outline:none}
 .slip a:focus-visible{box-shadow:0 0 0 3px #111}
