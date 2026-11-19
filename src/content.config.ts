@@ -31,6 +31,8 @@ const work = defineCollection({
       featured: z.number().optional(),
       // true publishes the Markdown below the frontmatter as a full case study page.
       caseStudy: z.boolean().default(false),
+      // A page that stands in for the case study, such as an interactive piece in public/. Rows and the guide link here first.
+      link: z.string().optional(),
       // true keeps the archive row to a summary and marks it as limited by NDA.
       confidential: z.boolean().default(false),
       cover: image().optional(),

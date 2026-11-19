@@ -371,6 +371,7 @@ export default class Board extends Component {
                     {"Play the prototype "}
                     <span aria-hidden={"true"}>{"→"}</span>
                   </a>
+                  <a className={"btn ss-line"} href={"/work/street-signal/"}>{"Read the case study"}</a>
                   <a className={"btn ss-line"} href={"/work/"}>{"See the product work"}</a>
                 </div>
                 <p className={"ss-meta"}>{"In development · Keyboard, controller or touch"}</p>

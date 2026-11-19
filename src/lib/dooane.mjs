@@ -9,7 +9,7 @@ export function publicProjects(work) {
   return work.filter(({ data }) => data.approved !== false && !data.draft && !data.confidential).map(({ id, data }) => ({
     title: data.title, client: data.client, summary: data.summary, disciplines: data.disciplines,
     featured: data.featured !== undefined,
-    href: data.caseStudy ? `/work/${id}/` : '/work/',
+    href: data.link ?? (data.caseStudy ? `/work/${id}/` : '/work/'),
   }));
 }
 

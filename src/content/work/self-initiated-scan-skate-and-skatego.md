@@ -1,5 +1,5 @@
 ---
-title: "Street Signal"
+title: "Street Signal and SkateGO"
 client: "Self-initiated"
 kind: lab
 role: "Designer and builder"
@@ -9,6 +9,7 @@ disciplines: ["Games", "Mobile", "AI"]
 summary: "A skateboarding game that turns real streets and skate spots into playable maps."
 status: "Playable"
 caseStudy: true
+link: "/work/street-signal/"
 ---
 
 ## The short version
