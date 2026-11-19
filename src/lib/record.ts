@@ -49,7 +49,7 @@ export function clientRecord(all: Work[]) {
       ind: d.industry ?? '',
       wh: whereOf(w),
       caps: capabilitiesOf(w),
-      href: d.caseStudy && !nda ? `/work/${w.id}/` : '',
+      href: nda ? '' : d.link ?? (d.caseStudy ? `/work/${w.id}/` : ''),
       q: (nda
         ? `${g.name} under nda ${d.industry ?? ''}`
         : [g.name, d.client, d.title, d.summary, d.disciplines.join(' '), d.industry].join(' ')

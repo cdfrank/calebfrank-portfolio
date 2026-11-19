@@ -22,7 +22,7 @@ export async function allWork(): Promise<Work[]> {
 export const years = (w: Work) =>
   w.data.end ? `${w.data.start}–${String(w.data.end).slice(2)}` : `${w.data.start}`;
 
-export const workUrl = (w: Work) => (w.data.caseStudy ? `/work/${w.id}/` : undefined);
+export const workUrl = (w: Work) => w.data.link ?? (w.data.caseStudy ? `/work/${w.id}/` : undefined);
 
 const clientData = parse(clientsRaw);
 export const capabilityMap: Record<string, string[]> = clientData.capabilities;
