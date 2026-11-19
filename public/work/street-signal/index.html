@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Street Signal: a capstone case study | Caleb Frank</title>
+<meta name="description" content="How one product designer directed AI like a studio to turn real streets and skate spots into a playable skateboarding game.">
+<meta property="og:title" content="Street Signal: a capstone case study">
+<meta property="og:description" content="Real gameplay, the cuts, and an honest ledger of what is built and what is not.">
+<meta property="og:image" content="https://calebfrank.com/work/street-signal/media/tricks.jpg">
+<link rel="canonical" href="https://calebfrank.com/work/street-signal/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:ital,wght@1,600;1,800&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one narrow reading column in the game's own black, signal yellow and electric blue; each chapter is a line of argument followed by one moving exhibit. Single dark theme by choice. */
+:root{
+  color-scheme:dark;
+  --bg:#0b0b0d; --glass:#15161b; --line:#2b2d35; --ink:#f4f1ea; --mute:#a5a7b1;
+  --sig:#f0ff0b; --blue:#2a2df0; --gold:#f2b632; --ok:#3ecf8e; --thesis:#9a97f5;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --tag:"Sedgwick Ave Display","Marker Felt","Comic Sans MS",cursive;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--ink);text-decoration-color:var(--sig);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,.tile:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:.98;margin:0;text-wrap:balance}
+h1{font-size:clamp(54px,15vw,112px)}
+h2{font-size:clamp(34px,8.5vw,56px)}
+h3{font-size:24px;font-weight:600}
+p{margin:0;max-width:62ch}
+.stack{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-family:var(--display);font-style:italic;font-weight:600;text-transform:uppercase;letter-spacing:.14em;font-size:15px;color:var(--sig)}
+.mute{color:var(--mute)}
+.small{font-size:14px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+
+/* hero */
+.hero{position:relative;padding:28px 0 0;border-top:6px solid var(--blue);border-bottom:1px solid var(--line);overflow:hidden}
+.hero .tagline{font-family:var(--tag);color:var(--sig);font-size:clamp(24px,6.5vw,38px);line-height:1.1;transform:rotate(-2deg);transform-origin:left;margin-top:2px}
+.hero canvas{display:block;width:100%;height:150px;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:6px 12px;font-size:14px}
+.chip b{font-family:var(--display);font-style:italic;font-size:18px;margin-right:4px}
+
+section{padding:64px 0;border-bottom:1px solid var(--line)}
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel svg{display:block;width:100%;height:auto;max-width:560px;margin:0 auto}
+.cap{font-size:14px;color:var(--mute);margin-top:10px}
+.btn{font:600 14px var(--body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--sig)}
+.btn svg{width:14px;height:14px;max-width:none;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+
+/* market numbers */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat .big{font-family:var(--display);font-style:italic;font-weight:800;font-size:clamp(38px,11vw,58px);line-height:1;color:var(--ink)}
+.stat .big em{font-style:italic;color:var(--sig)}
+.stat p{font-size:14px;line-height:1.4;color:var(--mute);margin-top:6px}
+.venn circle{fill:none;stroke-width:2;transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.venn.apart .c1{transform:translate(-46px,-22px)} .venn.apart .c2{transform:translate(46px,-22px)} .venn.apart .c3{transform:translate(0,44px)}
+.venn .core{transition:opacity .6s 1.1s} .venn.apart .core{opacity:0;transition:none}
+svg text{font-family:var(--body);fill:var(--ink)}
+
+/* the three no's */
+.nos{display:grid;gap:14px}
+.no{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center}
+.no svg{width:112px;height:112px;max-width:none;margin:0}
+.no .verdict{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;color:var(--sig);font-size:15px;letter-spacing:.1em}
+.no p{font-size:15.5px;line-height:1.45}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes slash{from{stroke-dashoffset:140}to{stroke-dashoffset:0}}
+@keyframes stamp{0%{transform:scale(2.4) rotate(-14deg);opacity:0}60%{transform:scale(.92) rotate(-14deg);opacity:1}100%{transform:scale(1) rotate(-14deg);opacity:1}}
+@keyframes snap{0%,45%{transform:translate(var(--dx),var(--dy)) rotate(var(--dr))}70%,100%{transform:none}}
+.no .die{transform-origin:56px 56px}
+.no .slash{stroke-dasharray:140;stroke-dashoffset:0}
+.no .stampg{transform-origin:56px 56px;transform:rotate(-14deg)}
+.no .piece{transform-box:fill-box;transform-origin:center}
+.play .die{animation:spin 1.1s cubic-bezier(.3,.7,.2,1) 1}
+.play .slash{animation:slash .45s 1.05s ease-out both}
+.play .stampg{animation:stamp .5s .5s cubic-bezier(.2,1.4,.4,1) both}
+.play .piece{animation:snap 2.2s cubic-bezier(.3,1.3,.5,1) both}
+
+/* ollie */
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px}
+.sw{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.padwrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.stage{position:relative;height:190px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(#101116,#0d0d10);overflow:hidden}
+.stage .ground{position:absolute;left:0;right:0;bottom:22px;border-top:2px solid var(--line)}
+.stage .board{position:absolute;left:50%;bottom:24px;width:64px;height:16px;margin-left:-32px}
+.stage .read{position:absolute;left:10px;top:8px;font-family:var(--display);font-style:italic;font-weight:800;font-size:30px}
+.stage .mark{position:absolute;left:0;right:0;border-top:1px dashed var(--sig);opacity:.0}
+.pad{position:relative;height:190px;border:1px solid var(--line);border-radius:12px;background:radial-gradient(circle at 50% 30%,#22242c,#121318);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.pad .thumb{border-color:#0b0b0d;outline:2px solid var(--sig);position:absolute;left:50%;top:28%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:var(--sig);border:3px solid var(--ink);box-shadow:0 6px 18px rgba(240,255,11,.28)}
+.pad .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:13px;color:var(--mute)}
+input[type=range]{accent-color:var(--sig);width:100%}
+
+/* unit chart */
+.units{display:grid;gap:14px}
+.urow .lab{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-bottom:6px}
+.urow .lab b{font-family:var(--display);font-style:italic;font-size:20px}
+.cells{display:grid;grid-template-columns:repeat(25,1fr);gap:3px}
+.cell{aspect-ratio:1;border-radius:2px;background:#24262e;transition:background .25s,transform .25s}
+.cell.on{background:var(--c,var(--ok))}
+
+/* flow */
+@keyframes dash{to{stroke-dashoffset:-24}}
+.flow .wire{fill:none;stroke:var(--sig);stroke-width:2;stroke-dasharray:6 6;animation:dash 1s linear infinite}
+.flow rect{fill:#101116;stroke:var(--line);stroke-width:1.5}
+.flow .hot{stroke:var(--sig)}
+
+/* timeline */
+.tl{position:relative;display:grid;gap:14px;padding-left:22px}
+.tl:before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.ev{position:relative;transition:opacity .5s,transform .5s}
+.ev:before{content:"";position:absolute;left:-22px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--sig)}
+.ev.pre{opacity:.25;transform:translateX(14px)}
+.ev .d{font-family:var(--display);font-style:italic;font-weight:800;font-size:18px;text-transform:uppercase}
+.tag{display:inline-block;font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;border-radius:4px;padding:2px 6px;margin-right:6px;vertical-align:1px}
+.t-ship{background:rgba(62,207,142,.15);color:var(--ok)} .t-cut{background:rgba(255,90,79,.18);color:#ff7d74} .t-call{background:rgba(242,182,50,.15);color:var(--gold)}
+
+/* orbit */
+@keyframes orbit{to{transform:rotate(360deg)}}
+.orbit g.ring{transform-origin:180px 180px;animation:orbit var(--t) linear infinite}
+.orbit g.ring.rev{animation-direction:reverse}
+.keylist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:14px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+
+/* ledger */
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px}
+.bar i{display:block;height:100%;transition:flex-grow 1.2s cubic-bezier(.2,.8,.2,1)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{font:500 13px/1.25 var(--body);text-align:left;color:var(--ink);background:#101116;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:8px;padding:9px 8px;min-height:62px;cursor:pointer}
+.tile[aria-pressed=true]{background:#1d1f26;border-color:var(--c)}
+.detail{min-height:66px;font-size:15px}
+.detail b{color:var(--c)}
+
+/* clips */
+.clips{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;justify-items:center}
+.clip{margin:0;width:100%;max-width:300px}
+.clip video{display:block;width:100%;height:auto;aspect-ratio:480/862;background:#000;border:2px solid var(--blue);border-radius:16px}
+.clip figcaption{font-size:14px;color:var(--mute);margin-top:8px;line-height:1.4}
+.clip figcaption b{color:var(--ink)}
+.herogrid{display:grid;grid-template-columns:1fr;gap:22px;align-items:center}
+@media (min-width:640px){.herogrid{grid-template-columns:1.25fr 1fr}}
+
+/* road */
+.road{display:grid;gap:0}
+.stop{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.stop .when{font-family:var(--display);font-style:italic;font-weight:800;font-size:19px;text-transform:uppercase}
+.stop.key .when{color:var(--sig)}
+.facts{display:grid;gap:8px;padding:0;margin:0;list-style:none}
+.facts li{padding-left:18px;position:relative}
+.facts li:before{content:"";position:absolute;left:0;top:.62em;width:8px;height:2px;background:var(--sig)}
+footer{padding:36px 0 60px;color:var(--mute);font-size:14px}
+footer ol{padding-left:18px;margin:8px 0 0;display:grid;gap:4px}
+@media (max-width:420px){.padwrap{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,1fr)}.no{grid-template-columns:88px 1fr}.no svg{width:88px;height:88px}.keylist{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap herogrid">
+  <div class="stack">
+    <a class="small mute" href="/work/" style="text-decoration:none">&larr; All work, calebfrank.com</a>
+    <div class="eyebrow">Capstone case study &middot; November 18, 2026</div>
+    <h1>Street Signal</h1>
+    <div class="tagline">Your city is the skatepark.</div>
+    <p>A product designer carried this game as a concept for a long time. When execution started, he directed AI the way a creative director runs a studio, and a skateboarding game built from real places came together fast. This is the case in motion: what was built, what was thrown out, and what is still unproven.</p>
+    <div class="chips">
+      <span class="chip"><b>1</b>builder</span>
+      <span class="chip"><b>2</b>skateable downtowns</span>
+      <span class="chip"><b>6</b>places on the spot list</span>
+      <a class="chip" href="https://streetsignalgame.com" style="border-color:var(--sig);text-decoration:none"><b>Play</b>it now</a>
+    </div>
+  </div>
+  <figure class="clip"><video src="/work/street-signal/media/tricks.mp4" poster="/work/street-signal/media/tricks.jpg" muted loop playsinline controls preload="metadata" aria-label="Gameplay: a rider linking tricks down a street in downtown Ann Arbor"></video><figcaption><b>Real gameplay.</b> Downtown Ann Arbor, recorded in a phone browser on November 18, 2026.</figcaption></figure>
+  </div>
+  <canvas id="heroCanvas" aria-label="A skateboard rolling through a street line, grinding a ledge and a rail" role="img"></canvas>
+</header>
+
+<main>
+
+<section id="gap"><div class="wrap stack">
+  <div class="eyebrow">01 &middot; The gap</div>
+  <h2>Every skate game ships somebody else's city</h2>
+  <p>Skaters already read architecture as terrain. The ledge behind the library and the three-stair at school are the real map. No game lets you skate the place you actually skate.</p>
+  <div class="stats">
+    <div class="stat"><div class="big num"><span data-count="15" data-suffix="M">15M</span></div><p>players tried EA's <i>skate.</i> in about three weeks of early access <a href="#s1">[1]</a></p></div>
+    <div class="stat"><div class="big num"><span data-count="84" data-suffix="K">84K</span></div><p>modders in Skater XL's community before launch, building real parks by hand <a href="#s2">[2]</a></p></div>
+    <div class="stat"><div class="big num">$<span data-count="3.5" data-dec="1" data-suffix="B">3.5B</span></div><p>paid for Niantic's location-game business, with 30M monthly players <a href="#s3">[3]</a></p></div>
+    <div class="stat"><div class="big num"><span data-count="8.9" data-dec="1" data-suffix="M">8.9M</span></div><p>people in the US skateboarded at least once in 2023 <a href="#s4">[4]</a></p></div>
+  </div>
+  <div class="panel">
+    <svg class="venn" id="venn" viewBox="0 0 360 250" role="img" aria-label="Three audiences overlap where Street Signal sits">
+      <circle class="c1" cx="140" cy="100" r="72" stroke="#a5a7b1"/>
+      <circle class="c2" cx="220" cy="100" r="72" stroke="#a5a7b1"/>
+      <circle class="c3" cx="180" cy="160" r="72" stroke="#a5a7b1"/>
+      <text x="112" y="19" font-size="13" text-anchor="middle">Skate games</text>
+      <text x="248" y="19" font-size="13" text-anchor="middle">Real places</text>
+      <text x="180" y="247" font-size="13" text-anchor="middle">Location play</text>
+      <g class="core"><path d="M180 88 A72 72 0 0 1 212 124 A72 72 0 0 1 148 124 A72 72 0 0 1 180 88Z" fill="#f0ff0b"/>
+      <text x="180" y="108" font-size="10.5" font-weight="600" text-anchor="middle" style="fill:#0b0b0d">Street</text><text x="180" y="120" font-size="10.5" font-weight="600" text-anchor="middle" style="fill:#0b0b0d">Signal</text></g>
+    </svg>
+    <p class="cap">Three proven audiences. Nothing sits where they overlap. These figures describe neighbouring markets and are not a forecast.</p>
+  </div>
+</div></section>
+
+<section id="no"><div class="wrap stack">
+  <div class="eyebrow">02 &middot; Taste</div>
+  <h2>The game got better every time the answer was no</h2>
+  <p>AI agents produce fast and confidently. The founder's job was to say what was wrong. Three calls shaped the game.</p>
+  <div class="nos" id="nos">
+    <div class="panel no">
+      <svg viewBox="0 0 112 112" aria-hidden="true"><g class="die"><polygon points="56,14 92,35 92,77 56,98 20,77 20,35" fill="#101116" stroke="#f4f1ea" stroke-width="2"/><polygon points="56,34 78,72 34,72" fill="none" stroke="#a5a7b1" stroke-width="1.5"/><text x="56" y="66" font-size="16" font-weight="600" text-anchor="middle">20</text></g><line class="slash" x1="14" y1="98" x2="98" y2="14" stroke="#ff5a4f" stroke-width="6" stroke-linecap="round"/></svg>
+      <div class="stack" style="gap:4px"><div class="verdict">Cut</div><h3>Dice battles</h3><p>The first design settled spots with a d20 game of S.K.A.T.E. It decided the outcome somewhere other than on the board. The rule that replaced it: the highest score holds the spot.</p></div>
+    </div>
+    <div class="panel no">
+      <svg viewBox="0 0 112 112" aria-hidden="true"><rect x="12" y="20" width="26" height="72" fill="#d8c7a6"/><rect x="43" y="20" width="26" height="72" fill="#8fb0c4"/><rect x="74" y="20" width="26" height="72" fill="#c9a0b4"/><g class="stampg"><rect x="10" y="42" width="92" height="28" rx="3" fill="#0b0b0d" stroke="#ff5a4f" stroke-width="3"/><text x="56" y="61" font-size="14" font-weight="600" text-anchor="middle" style="fill:#ff5a4f;letter-spacing:.08em">REJECTED</text></g></svg>
+      <div class="stack" style="gap:4px"><div class="verdict">Rejected</div><h3>The flat look</h3><p>The first three style directions came back flat. All three were dropped as not game quality. The look that shipped is loud and built for a game: signal yellow, electric blue and black.</p></div>
+    </div>
+    <div class="panel no">
+      <svg viewBox="0 0 112 112" aria-hidden="true"><g fill="none" stroke="#a5a7b1" stroke-width="1.5" stroke-dasharray="4 3"><rect x="14" y="18" width="38" height="24"/><circle cx="80" cy="34" r="16"/><rect x="18" y="62" width="76" height="10"/><rect x="40" y="84" width="34" height="14"/></g><g fill="#f0ff0b" fill-opacity=".28" stroke="#f0ff0b" stroke-width="2"><rect class="piece" style="--dx:9px;--dy:8px;--dr:9deg" x="14" y="18" width="38" height="24"/><circle class="piece" style="--dx:-12px;--dy:10px;--dr:0deg" cx="80" cy="34" r="16"/><rect class="piece" style="--dx:6px;--dy:-9px;--dr:-7deg" x="18" y="62" width="76" height="10"/><rect class="piece" style="--dx:-10px;--dy:-6px;--dr:12deg" x="40" y="84" width="34" height="14"/></g></svg>
+      <div class="stack" style="gap:4px"><div class="verdict">Rebuilt</div><h3>The AI-built park</h3><p>An AI workflow built the Ann Arbor Skatepark from its plan. Sizes and positions were mostly incorrect, and it rode badly. The response was two editors that snap a park to its evidence.</p></div>
+    </div>
+  </div>
+  <div><button class="btn" id="replayNo" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 8a5 5 0 1 1-1.5-3.5M13 2v3h-3"/></svg>Replay</button></div>
+</div></section>
+
+<section id="feel"><div class="wrap stack">
+  <div class="eyebrow">03 &middot; Feel</div>
+  <h2>A game ollie is twice as high, on purpose</h2>
+  <p>Feel was measured before it was tuned. The game's ollie peaks at 0.64 m after 0.36 s. A real one peaks near 0.30 m after 0.25 s. A trick has to read on a five-inch screen, so it gets more air.</p>
+  <div class="panel">
+    <div class="row"><div class="legend"><span><i class="sw" style="background:var(--sig)"></i>Street Signal, Street preset</span><span><i class="sw" style="background:var(--mute)"></i>Real-world ollie</span></div>
+    <button class="btn" id="replayOllie" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 8a5 5 0 1 1-1.5-3.5M13 2v3h-3"/></svg>Replay</button></div>
+    <svg id="ollie" viewBox="0 0 360 230" role="img" aria-label="Height against time for a game ollie and a real ollie" style="margin-top:8px"></svg>
+    <p class="cap">Board height above the ground, drawn at one third speed. Game values from the physics model. Real values are the reference figures the model is compared against.</p>
+  </div>
+  <h3>Try the touch idea</h3>
+  <p>On a phone the right thumb owns every pop. Pull down, let go. The deeper the pull, the higher the ollie, from 0.30 m to 0.66 m.</p>
+  <div class="padwrap">
+    <div class="pad" id="pad" aria-label="Thumb pad. Drag down and release to ollie."><div class="thumb" id="thumb"></div><div class="hint">Pull down, then let go</div></div>
+    <div class="stage" id="stage"><div class="read num" id="read">0.48 m</div><div class="mark" id="mark"></div><div class="ground"></div>
+      <svg class="board" id="board" viewBox="0 0 64 16" aria-hidden="true"><path d="M3 5 Q6 9 12 9 H52 Q58 9 61 5" fill="none" stroke="#f4f1ea" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="13" r="3" fill="#f0ff0b"/><circle cx="48" cy="13" r="3" fill="#f0ff0b"/></svg>
+    </div>
+  </div>
+  <div class="row"><label for="pull" class="small mute" style="flex:1;min-width:180px">Pull depth<input type="range" id="pull" min="0" max="100" value="50"></label><button class="btn" id="pop" type="button">Release</button></div>
+  <p class="cap">An illustration of the control idea using the game's height range. It is not the game's code.</p>
+</div></section>
+
+<section id="tests"><div class="wrap stack">
+  <div class="eyebrow">04 &middot; Proof, including the bad news</div>
+  <h2>Ledges are solved. Round rails are not.</h2>
+  <p>Every mechanic has an automated test. On the Ann Arbor street course, a scripted rider approaches each feature 49 times. Each square is one attempt.</p>
+  <div class="panel units" id="units"></div>
+  <p class="cap">Grind lock-ins out of 49 approaches, and clean stair ollies out of 22. Tests prove the controls are consistent. They do not prove the game feels good to anyone but its maker.</p>
+</div></section>
+
+<section id="world"><div class="wrap stack">
+  <div class="eyebrow">05 &middot; World</div>
+  <h2>Three roads in, one format out</h2>
+  <p>A spot can be scanned, traced from a plan, or modeled by hand. All three end in the same small set of parts, so one fix layer works on any map and the maps can move to a new engine.</p>
+  <div class="panel">
+    <svg class="flow" viewBox="0 0 360 330" role="img" aria-label="Scan, trace and model all feed one map format, then a fix layer, then play">
+      <rect x="8" y="10" width="104" height="50" rx="8"/><text x="60" y="32" font-size="13" font-weight="600" text-anchor="middle">Scan it</text><text x="60" y="48" font-size="10.5" text-anchor="middle" style="fill:#a5a7b1">phone, in game</text>
+      <rect x="128" y="10" width="104" height="50" rx="8"/><text x="180" y="32" font-size="13" font-weight="600" text-anchor="middle">Trace it</text><text x="180" y="48" font-size="10.5" text-anchor="middle" style="fill:#a5a7b1">park editor</text>
+      <rect x="248" y="10" width="104" height="50" rx="8"/><text x="300" y="32" font-size="13" font-weight="600" text-anchor="middle">Model it</text><text x="300" y="48" font-size="10.5" text-anchor="middle" style="fill:#a5a7b1">27 photos, Blender</text>
+      <path class="wire" d="M60 60 V84 H180 V104"/><path class="wire" d="M180 60 V104"/><path class="wire" d="M300 60 V84 H180"/>
+      <rect class="hot" x="40" y="104" width="280" height="84" rx="8"/><text x="180" y="126" font-size="13" font-weight="600" text-anchor="middle">One map format</text>
+      <text x="180" y="146" font-size="11" text-anchor="middle" style="fill:#a5a7b1">ground heightfield &middot; solid steps and ledges</text><text x="180" y="162" font-size="11" text-anchor="middle" style="fill:#a5a7b1">named grind lines &middot; start points &middot; goals</text><text x="180" y="178" font-size="11" text-anchor="middle" style="fill:#a5a7b1">visual model kept separate from collision</text>
+      <path class="wire" d="M180 188 V212"/>
+      <rect x="70" y="212" width="220" height="44" rx="8"/><text x="180" y="232" font-size="13" font-weight="600" text-anchor="middle">Fix layer</text><text x="180" y="247" font-size="10.5" text-anchor="middle" style="fill:#a5a7b1">edit in game, survives a rebuild</text>
+      <path class="wire" d="M180 256 V280"/>
+      <rect class="hot" x="110" y="280" width="140" height="40" rx="20" style="fill:#f0ff0b"/><text x="180" y="305" font-size="14" font-weight="600" text-anchor="middle" style="fill:#0b0b0d">Skate it</text>
+    </svg>
+    <p class="cap">The scan road works and is not optimized yet. Park dimensions in the modeled course are estimates from photographs.</p>
+  </div>
+  <h3>Then a whole downtown</h3>
+  <p>The biggest map is a city. Downtown Ann Arbor is skateable across a one-mile radius, built from USGS LiDAR and open map data. Pick a named drop-in point or tap anywhere on the map, and you are standing on that street.</p>
+  <div class="clips">
+    <figure class="clip"><video src="/work/street-signal/media/dropin.mp4" poster="/work/street-signal/media/dropin.jpg" muted loop playsinline controls preload="none" aria-label="Choosing a start point on the Ann Arbor map, then skating there"></video><figcaption><b>Map to pavement.</b> Choose a point in Ann Arbor, then skate it. Shown slightly sped up.</figcaption></figure>
+    <figure class="clip"><video src="/work/street-signal/media/detroit.mp4" poster="/work/street-signal/media/detroit.jpg" muted loop playsinline controls preload="none" aria-label="Gameplay around Hart Plaza in Detroit"></video><figcaption><b>Second city.</b> Detroit, one mile around Hart Plaza.</figcaption></figure>
+  </div>
+</div></section>
+
+<section id="atlas"><div class="wrap stack">
+  <div class="eyebrow">06 &middot; Map</div>
+  <h2>The map is a product on its own</h2>
+  <p>Signal Atlas puts a whole skate scene on one map. It answers what a skater asks before leaving the house: where can I skate, who is out, and which shop is open. This is the real thing, not a mockup.</p>
+  <div class="clips">
+    <figure class="clip"><video src="/work/street-signal/media/atlas.mp4" poster="/work/street-signal/media/atlas.jpg" muted loop playsinline controls preload="none" aria-label="The Signal Atlas map: spots, parks and plazas, and shops"></video><figcaption><b>Spots, parks, shops.</b> One map, five tabs. Shown at double speed.</figcaption></figure>
+    <figure class="clip"><video src="/work/street-signal/media/world.mp4" poster="/work/street-signal/media/world.jpg" muted loop playsinline controls preload="none" aria-label="Pausing a run, opening the world map and jumping from Ann Arbor to Detroit"></video><figcaption><b>Pause, then travel.</b> From a run in Ann Arbor to Hart Plaza in Detroit. Shown sped up.</figcaption></figure>
+  </div>
+  <ul class="facts">
+    <li>Skate shops across Metro Detroit, each marked verified or call first, with phone, site and map links.</li>
+    <li>Parks, plazas and pump tracks, with a request to have a park built as a playable map.</li>
+    <li>Ten named drop-in points in Ann Arbor, from Liberty Plaza to the Diag.</li>
+    <li>Add a spot from the map, and switch the whole thing to night.</li>
+  </ul>
+</div></section>
+
+<section id="week"><div class="wrap stack">
+  <div class="eyebrow">07 &middot; Pace</div>
+  <h2>Long in the making, quick in the build</h2>
+  <p>The concept sat with its founder for a long time. Once execution began, it moved in beats like these, with the cuts left in.</p>
+  <div class="tl" id="tl">
+    <div class="ev"><div class="d">Look and loop</div><span class="tag t-cut">Rejected</span>Flat visual direction. <span class="tag t-ship">Shipped</span>New look approved, UI system live the same day. <span class="tag t-cut">Cut</span>Dice battles.</div>
+    <div class="ev"><div class="d">Hands</div><span class="tag t-ship">Shipped</span>Phone controls rebuilt from a playtest.</div>
+    <div class="ev"><div class="d">Tricks</div><span class="tag t-ship">Shipped</span>Touch grammar for flips and spins. In-game scan guide.</div>
+    <div class="ev"><div class="d">World</div><span class="tag t-call">Call</span>AI-built park judged mostly incorrect. Park editor built and tested.</div>
+    <div class="ev"><div class="d">Name</div><span class="tag t-call">Call</span>The game is named Street Signal.</div>
+    <div class="ev"><div class="d">Cast</div><span class="tag t-ship">Shipped</span>Brick Plaza playable. <span class="tag t-call">Call</span>Hybrid character look chosen.</div>
+    <div class="ev"><div class="d">Tools</div><span class="tag t-ship">Shipped</span>In-game map editor: fix any map without leaving the session.</div>
+    <div class="ev"><div class="d">City</div><span class="tag t-ship">Shipped</span>Downtown Ann Arbor skateable, then Detroit's Hart Plaza.</div>
+    <div class="ev"><div class="d">Restraint</div><span class="tag t-cut">Pulled</span>Recorded routes, built and then removed for feeling out of place.</div>
+  </div>
+</div></section>
+
+<section id="studio"><div class="wrap stack">
+  <div class="eyebrow">08 &middot; Method</div>
+  <h2>A studio with one employee</h2>
+  <p>The founder is the creative director. Specialist AI roles propose, build and check the work, and they answer to one person with taste in both skating and design. The speed comes from the machines. The calls come from him.</p>
+  <div class="panel">
+    <svg class="orbit" viewBox="0 0 360 360" role="img" aria-label="One human director at the centre with AI roles in orbit"></svg>
+    <p class="cap">One person at the centre. Everything else moves around the direction he sets.</p>
+  </div>
+  <ul class="facts">
+    <li>Every claim is labelled by how much stands behind it.</li>
+    <li>Machine output is never treated as customer evidence.</li>
+    <li>Disagreements end as a decision by a person, with the options on the table.</li>
+    <li>Everything is tested before it is trusted.</li>
+  </ul>
+</div></section>
+
+<section id="ledger"><div class="wrap stack">
+  <div class="eyebrow">09 &middot; Honesty</div>
+  <h2>What is built, what is prototype, what is still a thesis</h2>
+  <p>Sixteen claims, sorted by how much stands behind each. Tap one to see what supports it and what is missing.</p>
+  <div class="bar" id="lbar" aria-hidden="true"></div>
+  <div class="legend small"><span><i class="dot" style="background:var(--ok)"></i>Built, 6</span><span><i class="dot" style="background:var(--gold)"></i>Prototype, 5</span><span><i class="dot" style="background:var(--thesis)"></i>Thesis, 4</span><span><i class="dot" style="background:#ff5a4f"></i>Unmeasured, 1</span></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="panel detail" id="detail" aria-live="polite"></div>
+</div></section>
+
+<section id="next"><div class="wrap stack">
+  <div class="eyebrow">10 &middot; Now</div>
+  <h2>It is playable today</h2>
+  <p>Street Signal is open now. Anyone can log in and skate it in a browser, on a phone or a desktop. There is no launch date to wait for.</p>
+  <div class="panel stack" style="gap:12px">
+    <h3>In the build</h3>
+    <ul class="facts">
+      <li>Two skateable downtowns: Ann Arbor and Detroit's Hart Plaza, each a one-mile radius.</li>
+      <li>Six places on the spot list: Test Park, A2 Skatepark, Cranbrook 11, Graffiti Box, Downtown A2 and Hart Plaza.</li>
+      <li>Touch, keyboard and controller play, with every trick and combo named on screen as you land it.</li>
+      <li>A running score and goals at each spot.</li>
+      <li>A world map behind the pause button, plus settings, mods and an in-game radio.</li>
+    </ul>
+    <div><a class="btn" href="https://streetsignalgame.com" style="background:var(--sig);border-color:var(--sig);color:#0b0b0d;text-decoration:none;font-size:16px;padding:12px 20px">Play Street Signal</a></div>
+  </div>
+  <h3>What the next stretch has to prove</h3>
+  <ul class="facts">
+    <li>A stranger picks it up on a phone, lands an ollie and locks a grind without instructions.</li>
+    <li>The game holds frame rate on one named mid-range phone, with the numbers published.</li>
+    <li>One spot goes from scan to playable on camera, with the cleanup time shown.</li>
+  </ul>
+  <div class="road">
+    <div class="stop key"><div class="when">Now</div><div><b>Playable.</b> Log in and skate, in a browser with no install.</div></div>
+    <div class="stop"><div class="when">April 2027</div><div>Pitch at the annual skateboarding art show in Ann Arbor, to players and funders in the same room.</div></div>
+    <div class="stop"><div class="when">Later 2027</div><div>Engine move to Unity or Unreal for console and PC.</div></div>
+  </div>
+  <div class="panel stack" style="gap:10px">
+    <h3>The story in one line</h3>
+    <p>A product designer who helps run his city's skatepark nonprofit is directing AI like a studio to turn real streets and skate spots into a game, and he is publishing the failures alongside the build.</p>
+    <p class="small mute">Play it at <a href="https://streetsignalgame.com">streetsignalgame.com</a></p>
+  </div>
+  <div class="panel stack" style="gap:12px" id="press">
+    <h3>Press kit</h3>
+    <ul class="facts">
+      <li><b>What:</b> a skateboarding game that turns real places into playable spots, from a single ledge to a whole downtown.</li>
+      <li><b>Who:</b> one product designer with 14 years in design, treasurer of Friends of the Ann Arbor Skatepark.</li>
+      <li><b>How:</b> AI-assisted production under one person's creative direction.</li>
+      <li><b>Where it runs:</b> in a browser on phone and desktop, with touch, keyboard and controller.</li>
+      <li><b>Stage:</b> playable prototype, open to anyone. No revenue yet.</li>
+      <li><b>Dates:</b> playable now. Pitch at Ann Arbor's annual skateboarding art show, April 2027.</li>
+    </ul>
+    <p id="boiler" class="small" style="border-left:3px solid var(--sig);padding-left:12px">Street Signal is a skateboarding game built from real places. Players can skate downtown Ann Arbor and Detroit's Hart Plaza today, and scan their own spots to make them playable. It is being built in Ann Arbor, Michigan by one product designer who directs AI-assisted production himself. It is playable now at streetsignalgame.com.</p>
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="copyBoiler" type="button">Copy description</button><span class="small mute" id="copied" aria-live="polite"></span></div>
+    <p class="small mute">The clips on this page are real gameplay with the audio removed. A founder statement is not published yet. Press requests go through <a href="https://streetsignalgame.com">streetsignalgame.com</a>.</p>
+  </div>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <p>Project figures are from Street Signal's own build notes and test results as of November 18, 2026. The game is a playable prototype with no revenue yet. Gameplay clips were recorded by the founder in a phone browser on November 18, 2026. Market sources were opened and checked the same day.</p>
+  <ol>
+    <li id="s1"><a href="https://worthplaying.com/article/2025/10/7/news/147863-skate-reaches-15-million-players-on-the-eve-of-its-season-1-launch">Worthplaying, October 7, 2025</a></li>
+    <li id="s2"><a href="https://gamespress.com/SKATER-XL-ANNOUNCES-COMMUNITY-CREATED-MAPS-WILL-BE-AVAILABLE-IN-GAME-O">Easy Day Studios press release, June 25, 2020</a></li>
+    <li id="s3"><a href="https://ng.investing.com/news/company-news/scopely-to-acquire-niantics-games-business-including-pokemon-go-for-35-billion-93CH-1811357">Investing.com, March 12, 2025</a></li>
+    <li id="s4"><a href="https://statista.com/statistics/191308/participants-in-skateboarding-in-the-us-since-2006">Outdoor Foundation via Statista</a></li>
+  </ol>
+</div></footer>
+
+<script>
+(function(){
+"use strict";
+var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var NS = "http://www.w3.org/2000/svg";
+function $(id){return document.getElementById(id);}
+function el(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+function onSee(node,fn,th){
+  if(RM||!("IntersectionObserver" in window))return;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(node);fn();}});},{threshold:th||0.35});
+  io.observe(node);
+}
+
+/* count-ups */
+document.querySelectorAll("[data-count]").forEach(function(n){
+  var end=parseFloat(n.dataset.count),dec=parseInt(n.dataset.dec||"0",10),suf=n.dataset.suffix||"";
+  onSee(n,function(){var t0=performance.now();(function step(now){var p=Math.min(1,(now-t0)/1300),e=1-Math.pow(1-p,3);n.textContent=(end*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(step);})(t0);},0.6);
+});
+
+/* venn */
+var venn=$("venn");
+if(!RM){venn.classList.add("apart");onSee(venn,function(){setTimeout(function(){venn.classList.remove("apart");},150);},0.5);}
+
+/* three no's */
+var nos=$("nos");
+function playNo(){nos.classList.remove("play");void nos.offsetWidth;nos.classList.add("play");}
+onSee(nos,playNo,0.25);
+$("replayNo").addEventListener("click",playNo);
+
+/* ollie chart */
+(function(){
+  var svg=$("ollie"),L=40,R=12,T=14,B=34,W=360,H=230,tMax=0.8,hMax=0.7;
+  function X(t){return L+t/tMax*(W-L-R);} function Y(h){return H-B-h/hMax*(H-T-B);}
+  var i;
+  for(i=0;i<=7;i++){var h=i/10;svg.appendChild(el("line",{x1:L,x2:W-R,y1:Y(h),y2:Y(h),stroke:"#2b2d35","stroke-width":1}));
+    if(i%2===0)svg.appendChild(el("text",{x:L-6,y:Y(h)+4,"font-size":11,"text-anchor":"end",style:"fill:#a5a7b1"},h.toFixed(1)));}
+  for(i=0;i<=4;i++){var t=i*0.2;svg.appendChild(el("text",{x:X(t),y:H-B+16,"font-size":11,"text-anchor":"middle",style:"fill:#a5a7b1"},t.toFixed(1)));}
+  svg.appendChild(el("text",{x:W-R,y:H-4,"font-size":11,"text-anchor":"end",style:"fill:#a5a7b1"},"seconds after the pop"));
+  svg.appendChild(el("text",{x:L,y:T-2,"font-size":11,style:"fill:#a5a7b1"},"metres"));
+  var arcs=[{v:2.4,g:9.6,c:"#a5a7b1",lab:"Real 0.30 m",w:2.5},{v:3.55,g:9.86,c:"#f0ff0b",lab:"Game 0.64 m",w:3.5}];
+  arcs.forEach(function(a){
+    a.T=2*a.v/a.g;var d="",n=60;
+    for(var k=0;k<=n;k++){var tt=a.T*k/n,hh=a.v*tt-0.5*a.g*tt*tt;d+=(k?"L":"M")+X(tt).toFixed(1)+" "+Y(hh).toFixed(1);}
+    a.path=el("path",{d:d,fill:"none",stroke:a.c,"stroke-width":a.w,"stroke-linecap":"round"});svg.appendChild(a.path);
+    a.len=a.path.getTotalLength();a.path.style.strokeDasharray=a.len;
+    var tp=a.v/a.g,hp=a.v*a.v/(2*a.g);
+    svg.appendChild(el("text",{x:X(tp),y:Y(hp)-8,"font-size":12,"font-weight":600,"text-anchor":"middle",style:"fill:"+a.c},a.lab));
+    a.dot=el("rect",{width:16,height:4,rx:2,fill:a.c});svg.appendChild(a.dot);
+    a.place=function(tt){tt=Math.min(tt,a.T);var hh=a.v*tt-0.5*a.g*tt*tt;a.dot.setAttribute("x",X(tt)-8);a.dot.setAttribute("y",Y(hh)-2);a.path.style.strokeDashoffset=a.len*(1-tt/a.T);};
+    a.place(a.T);
+  });
+  var raf;
+  function run(){cancelAnimationFrame(raf);var t0=performance.now();(function step(now){var tt=(now-t0)/1000/3,done=true;arcs.forEach(function(a){a.place(tt);if(tt<a.T)done=false;});if(!done)raf=requestAnimationFrame(step);})(t0);}
+  onSee(svg,run,0.5);
+  $("replayOllie").addEventListener("click",function(){if(RM)return;run();});
+})();
+
+/* thumb pad */
+(function(){
+  var pad=$("pad"),thumb=$("thumb"),board=$("board"),read=$("read"),mark=$("mark"),range=$("pull"),stage=$("stage");
+  var PX=190,G=9.86,raf,startY=null,MAXD=80;
+  function heightFor(p){return 0.30+0.36*p;}
+  function show(p){read.textContent=heightFor(p).toFixed(2)+" m";thumb.style.transform="translateY("+(p*MAXD)+"px)";}
+  function pop(p){
+    var Hm=heightFor(p),v=Math.sqrt(2*G*Hm),T=2*v/G,t0=performance.now();
+    mark.style.bottom=(24+Hm*PX)+"px";mark.style.opacity=.7;
+    thumb.style.transition="transform .18s";thumb.style.transform="none";
+    cancelAnimationFrame(raf);
+    if(RM){board.style.transform="none";return;}
+    (function step(now){var t=(now-t0)/1000/1.6;if(t>=T){board.style.transform="none";return;}
+      var h=v*t-0.5*G*t*t,rot=-16*Math.cos(Math.PI*t/T);
+      board.style.transform="translateY("+(-h*PX)+"px) rotate("+rot+"deg)";raf=requestAnimationFrame(step);})(t0);
+  }
+  function depth(e){return Math.max(0,Math.min(1,(e.clientY-startY)/MAXD));}
+  pad.addEventListener("pointerdown",function(e){startY=e.clientY;thumb.style.transition="none";try{pad.setPointerCapture(e.pointerId);}catch(x){}});
+  pad.addEventListener("pointermove",function(e){if(startY==null)return;var p=depth(e);range.value=Math.round(p*100);show(p);});
+  function up(e){if(startY==null)return;var p=depth(e);startY=null;if(p>0.03)pop(p);else{thumb.style.transform="none";}}
+  pad.addEventListener("pointerup",up);pad.addEventListener("pointercancel",function(){startY=null;thumb.style.transform="none";});
+  range.addEventListener("input",function(){thumb.style.transition="none";show(range.value/100);});
+  $("pop").addEventListener("click",function(){pop(range.value/100);});
+  read.textContent=heightFor(0.5).toFixed(2)+" m";
+  onSee(stage,function(){pop(0.5);},0.7);
+})();
+
+/* unit chart */
+(function(){
+  var rows=[["Out ledge",47,49,"#3ecf8e"],["Manual pad edge",26,49,"#f2b632"],["Centre rail",15,49,"#ff5a4f"],["Handrail",14,49,"#ff5a4f"],["3-stair and 5-stair ollies",22,22,"#3ecf8e"]];
+  var box=$("units"),all=[];
+  rows.forEach(function(r){
+    var d=document.createElement("div");d.className="urow";
+    d.innerHTML='<div class="lab"><span>'+r[0]+'</span><b class="num">'+r[1]+' of '+r[2]+'</b></div><div class="cells"></div>';
+    var c=d.lastChild,cells=[];
+    for(var i=0;i<r[2];i++){var s=document.createElement("i");s.className="cell"+(i<r[1]?" on":"");s.style.setProperty("--c",r[3]);c.appendChild(s);cells.push(s);}
+    box.appendChild(d);all.push({cells:cells,n:r[1]});
+  });
+  onSee(box,function(){
+    all.forEach(function(r,ri){r.cells.forEach(function(s){s.classList.remove("on");});
+      r.cells.slice(0,r.n).forEach(function(s,i){setTimeout(function(){s.classList.add("on");},200+ri*250+i*28);});});
+  },0.3);
+})();
+
+/* timeline */
+(function(){
+  var evs=[].slice.call(document.querySelectorAll("#tl .ev"));
+  if(RM||!("IntersectionObserver" in window))return;
+  evs.forEach(function(e){e.classList.add("pre");});
+  var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.remove("pre");io.unobserve(x.target);}});},{threshold:0.6,rootMargin:"0px 0px -8% 0px"});
+  evs.forEach(function(e){io.observe(e);});
+  setTimeout(function(){evs.forEach(function(e){var r=e.getBoundingClientRect();if(r.top<window.innerHeight)e.classList.remove("pre");});},400);
+})();
+
+/* orbit */
+(function(){
+  var svg=document.querySelector(".orbit"),rings=[[5,70,"#f0ff0b","38s"],[8,112,"#a5a7b1","56s"],[11,154,"#5b5e68","74s"]];
+  rings.forEach(function(r,ri){
+    svg.appendChild(el("circle",{cx:180,cy:180,r:r[1],fill:"none",stroke:"#2b2d35","stroke-width":1}));
+    var g=el("g",{"class":"ring"+(ri%2?" rev":""),style:"--t:"+r[3]});
+    for(var i=0;i<r[0];i++){var a=2*Math.PI*i/r[0]+ri*0.5;g.appendChild(el("circle",{cx:180+r[1]*Math.cos(a),cy:180+r[1]*Math.sin(a),r:7,fill:r[2]}));}
+    svg.appendChild(g);
+  });
+  svg.appendChild(el("circle",{cx:180,cy:180,r:34,fill:"#f4f1ea"}));
+  svg.appendChild(el("text",{x:180,y:177,"font-size":11,"font-weight":600,"text-anchor":"middle",style:"fill:#0b0b0d"},"Creative"));
+  svg.appendChild(el("text",{x:180,y:191,"font-size":11,"font-weight":600,"text-anchor":"middle",style:"fill:#0b0b0d"},"director"));
+})();
+
+/* ledger */
+(function(){
+  var C={Built:"#3ecf8e",Prototype:"#f2b632",Thesis:"#9a97f5",Unmeasured:"#ff5a4f"};
+  var D=[
+   ["Core skating","Built","Playable now on phone and desktop, with a test per mechanic.","Play data from people outside the studio."],
+   ["Touch trick grammar","Built","Tests run on real pointer events.","Phone confirmation of the no-zoom fix."],
+   ["Ledge grinds","Built","47 of 49 lock-ins on the out ledge.","Nothing open."],
+   ["Park editor","Built","17 checks. Reproduces the Test Park terrain to the millimetre.","Merge to the live site, and one full park traced with it."],
+   ["In-game map editor","Built","32 of 32 checks on desktop and phone.","Nothing open."],
+   ["UI system and menus","Built","Live in the build.","Vector logos and contrast measurements."],
+   ["Rail grinds","Prototype","14 and 15 of 49 on two rails.","Tuning before January."],
+   ["A2 street course","Prototype","Modeled from 27 photos. Ride tests pass.","One on-site measurement. Bowls and snake run."],
+   ["Scan to playable","Prototype","A working pipeline and an in-game guide.","Speed, cleanup rate and mesh-size figures."],
+   ["Characters","Prototype","Six riders integrated locally. Import checks pass.","Deformation and phone frame rate."],
+   ["Map, crews, shops","Prototype","Live map with parks, shops, crews and spot submission.","Moderation and data upkeep."],
+   ["$5 park request","Thesis","A screen.","Payments, fulfilment and any demand signal."],
+   ["Console and PC","Thesis","Controller support in the web build.","The engine migration."],
+   ["Accessibility data","Thesis","A data model and a synthetic stress test.","Any buyer conversation. A legal read on data terms."],
+   ["Player demand","Thesis","Figures from neighbouring markets.","Usage numbers from the open build."],
+   ["Phone performance","Unmeasured","It runs in a phone browser, as the footage on this page shows.","Frame rate, load time and memory on a named device."]
+  ];
+  var tiles=$("tiles"),detail=$("detail"),bar=$("lbar"),btns=[];
+  function pick(i){btns.forEach(function(b,k){b.setAttribute("aria-pressed",k===i?"true":"false");});
+    var d=D[i];detail.style.setProperty("--c",C[d[1]]);
+    detail.innerHTML="<b>"+d[1]+"</b> &middot; "+d[0]+"<br>Behind it: "+d[2]+"<br><span class='mute'>Missing: "+d[3]+"</span>";}
+  D.forEach(function(d,i){var b=document.createElement("button");b.type="button";b.className="tile";b.style.setProperty("--c",C[d[1]]);b.textContent=d[0];b.addEventListener("click",function(){pick(i);});tiles.appendChild(b);btns.push(b);});
+  [["Built",6],["Prototype",5],["Thesis",4],["Unmeasured",1]].forEach(function(s){var i=document.createElement("i");i.style.background=C[s[0]];i.style.flex=s[1]+" 0 0";i.dataset.n=s[1];bar.appendChild(i);});
+  pick(15);
+  onSee(bar,function(){var is=[].slice.call(bar.children);is.forEach(function(i){i.style.transition="none";i.style.flexGrow=0.001;});void bar.offsetWidth;is.forEach(function(i){i.style.transition="";i.style.flexGrow=i.dataset.n;});},0.9);
+})();
+
+/* copy the press description */
+$("copyBoiler").addEventListener("click",function(){var t=$("boiler").textContent,out=$("copied");
+  try{navigator.clipboard.writeText(t).then(function(){out.textContent="Copied";},function(){out.textContent="Select the text above to copy it";});}catch(e){out.textContent="Select the text above to copy it";}});
+
+/* play clips while they are on screen */
+(function(){
+  var vids=[].slice.call(document.querySelectorAll(".clip video"));
+  if(RM||!("IntersectionObserver" in window))return;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;
+    if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{v.pause();}});},{threshold:0.55});
+  vids.forEach(function(v){io.observe(v);});
+})();
+
+/* hero canvas */
+(function(){
+  var cv=$("heroCanvas"),cx=cv.getContext("2d"),W,H,dpr,P=900,SPEED=165,G=1100,POP=360;
+  function size(){dpr=Math.min(2,window.devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);}
+  function surf(x){x=((x%P)+P)%P;
+    if(x>=150&&x<=290)return 26;
+    if(x>=430&&x<490)return 34*(x-430)/60; if(x>=490&&x<=580)return 34; if(x>580&&x<=640)return 34*(640-x)/60;
+    if(x>=730&&x<=850)return 22; return 0;}
+  var trig=[95,676],wx=0,y=0,vy=0,air=false,sparks=[],last=null,vis=true;
+  function crossed(a,b){for(var i=0;i<trig.length;i++){var t=trig[i],ma=((a%P)+P)%P,mb=((b%P)+P)%P;if(mb<ma){if(t>=ma||t<mb)return true;}else if(t>=ma&&t<mb)return true;}return false;}
+  function step(dt){
+    var bx0=wx+W*0.3;wx+=SPEED*dt;var bx=wx+W*0.3,s=surf(bx);
+    if(!air&&crossed(bx0,bx)){vy=POP;air=true;}
+    if(air){vy-=G*dt;y+=vy*dt;if(y<=s&&vy<0){y=s;vy=0;air=false;}}
+    else{if(s<y-3){air=true;vy=0;}else y=s;}
+    var m=((bx%P)+P)%P,grind=!air&&((m>=150&&m<=290)||(m>=730&&m<=850));
+    if(grind&&sparks.length<40)sparks.push({x:W*0.3-18,y:y,vx:-60-Math.random()*90,vy:40+Math.random()*90,l:.35});
+    sparks.forEach(function(p){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy-=500*dt;p.l-=dt;});sparks=sparks.filter(function(p){return p.l>0;});
+  }
+  function draw(){
+    cx.clearRect(0,0,W,H);var gy=H-34,i,x;
+    cx.fillStyle="#131419";
+    for(i=-1;i<W/46+2;i++){var k=Math.floor(wx*0.25/46)+i,hh=40+((k*53%7+7)%7)*16;x=k*46-wx*0.25;cx.fillRect(x,gy-hh,40,hh);}
+    cx.strokeStyle="#2b2d35";cx.lineWidth=2;cx.beginPath();cx.moveTo(0,gy);cx.lineTo(W,gy);cx.stroke();
+    for(var c=Math.floor(wx/P)-1;c<=Math.floor((wx+W)/P);c++){var o=c*P-wx;
+      cx.fillStyle="#1b1d24";cx.strokeStyle="#f4f1ea";cx.lineWidth=1.5;
+      cx.fillRect(o+150,gy-26,140,26);cx.strokeRect(o+150,gy-26,140,26);
+      cx.strokeStyle="#f0ff0b";cx.beginPath();cx.moveTo(o+150,gy-26);cx.lineTo(o+290,gy-26);cx.stroke();
+      cx.strokeStyle="#f4f1ea";cx.beginPath();cx.moveTo(o+430,gy);cx.lineTo(o+490,gy-34);cx.lineTo(o+580,gy-34);cx.lineTo(o+640,gy);cx.closePath();cx.fill();cx.stroke();
+      cx.strokeStyle="#f0ff0b";cx.lineWidth=3;cx.beginPath();cx.moveTo(o+730,gy-22);cx.lineTo(o+850,gy-22);cx.stroke();
+      cx.strokeStyle="#a5a7b1";cx.lineWidth=2;[745,790,835].forEach(function(px){cx.beginPath();cx.moveTo(o+px,gy-22);cx.lineTo(o+px,gy);cx.stroke();});
+    }
+    cx.fillStyle="#f2b632";sparks.forEach(function(p){cx.globalAlpha=Math.max(0,p.l/.35);cx.fillRect(p.x,gy-p.y-2,3,3);});cx.globalAlpha=1;
+    var bx=W*0.3,by=gy-y;cx.save();cx.translate(bx,by-7);cx.rotate(air?Math.max(-.35,Math.min(.35,-vy/1400)):0);
+    cx.strokeStyle="#f4f1ea";cx.lineWidth=4;cx.lineCap="round";cx.beginPath();cx.moveTo(-26,-5);cx.quadraticCurveTo(-22,0,-16,0);cx.lineTo(16,0);cx.quadraticCurveTo(22,0,26,-5);cx.stroke();
+    cx.fillStyle="#f0ff0b";cx.beginPath();cx.arc(-13,4,3.4,0,7);cx.arc(13,4,3.4,0,7);cx.fill();cx.restore();
+  }
+  function loop(now){if(!vis){last=null;return;}if(last==null)last=now;var dt=Math.min(.033,(now-last)/1000);last=now;step(dt);draw();requestAnimationFrame(loop);}
+  size();wx=200;y=surf(wx+W*0.3);draw();
+  window.addEventListener("resize",function(){size();draw();});
+  if(!RM){
+    if("IntersectionObserver" in window){new IntersectionObserver(function(es){var was=vis;vis=es[0].isIntersecting;if(vis&&!was)requestAnimationFrame(loop);},{threshold:0}).observe(cv);}
+    requestAnimationFrame(loop);
+  }
+})();
+})();
+</script>
+</body>
+</html>
