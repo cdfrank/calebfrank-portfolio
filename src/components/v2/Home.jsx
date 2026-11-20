@@ -711,7 +711,7 @@ export default class Board extends Component {
                 <img src={"/v2/10b4e3180393c55b1689c09fab8ef833.png"} alt={""} aria-hidden={"true"} style={{"width": "130px", "alignSelf": "flex-end"}} />
                 {" "}
                 <p style={{"margin": "0", "fontWeight": "600"}}>
-                  {"Honeywell, General Motors, Fujifilm, TriHealth, and 14 I can’t name "}
+                  {"Honeywell, General Motors, Fujifilm, TriHealth, and more "}
                   <span aria-hidden={"true"}>
                     {"→"}
                   </span>
