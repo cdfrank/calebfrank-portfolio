@@ -4,7 +4,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 
 const GAP = 1.6; // empty slots between years
-const TYPES = ['', 'case', 'lab', 'nda'];
+const TYPES = ['', 'case', 'lab', ''];
 
 export default function Scrubber({ rows, sel, onPick }) {
   const ref = useRef(null);

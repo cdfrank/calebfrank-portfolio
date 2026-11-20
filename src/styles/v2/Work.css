@@ -147,7 +147,6 @@ a{color:inherit;text-decoration:none}
 .rjob h4{margin:0;font:700 17px/1.25 Inter,sans-serif;letter-spacing:-.012em;color:var(--ink)}
 .rjob h4 a{color:inherit;text-decoration:underline;text-decoration-color:#FF2B2B;text-underline-offset:.2em}
 .rjob h4 .tx.on{display:none}
-.rjob.nda h4{color:var(--quiet)}
 .rnote{margin:2px 0 0;font-size:14px;color:var(--quiet);line-height:1.35}
 .rnote:empty{display:none}
 .rsum{margin:0;font-size:15px;color:var(--quiet);line-height:1.42}
@@ -193,3 +192,8 @@ a{color:inherit;text-decoration:none}
 .lead-go{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;background:#EEFF00;color:#111;font-weight:700;font-size:15px;white-space:nowrap}
 @media (max-width:760px){.lead-ss{grid-template-columns:auto minmax(0,1fr)}.lead-pic{width:72px;align-self:start}.lead-go{grid-column:1/-1;justify-self:start}}
 @media (prefers-reduced-motion:reduce){.lead-ss{transition:none}.lead-ss:hover{transform:none}}
+/* Phones and tablets: a row with no case study opens the full-screen viewer, so the whole row is the tap target. */
+.rjob.opens{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rjob.opens:active{background:#161616}
+.rjob h4 .tx-open{display:inline;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:#6B655E;text-underline-offset:.2em}
+.rjob h4 .tx-open:focus-visible{outline:3px solid #FF2B2B;outline-offset:2px}
