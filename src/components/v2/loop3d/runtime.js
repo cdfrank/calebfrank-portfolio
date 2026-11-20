@@ -99,7 +99,7 @@ export const ok = () => !!renderer();
 
 function scene(slug) {
   if (!built.has(slug)) {
-    built.set(slug, Promise.all([SCENES[slug](), document.fonts ? Promise.all([document.fonts.load('700 32px Inter'), document.fonts.load('600 20px Inter'), document.fonts.load('700 20px "JetBrains Mono"')]).catch(() => null) : null]).then(([mod]) => (() => { const sc = mod.build({ THREE, env: R.env, renderer: R.renderer }); hiShadows(sc.scene); return sc; })())));
+    built.set(slug, Promise.all([SCENES[slug](), document.fonts ? Promise.all([document.fonts.load('700 32px Inter'), document.fonts.load('600 20px Inter'), document.fonts.load('700 20px "JetBrains Mono"')]).catch(() => null) : null]).then(([mod]) => (() => { const sc = mod.build({ THREE, env: R.env, renderer: R.renderer }); hiShadows(sc.scene); return sc; })()));
   }
   return built.get(slug);
 }
