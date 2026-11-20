@@ -194,14 +194,14 @@ export function lite() {
   const s = window.screen || {};
   return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || Math.min(s.width || 1e4, s.height || 1e4) < 700;
 }
-export function pixelRatio(w, h, scale = 1) {
-  const budget = lite() ? 1.4e6 : 4.2e6;
+export function pixelRatio(w, h, scale = 1, force = false) {
+  const budget = lite() && !force ? 1.4e6 : 4.2e6;
   return Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(budget / Math.max(1, w * h))) * scale;
 }
 // Sharper, softer-edged shadows on desktop: double each shadow map (up to 4096) and widen the PCF blur a
 // touch. Run once after a scene is built and before its first render.
-export function hiShadows(scene) {
-  if (lite()) return;
+export function hiShadows(scene, force = false) {
+  if (lite() && !force) return;
   scene.traverse((o) => {
     if (!o.isLight || !o.castShadow || !o.shadow) return;
     const m = o.shadow.mapSize, n = Math.min(4096, Math.max(2048, m.x * 2));
