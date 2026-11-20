@@ -176,7 +176,7 @@ export function build({ env }) {
   ]);
   const camTgt = (t) => kf(t, [
     [0, [0, 1.2, 0]], [2.4, [0, 1.15, 0.1], (x) => x],
-    [4.2, [0.25, 0.5, 0]], [7.9, [0.35, 0.5, 0], (x) => x],
+    [4.2, [0.02, 0.5, 0.2]], [7.9, [0.08, 0.5, 0.24], (x) => x],
     [9.2, [0.1, 0.42, 0]], [10, [0.1, 0.42, 0], (x) => x],
   ]);
   const tgt = new THREE.Vector3(), c0 = new THREE.Color(), c1 = new THREE.Color();
@@ -231,7 +231,7 @@ export function build({ env }) {
     const hin = eo(k(t, 4.6, 5.2));
     // The builder rides in the left of frame, so it stays readable as the camera moves.
     camera.updateMatrixWorld();
-    hudM.position.set(-0.62 - (1 - hin) * 0.2, 0.06, -1.75).applyMatrix4(camera.matrixWorld);
+    hudM.position.set(-0.7 - (1 - hin) * 0.2, 0.04, -1.85).applyMatrix4(camera.matrixWorld);
     hudM.quaternion.copy(camera.quaternion);
     hudM.material.opacity = hin * (1 - ei(k(t, 8.9, 9.4))); hudM.visible = hin > 0.01;
     drawHud(t);
