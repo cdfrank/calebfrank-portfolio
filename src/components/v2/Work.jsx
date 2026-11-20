@@ -267,6 +267,18 @@ export default class Board extends Component {
           {" "}
         </header>
         {" "}
+        <section className={"wrap lead-wrap"} aria-label={"Featured case study"}>
+          <a className={"lead-ss"} href={"/work/street-signal/"}>
+            <img className={"lead-pic"} src={"/work/street-signal/media/tricks.jpg"} alt={""} aria-hidden={"true"} loading={"lazy"} />
+            <div className={"lead-copy"}>
+              <p className={"lead-k"}>{"Featured case study"}</p>
+              <h2 className={"display"}>{"Street Signal"}</h2>
+              <p className={"lead-s"}>{"A skate game I’m designing and building that turns real streets into playable maps. The full story: what was built, what was cut, and what is still unproven."}</p>
+            </div>
+            <span className={"lead-go"}>{"Read the case study "}<span aria-hidden={"true"}>{"→"}</span></span>
+          </a>
+        </section>
+        {" "}
         <main className={"wrap rec"} id={"rec"} style={{"paddingBottom": "96px"}}>
           {" "}
           <section className={v.rwallCls} aria-label={"Filter by client"}>

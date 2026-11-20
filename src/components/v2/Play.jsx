@@ -90,7 +90,7 @@ export default class Board extends Component {
         {" "}
         <section className={"wrap"} aria-label={"Featured game"}>
           {" "}
-          <a className={"feat ssf"} href={"https://skate-spotter-teal.vercel.app"} target={"_blank"} rel={"noopener"}>
+          <a className={"feat ssf"} href={"https://streetsignalgame.com"} target={"_blank"} rel={"noopener"}>
             {" "}
             <div className={"vid"}>
               {" "}
