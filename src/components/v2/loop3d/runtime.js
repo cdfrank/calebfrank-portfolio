@@ -11,6 +11,16 @@ const SCENES = {
   'general-motors-build-price-platform-redesign': () => import('./scenes/build-price.js'),
   'honeywell-product-selector-and-tools': () => import('./scenes/honeywell.js'),
   'new-york-lottery-single-sign-on': () => import('./scenes/nyl-sso.js'),
+  'basf-agriculture-customer-portal': () => import('./scenes/customer-portal.js'),
+  'valero-digital-ecosystem-audit': () => import('./scenes/valero.js'),
+  'city-of-raleigh-website-redesign': () => import('./scenes/raleigh.js'),
+  'general-motors-global-design-system': () => import('./scenes/gm-design-system.js'),
+  'general-motors-onstar-shopping-pages-and-cart': () => import('./scenes/onstar-cart.js'),
+  'gm-lab313-mycardrive': () => import('./scenes/mycardrive.js'),
+  'gm-lab313-test-drive-myway': () => import('./scenes/test-drive-myway.js'),
+  'mrm-agent-relationship-management': () => import('./scenes/agent-rm.js'),
+  'mrm-ux-team-ux-jam-sessions': () => import('./scenes/ux-jam.js'),
+  'stella-alert-rework': () => import('./scenes/stella-alert.js'),
 };
 
 let R = null;          // { renderer, env }

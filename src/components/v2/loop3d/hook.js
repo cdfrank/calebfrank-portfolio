@@ -4,6 +4,16 @@
 export const LIT = new Set([
   'self-initiated-street-signal', 'nyl-digital-playslip', 'basf-salesx',
   'general-motors-build-price-platform-redesign', 'honeywell-product-selector-and-tools', 'new-york-lottery-single-sign-on',
+  'basf-agriculture-customer-portal',
+  'valero-digital-ecosystem-audit',
+  'city-of-raleigh-website-redesign',
+  'general-motors-global-design-system',
+  'general-motors-onstar-shopping-pages-and-cart',
+  'gm-lab313-mycardrive',
+  'gm-lab313-test-drive-myway',
+  'mrm-agent-relationship-management',
+  'mrm-ux-team-ux-jam-sessions',
+  'stella-alert-rework',
 ]);
 
 let rt = null;
