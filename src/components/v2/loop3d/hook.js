@@ -13,13 +13,18 @@ function webgl() {
   } catch (e) { return false; }
 }
 
+// Errors are kept (not thrown) so a broken lit loop never breaks the page; /lab/motion/?debug shows them.
+const errs = (globalThis.__l3dErrors ||= []);
+const note = (e) => { errs.push(String((e && (e.stack || e.message)) || e)); };
+
 const classic = () => {
   try { return new URLSearchParams(location.search).get('loops') === 'classic' || document.documentElement.dataset.loops === 'classic'; } catch (e) { return false; }
 };
 
 // enhance(box, slug) -> controller { play(), rest() } or null when this project keeps its coded loop.
 export function enhance(box, slug) {
-  if (!box || !LIT.has(slug) || classic() || !webgl()) return null;
+  if (!box || !LIT.has(slug) || classic()) return null;
+  if (!webgl()) { note('no webgl'); return null; }
   let stage = box.querySelector(':scope > .l3d');
   if (!stage) {
     stage = document.createElement('div');
@@ -34,12 +39,12 @@ export function enhance(box, slug) {
     if (!img) { img = document.createElement('img'); img.alt = ''; img.decoding = 'async'; stage.prepend(img); }
     img.src = url;
     box.classList.add('l3d-host');
-  }).catch(() => {});
+  }).catch(note);
   return {
     play() {
       if (still) return;
       stage.dataset.want = 'play';
-      runtime().then((r) => r.play(stage, slug)).then((on) => { if (on) box.classList.add('l3d-host'); }).catch(() => {});
+      runtime().then((r) => r.play(stage, slug)).then((on) => { if (on) box.classList.add('l3d-host'); }).catch(note);
     },
     rest() {
       stage.dataset.want = 'rest';

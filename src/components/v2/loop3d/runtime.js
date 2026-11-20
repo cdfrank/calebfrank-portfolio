@@ -32,7 +32,7 @@ function renderer() {
     cv.className = 'l3d-cv';
     cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); broken = true; stopActive(); document.querySelectorAll('.l3d-host').forEach((h) => h.classList.remove('l3d-host')); });
     R = { renderer, env };
-  } catch (e) { broken = true; }
+  } catch (e) { broken = true; (globalThis.__l3dErrors ||= []).push('renderer: ' + (e && e.message)); }
   return R;
 }
 
@@ -72,7 +72,7 @@ export async function poster(slug) {
       const url = R.renderer.domElement.toDataURL('image/jpeg', 0.86);
       if (active) { active.w = 0; frame(); } // put the playing loop's own frame back before the browser paints
       return url;
-    })().catch(() => ''));
+    })().catch((e) => { (globalThis.__l3dErrors ||= []).push('poster ' + slug + ': ' + (e && (e.stack || e.message))); return ''; }));
   }
   return posters.get(slug);
 }

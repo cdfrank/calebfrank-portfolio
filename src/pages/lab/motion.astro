@@ -56,9 +56,17 @@ const rows = [
         </section>
       ))}
       <p class="how">In place on the site: the same two projects play the lit version in the Home record card, the Work page hover card and the phone viewer on this preview. Every other project still plays its coded loop. Add <code>?loops=classic</code> to any page to switch the lit loops off.</p>
+      <pre id="dbg" hidden style="white-space:pre-wrap;font:12px/1.4 monospace;color:#f88;margin-top:24px"></pre>
     </main>
     <script>
       import { enhance } from '../../components/v2/loop3d/hook.js';
+      if (location.search.includes('debug')) {
+        const d = document.getElementById('dbg')!;
+        d.hidden = false;
+        addEventListener('error', (e) => ((window as any).__l3dErrors ||= []).push('err: ' + e.message));
+        addEventListener('unhandledrejection', (e) => ((window as any).__l3dErrors ||= []).push('rej: ' + String(e.reason && (e.reason.stack || e.reason))));
+        setInterval(() => { d.textContent = 'debug ' + performance.now().toFixed(0) + '\n' + ((window as any).__l3dErrors || []).join('\n---\n'); }, 500);
+      }
       const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const svgFor = (slug) => fetch(`/loops/${slug}.svg`).then((r) => (r.ok ? r.text() : ''));
       const start = (box) => {
