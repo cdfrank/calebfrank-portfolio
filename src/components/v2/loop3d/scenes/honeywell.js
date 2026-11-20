@@ -149,12 +149,12 @@ export function build({ env }) {
   const camPos = (t) => kf(t, [
     [0, [0.25, 0.62, 2.05]], [2.6, [0.12, 0.55, 1.85], (x) => x],
     [4.2, [0.32, 0.46, 1.18]], [6.6, [0.22, 0.43, 1.06], (x) => x],
-    [8.2, [0.05, 0.55, 1.62]], [10, [-0.08, 0.6, 1.78], (x) => x],
+    [8.2, [0.02, 0.6, 2.0]], [10, [-0.06, 0.64, 2.15], (x) => x],
   ]);
   const camTgt = (t) => kf(t, [
-    [0, [-0.05, 0.36, 0]], [2.6, [-0.12, 0.38, 0], (x) => x],
+    [0, [-0.08, 0.36, 0]], [2.6, [-0.2, 0.38, 0], (x) => x],
     [4.2, [0.02, 0.31, 0]], [6.6, [0.02, 0.31, 0], (x) => x],
-    [8.2, [0.05, 0.38, 0]], [10, [0.05, 0.4, 0], (x) => x],
+    [8.2, [0.0, 0.42, 0]], [10, [0.0, 0.43, 0], (x) => x],
   ]);
   const tgt = new THREE.Vector3(), cpos = new THREE.Vector3(), n = new THREE.Vector3(), ctr = new THREE.Vector3();
 
@@ -168,12 +168,12 @@ export function build({ env }) {
     key.intensity = 34 * clamp(back(k(t, 0.15, 0.7)));
     const land = spring(k(t, 0.35, 1.35));
     valve.position.y = 0.29 + (1 - land) * 0.9;
-    spin.rotation.y = -0.55 + t * 0.22 - eio(k(t, 3.6, 4.4)) * 0.25 + eio(k(t, 6.2, 7.0)) * 0.25;
+    spin.rotation.y = -0.85 + t * 0.13 - eio(k(t, 3.6, 4.4)) * 0.2 + eio(k(t, 6.2, 7.0)) * 0.2;
     valve.rotation.z = (1 - land) * 0.4;
 
     // Panel slides in beside the stage, answers lock in turn.
     const pin = eo(k(t, 1.5, 2.2)), pout = ei(k(t, 8.6, 9.3));
-    panel.position.set(-0.66 - (1 - pin) * 0.25 - pout * 0.2, 0.43, 0.12);
+    panel.position.set(-0.56 - (1 - pin) * 0.25 - pout * 0.2, 0.43, 0.18);
     panel.lookAt(camera.position.x, panel.position.y, camera.position.z);
     panel.material.opacity = pin * (1 - pout);
     panel.visible = pin > 0.01;
@@ -195,7 +195,7 @@ export function build({ env }) {
     // Match: the handle turns a quarter closed, the ring flips from red to blue, the card pops.
     lever.rotation.y = -back(k(t, 7.25, 7.75)) * Math.PI / 2;
     const m = back(k(t, 7.0, 7.5)), mout = ei(k(t, 8.9, 9.4));
-    card.position.set(0.58, 0.64 - (1 - m) * 0.06, 0.08);
+    card.position.set(0.46, 0.62 - (1 - m) * 0.06, 0.12);
     card.lookAt(camera.position.x, card.position.y, camera.position.z);
     card.scale.setScalar(Math.max(0.001, m * (1 - mout * 0.1)));
     card.material.opacity = clamp(m) * (1 - mout);

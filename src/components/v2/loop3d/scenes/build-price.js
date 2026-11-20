@@ -12,7 +12,7 @@ const D = 10;
 const BRANDS = ['CHEVROLET', 'GMC', 'BUICK', 'CADILLAC'];
 const PRICES = [31200, 34950, 35400, 38425];
 const STEP = [5.05, 5.75, 6.45, 7.15];          // model, trim, color, price lock in
-const PAINT = [[5.9, 0x8e1018], [6.55, 0x123a8a], [7.2, 0x9aa1aa], [7.85, 0x5c0d14]];
+const PAINT = [[5.9, 0x6a0a10], [6.55, 0x10285a], [7.2, 0x7d838b], [7.85, 0x4a080d]];
 const CN = 212;
 
 function suvGeometry() {
@@ -39,8 +39,8 @@ function glassGeometry() {
   const s = new THREE.Shape();
   s.moveTo(0.33, 0.44); s.quadraticCurveTo(0.22, 0.52, 0.1, 0.6); s.lineTo(-0.62, 0.6);
   s.quadraticCurveTo(-0.74, 0.59, -0.79, 0.47); s.lineTo(0.33, 0.44);
-  const g = new THREE.ExtrudeGeometry(s, { depth: 0.73, bevelEnabled: true, bevelThickness: 0.035, bevelSize: 0.02, bevelSegments: 3, curveSegments: 16 });
-  g.translate(0, 0, -0.365);
+  const g = new THREE.ExtrudeGeometry(s, { depth: 0.77, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.02, bevelSegments: 3, curveSegments: 16 });
+  g.translate(0, 0, -0.385);
   return g;
 }
 
@@ -55,7 +55,7 @@ export function build({ env }) {
   const setDip = dip(camera);
 
   // ----------------------------------------------------------- showroom
-  const floor = mesh(new THREE.PlaneGeometry(20, 20), std(0xffffff, { map: grainTex('#0c0d11', { size: 256, speck: 0.04, blot: 0.05, seed: 2, repeat: 10 }), roughness: 0.16, metalness: 0.5 }), { cast: false });
+  const floor = mesh(new THREE.PlaneGeometry(20, 20), std(0xffffff, { map: grainTex('#0c0d11', { size: 256, speck: 0.04, blot: 0.05, seed: 2, repeat: 10 }), roughness: 0.3, metalness: 0.5 }), { cast: false });
   floor.rotation.x = -Math.PI / 2; scene.add(floor);
   const disc = mesh(new THREE.CylinderGeometry(1.35, 1.38, 0.05, 96), std(0x16181d, { roughness: 0.25, metalness: 0.75 }));
   disc.position.y = 0.025; scene.add(disc);
@@ -66,7 +66,7 @@ export function build({ env }) {
   box.rotation.x = Math.PI / 2; box.position.set(0, 3.2, 0); scene.add(box);
   [-3.4, 3.4].forEach((x) => { const w = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 2.6), new THREE.MeshBasicMaterial({ color: 0xbfd0ff, toneMapped: false })); w.position.set(x, 1.3, -3.2); scene.add(w); const g = glow(0x8fb0ff, 1.2, 0.3, 0.5); g.position.copy(w.position); g.scale.set(0.6, 3.4, 1); scene.add(g); });
   scene.add(new THREE.HemisphereLight(0x8f9ab8, 0x050608, 0.3));
-  const top = new THREE.SpotLight(0xffffff, 40, 0, 0.6, 0.7, 1.4);
+  const top = new THREE.SpotLight(0xffffff, 24, 0, 0.5, 0.75, 1.4);
   top.position.set(0.4, 3.4, 1.0); top.target.position.set(0, 0.3, 0);
   top.castShadow = true; top.shadow.mapSize.set(1024, 1024); top.shadow.bias = -0.0003; top.shadow.normalBias = 0.02;
   top.shadow.camera.near = 1.5; top.shadow.camera.far = 6;
@@ -78,26 +78,27 @@ export function build({ env }) {
   const car = new THREE.Group();
   const spinG = new THREE.Group(); spinG.position.y = 0.05; spinG.add(car); scene.add(spinG);
   const reveal = new THREE.Plane(new THREE.Vector3(-1, 0, 0), -2);
-  const paint = new THREE.MeshPhysicalMaterial({ color: 0x8e1018, metalness: 0.55, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.06, clippingPlanes: [reveal] });
+  const paint = new THREE.MeshPhysicalMaterial({ color: 0x6a0a10, metalness: 0.7, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.06, clippingPlanes: [reveal] });
   const body = mesh(suvGeometry(), paint); car.add(body);
   const glassM = new THREE.MeshPhysicalMaterial({ color: 0x05070b, metalness: 0.2, roughness: 0.05, clearcoat: 1, clippingPlanes: [reveal] });
   const glass = mesh(glassGeometry(), glassM); car.add(glass);
   const trimM = std(0x0d0e11, { roughness: 0.5, metalness: 0.3, clippingPlanes: [reveal] });
   const sill = mesh(new THREE.BoxGeometry(0.72, 0.05, 0.8), trimM); sill.position.set(0, 0.15, 0); car.add(sill);
-  const grille = mesh(new THREE.BoxGeometry(0.04, 0.12, 0.5), std(0x0a0a0c, { roughness: 0.3, metalness: 0.8, clippingPlanes: [reveal] })); grille.position.set(0.965, 0.27, 0); car.add(grille);
+  const grille = mesh(new THREE.BoxGeometry(0.03, 0.06, 0.46), std(0x0a0a0c, { roughness: 0.3, metalness: 0.8, clippingPlanes: [reveal] })); grille.position.set(0.95, 0.28, 0); car.add(grille);
   const roofRail = [-1, 1].map((sd) => { const r = mesh(new THREE.BoxGeometry(0.6, 0.018, 0.025), std(0x9aa0a8, { metalness: 1, roughness: 0.3, clippingPlanes: [reveal] })); r.position.set(-0.27, 0.665, sd * 0.3); car.add(r); return r; });
   const headM = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false, clippingPlanes: [reveal] });
   const tailM = new THREE.MeshBasicMaterial({ color: 0xff1a2a, toneMapped: false, clippingPlanes: [reveal] });
   const heads = [-1, 1].map((sd) => { const h = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.035, 0.2), headM); h.position.set(0.935, 0.35, sd * 0.25); car.add(h); const g = glow(0xe8f0ff, 0.5, 0, 0.3); g.position.set(1.0, 0.35, sd * 0.25); car.add(g); return g; });
   [-1, 1].forEach((sd) => { const h = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.04, 0.2), tailM); h.position.set(-0.94, 0.42, sd * 0.26); car.add(h); });
-  const tireM = std(0x111214, { roughness: 0.85 }), rimM = std(0xb8bdc4, { metalness: 1, roughness: 0.25 });
+  const tireM = std(0x111214, { roughness: 0.85, clippingPlanes: [reveal] }), rimM = std(0xb8bdc4, { metalness: 1, roughness: 0.25, clippingPlanes: [reveal] });
+  const spokeM = std(0x2a2c31, { metalness: 0.8, roughness: 0.35, clippingPlanes: [reveal] });
   const wheels = [];
   [[-0.57, 1], [-0.57, -1], [0.59, 1], [0.59, -1]].forEach(([x, sd]) => {
     const w = new THREE.Group(); w.position.set(x, 0.17, sd * 0.36);
     const tire = mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.13, 40), tireM); tire.rotation.x = Math.PI / 2; w.add(tire);
     const rim = mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.135, 40), rimM); rim.rotation.x = Math.PI / 2; w.add(rim);
-    for (let i = 0; i < 5; i++) { const sp = mesh(new THREE.BoxGeometry(0.2, 0.026, 0.02), std(0x2a2c31, { metalness: 0.8, roughness: 0.35 })); sp.rotation.z = (i / 5) * Math.PI; sp.position.z = sd * 0.07; w.add(sp); }
-    const hub = mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.142, 16), std(0x1a1b1f, { metalness: 0.9, roughness: 0.3 })); hub.rotation.x = Math.PI / 2; w.add(hub);
+    for (let i = 0; i < 5; i++) { const sp = mesh(new THREE.BoxGeometry(0.2, 0.026, 0.02), spokeM); sp.rotation.z = (i / 5) * Math.PI; sp.position.z = sd * 0.07; w.add(sp); }
+    const hub = mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.142, 16), spokeM); hub.rotation.x = Math.PI / 2; w.add(hub);
     car.add(w); wheels.push(w);
   });
   car.scale.setScalar(1.15);
@@ -119,7 +120,7 @@ export function build({ env }) {
   });
   const picked = label('SUV', { font: '800 60px Inter, system-ui, sans-serif', fg: '#0b0d12', bg: '#e9edf5', h: 0.16, pad: 54, track: 6 });
   picked.position.set(...lane[1]); scene.add(picked);
-  const many = label('212 options', { font: '800 56px "JetBrains Mono", ui-monospace, monospace', fg: '#e9edf5', h: 0.12 });
+  const many = label('212 options', { font: '800 56px "JetBrains Mono", ui-monospace, monospace', fg: '#e9edf5', h: 0.22 });
   many.position.set(0, 1.78, 0.2); scene.add(many);
   const m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), e4 = new THREE.Euler(), s4 = new THREE.Vector3(), p4 = new THREE.Vector3();
 
@@ -216,7 +217,7 @@ export function build({ env }) {
 
     // Act 3: scan the SUV onto the turntable, then spin under the builder.
     const rv = eio(k(t, 3.9, 4.9));
-    spinG.rotation.y = 0.9 - t * 0.28;
+    spinG.rotation.y = 0.35 - t * 0.08;
     spinG.updateMatrixWorld();
     const front = lerp(-1.35, 1.35, rv);
     // The plane is in world space; the car turns, so cut along the car's own length axis.
@@ -228,8 +229,10 @@ export function build({ env }) {
     car.visible = rv > 0;
 
     const hin = eo(k(t, 4.6, 5.2));
-    hudM.position.set(-0.95 + (1 - hin) * -0.3, 0.92, 0.85);
-    hudM.lookAt(camera.position);
+    // The builder rides in the left of frame, so it stays readable as the camera moves.
+    camera.updateMatrixWorld();
+    hudM.position.set(-0.62 - (1 - hin) * 0.2, 0.06, -1.75).applyMatrix4(camera.matrixWorld);
+    hudM.quaternion.copy(camera.quaternion);
     hudM.material.opacity = hin * (1 - ei(k(t, 8.9, 9.4))); hudM.visible = hin > 0.01;
     drawHud(t);
 
@@ -245,7 +248,7 @@ export function build({ env }) {
     const hl = eo(k(t, 8.4, 8.9));
     heads.forEach((g) => { g.material.opacity = hl * 0.9; });
     headM.color.setScalar(0.4 + hl * 0.6);
-    top.intensity = 40 + hl * 10;
+    top.intensity = 24 + hl * 6;
   }
 
   return { scene, camera, update, duration: D, poster: 7.6 };

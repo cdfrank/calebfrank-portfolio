@@ -46,7 +46,14 @@ export function build({ env }) {
     [[-DW / 2 - 0.04, DH / 2, 0.08, DH + 0.08], [DW / 2 + 0.04, DH / 2, 0.08, DH + 0.08]].forEach(([fx, fy, fw, fh]) => { const f = mesh(new THREE.BoxGeometry(fw, fh, 0.14), frameM); f.position.set(fx, fy, 0); g.add(f); });
     const lintel = mesh(new THREE.BoxGeometry(DW + 0.16, 0.08, 0.14), frameM); lintel.position.set(0, DH + 0.04, 0); g.add(lintel);
     // The room behind: pure light, only seen once the door opens.
-    const light = new THREE.Mesh(new THREE.PlaneGeometry(DW, DH), new THREE.MeshBasicMaterial({ color: TINT[i], toneMapped: false }));
+    // A lit room seen through the door: bright floor-level core falling off to the frame, not a flat card.
+    const roomTex = canvasTex(64, 128, (c, w, h) => {
+      c.fillStyle = '#1a1d2a'; c.fillRect(0, 0, w, h);
+      const g = c.createRadialGradient(w / 2, h * 0.62, 2, w / 2, h * 0.62, h * 0.62);
+      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.45, 'rgba(255,255,255,0.62)'); g.addColorStop(1, 'rgba(255,255,255,0.12)');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+    }).tex;
+    const light = new THREE.Mesh(new THREE.PlaneGeometry(DW, DH), new THREE.MeshBasicMaterial({ map: roomTex, color: TINT[i], toneMapped: false }));
     light.position.set(0, DH / 2, -0.05); g.add(light);
     const spill = new THREE.PointLight(TINT[i], 0, 3.2, 1.6); spill.position.set(0, 0.7, 0.35); g.add(spill);
     const halo = glow(TINT[i], 1.6, 0, 0.45); halo.position.set(0, DH / 2, 0.05); halo.scale.set(1.1, 2.1, 1); g.add(halo);
@@ -100,20 +107,20 @@ export function build({ env }) {
   motes.frustumCulled = false; scene.add(motes);
 
   // ----------------------------------------------------------- captions
-  const ask = label('Which password was this one?', { font: '700 52px Inter, system-ui, sans-serif', fg: '#ffffff', bg: 'rgba(15,37,87,0.85)', h: 0.13, pad: 40 });
+  const ask = label('Which password was this one?', { font: '700 52px Inter, system-ui, sans-serif', fg: '#ffffff', bg: 'rgba(15,37,87,0.85)', h: 0.17, pad: 40 });
   scene.add(ask);
-  const one = label('1 account  ·  4 experiences', { font: '800 56px Inter, system-ui, sans-serif', fg: NAVY, bg: GOLD, h: 0.15, pad: 44 });
+  const one = label('1 account  ·  4 experiences', { font: '800 56px Inter, system-ui, sans-serif', fg: NAVY, bg: GOLD, h: 0.26, pad: 44 });
   scene.add(one);
 
   // ----------------------------------------------------------- camera
   const camPos = (t) => kf(t, [
-    [0, [-1.5, 1.02, 2.5]], [2.6, [1.15, 0.98, 2.45], eio],
-    [4.0, [0.0, 1.0, 2.35]], [7.1, [0.15, 0.96, 2.2], (x) => x],
-    [9.2, [0.0, 1.55, 4.1]], [10, [0.0, 1.6, 4.3], (x) => x],
+    [0, [-1.2, 1.12, 3.5]], [2.6, [0.95, 1.1, 3.4], eio],
+    [4.0, [0.0, 1.12, 3.3]], [7.1, [0.15, 1.08, 3.05], (x) => x],
+    [9.2, [0.0, 1.6, 4.7]], [10, [0.0, 1.65, 4.9], (x) => x],
   ]);
   const camTgt = (t) => kf(t, [
-    [0, [-0.95, 0.88, 0]], [2.6, [0.75, 0.88, 0], eio],
-    [4.0, [0, 0.92, 0.5]], [7.1, [0.2, 0.9, 0.2], (x) => x],
+    [0, [-0.8, 0.98, 0]], [2.6, [0.62, 0.98, 0], eio],
+    [4.0, [0, 1.0, 0.5]], [7.1, [0.2, 0.98, 0.2], (x) => x],
     [9.2, [0, 0.82, 0]], [10, [0, 0.82, 0], (x) => x],
   ]);
   const tgt = new THREE.Vector3(), a = new THREE.Vector3(), b = new THREE.Vector3(), mid = new THREE.Vector3();
@@ -124,7 +131,7 @@ export function build({ env }) {
     const p = camPos(t), q = camTgt(t);
     camera.position.set(p[0] + Math.sin(t * 1.1) * 0.01, p[1] + Math.sin(t * 1.6) * 0.006, p[2]);
     tgt.set(q[0], q[1], q[2]); camera.lookAt(tgt);
-    camera.fov = kf(t, [[0, 36], [7.1, 36], [9.2, 40]]);
+    camera.fov = kf(t, [[0, 38], [7.1, 38], [9.2, 40]]);
     setDip(Math.max(1 - k(t, 0, 0.35), k(t, 9.55, 10)));
 
     // Act 1: each keypad refuses with a red flash and a shake.
@@ -141,7 +148,7 @@ export function build({ env }) {
       const lit = eo(k(t, TOUCH[i] + 0.05, TOUCH[i] + 0.6));
       d.spill.intensity = 5.5 * lit;
       d.halo.material.opacity = 0.55 * lit;
-      d.light.material.color.setHex(TINT[i]).multiplyScalar(0.25 + 0.75 * lit);
+      d.light.material.color.setHex(TINT[i]).multiplyScalar(0.15 + 0.7 * lit);
     });
     const askP = eo(k(t, 1.3, 1.8)) * (1 - ei(k(t, 2.7, 3.1)));
     ask.position.set(lerp(-0.2, 0.5, k(t, 1.3, 3.1)), 1.98, 0.55); ask.lookAt(camera.position);
@@ -189,7 +196,7 @@ export function build({ env }) {
 
     // Close: one line for all four doors.
     const o1 = back(k(t, 7.45, 8.0)), o2 = ei(k(t, 9.2, 9.6));
-    one.position.set(0, 2.05, 0.35); one.lookAt(camera.position);
+    one.position.set(0, 2.08, 0.45); one.lookAt(camera.position);
     one.scale.setScalar(Math.max(0.001, o1));
     one.material.opacity = clamp(o1) * (1 - o2); one.visible = o1 > 0.01;
   }

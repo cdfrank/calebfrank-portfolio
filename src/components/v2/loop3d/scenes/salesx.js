@@ -125,7 +125,7 @@ export function build({ env }) {
   const cob = new THREE.Group();
   const kern = mesh(new THREE.CapsuleGeometry(0.045, 0.24, 6, 12), std(0xe6b13a, { roughness: 0.45 })); kern.rotation.z = Math.PI / 2; cob.add(kern);
   const husk = mesh(new THREE.ConeGeometry(0.06, 0.22, 6), std(0xc9b77a, { roughness: 0.9 })); husk.rotation.z = -Math.PI / 2; husk.position.x = 0.22; cob.add(husk);
-  cob.position.set(-1.62, 0.045, -0.5); cob.rotation.y = 0.5; scene.add(cob);
+  cob.position.set(-1.62, 0.045, -0.5); cob.rotation.y = 0.5;
 
   // ----------------------------------------------------------- the five scattered tools
   const cards = TOOLS.map((tool, i) => {
@@ -241,14 +241,14 @@ export function build({ env }) {
 
   // ----------------------------------------------------------- camera
   const camPos = (t) => kf(t, [
-    [0, [1.75, 1.3, 2.35]], [2.2, [1.05, 1.15, 2.15], (x) => x],
-    [4.3, [0.28, 0.8, 1.85]], [8.3, [-0.12, 0.62, 1.32], (x) => x],
-    [10, [0.55, 0.95, 2.1]],
+    [0, [1.6, 1.08, 2.45]], [2.2, [1.0, 1.0, 2.25], (x) => x],
+    [4.3, [0.78, 0.82, 2.15]], [8.3, [0.32, 0.72, 1.85], (x) => x],
+    [10, [0.8, 0.95, 2.35]],
   ]);
   const camTgt = (t) => kf(t, [
-    [0, [0, 0.05, -0.05]], [2.2, [0, 0.1, -0.05], (x) => x],
-    [4.3, [0, 0.42, -0.08]], [8.3, [0.02, 0.44, -0.08], (x) => x],
-    [10, [0, 0.36, -0.3]],
+    [0, [0, 0.3, -0.45]], [2.2, [0, 0.22, -0.25], (x) => x],
+    [4.3, [0, 0.44, -0.15]], [8.3, [0.02, 0.46, -0.12], (x) => x],
+    [10, [0, 0.42, -0.45]],
   ]);
   const tgt = new THREE.Vector3(), from = new THREE.Vector3(), to = new THREE.Vector3(), mid = new THREE.Vector3();
   const TAB_FLAT = [0, 0.028, -0.05, -Math.PI / 2], TAB_UP = [0, 0.46, -0.12, -0.3];
@@ -270,7 +270,7 @@ export function build({ env }) {
     tab.userData.sheen.position.x = Math.sin(t * 0.6) * 0.06;
     tab.updateMatrixWorld();
     drawUI(t);
-    tab.userData.screen.material.color.setScalar(lerp(0.04, 1, eo(k(t, 2.9, 3.4))));
+    tab.userData.screen.material.color.setScalar(lerp(0.04, 0.86, eo(k(t, 2.9, 3.4))));
     screenGlow.material.opacity = 0.35 * eo(k(t, 3.0, 4.2));
 
     // Cards: breeze flutter, lift, turn to camera, then arc into the tablet's module rail.
