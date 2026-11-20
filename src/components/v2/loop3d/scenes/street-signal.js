@@ -85,8 +85,9 @@ export function build({ env, renderer }) {
   // ----------------------------------------------------------- set
   const asphalt = grainTex('#1d1e22', { size: 512, speck: 0.1, blot: 0.14, seed: 3, repeat: 6 });
   // Wet patches: low roughness where the blotches are, so the lamp and the sparks reflect in the street.
-  const wet = grainTex('#9a9a9a', { size: 256, speck: 0.05, blot: 0.55, seed: 21, repeat: 3 });
-  const ground = mesh(new THREE.PlaneGeometry(60, 60), std(0xffffff, { map: asphalt, roughness: 0.78, roughnessMap: wet, metalness: 0.0, envMapIntensity: 0.5 }), { cast: false });
+  const wet = grainTex('#b4b4b4', { size: 256, speck: 0.05, blot: 0.45, seed: 21, repeat: 3 });
+  wet.colorSpace = THREE.NoColorSpace; // roughness is data, not color
+  const ground = mesh(new THREE.PlaneGeometry(60, 60), std(0xffffff, { map: asphalt, roughness: 0.95, roughnessMap: wet, metalness: 0.0, envMapIntensity: 0.5 }), { cast: false });
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
   // Painted curb line, worn
@@ -144,7 +145,7 @@ export function build({ env, renderer }) {
   key.shadow.camera.near = 1; key.shadow.camera.far = 12;
   key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(0x6a86d6, 1.2);
+  const rim = new THREE.DirectionalLight(0x6a86d6, 0.9);
   rim.position.set(4, 3, -5);
   scene.add(rim);
   const fill = new THREE.DirectionalLight(0x8fa6ff, 0.25);
