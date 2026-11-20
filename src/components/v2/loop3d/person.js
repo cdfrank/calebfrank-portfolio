@@ -14,7 +14,10 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 const UP = V(0, 1, 0);
 const LT = 0.44, LS = 0.43, LU = 0.29, LF = 0.27;
-const EYE = new THREE.MeshStandardMaterial({ color: 0x141210, roughness: 0.22, metalness: 0 });
+const EYE = new THREE.MeshStandardMaterial({ color: 0x1a1410, roughness: 0.18, metalness: 0 });
+const EYEW = new THREE.MeshStandardMaterial({ color: 0xf2eee6, roughness: 0.3, metalness: 0 });
+const MOUTH = new THREE.MeshStandardMaterial({ color: 0x6e3a33, roughness: 0.55, metalness: 0 });
+const SOLE = new THREE.MeshStandardMaterial({ color: 0xece6da, roughness: 0.62, metalness: 0 });
 
 // Bones, in order. Every bone is a direct child of one root at the origin, so a bone's local transform is
 // its world transform, and scenes can read or tweak p.hand[i] / p.shoe[i] as before.
@@ -23,7 +26,28 @@ const NB = 18;
 
 // A smooth lofted tube along local Y through elliptical rings [y, halfWidth(x), halfDepth(z), zOffset].
 // End rings shrink to a point so the ends close as domes.
-function loft(rings, seg = 18) {
+// Rings are resampled on a Catmull-Rom curve (sub extra rings per gap) so profiles read as curves, not
+// straight cone sections, and the seam's normals are averaged so no line shows down the back.
+function smoothRings(rings, sub) {
+  if (sub < 1 || rings.length < 3) return rings;
+  const out = [], n = rings.length, P = (i) => rings[Math.max(0, Math.min(n - 1, i))];
+  for (let i = 0; i < n - 1; i++) {
+    const a = P(i - 1), b = P(i), c = P(i + 1), d = P(i + 2);
+    out.push(b);
+    for (let s = 1; s <= sub; s++) {
+      const u = s / (sub + 1), u2 = u * u, u3 = u2 * u;
+      out.push(b.map((_, j) => {
+        const p0 = a[j] ?? 0, p1 = b[j] ?? 0, p2 = c[j] ?? 0, p3 = d[j] ?? 0;
+        const v = 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u2 + (-p0 + 3 * p1 - 3 * p2 + p3) * u3);
+        return j === 0 ? v : (j < 3 ? Math.max(0.0008, v) : v);
+      }));
+    }
+  }
+  out.push(P(n - 1));
+  return out;
+}
+function loft(rings0, seg = 30, sub = 2) {
+  const rings = smoothRings(rings0, sub);
   const pos = [], idx = [];
   rings.forEach(([y, w, d, oz = 0]) => {
     for (let s = 0; s <= seg; s++) {
@@ -39,10 +63,16 @@ function loft(rings, seg = 18) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setIndex(idx);
   g.computeVertexNormals();
+  const nr = g.attributes.normal;
+  for (let r = 0; r < rings.length; r++) {
+    const a = r * (seg + 1), b = a + seg;
+    const x = nr.getX(a) + nr.getX(b), y = nr.getY(a) + nr.getY(b), z = nr.getZ(a) + nr.getZ(b), l = Math.hypot(x, y, z) || 1;
+    nr.setXYZ(a, x / l, y / l, z / l); nr.setXYZ(b, x / l, y / l, z / l);
+  }
   return g;
 }
 // Dome rings for the end of a loft: from (y, w, d) closing toward y + dir * h.
-function dome(y, w, d, h, dir, n = 4, oz = 0) {
+function dome(y, w, d, h, dir, n = 6, oz = 0) {
   const out = [];
   for (let i = 1; i <= n; i++) {
     const a = (i / n) * Math.PI / 2;
@@ -51,9 +81,9 @@ function dome(y, w, d, h, dir, n = 4, oz = 0) {
   return dir > 0 ? out : out.reverse();
 }
 // A limb from y0 to y1 (local) with a radius profile and domed ends.
-function limb(profile, seg = 16) {
+function limb(profile, seg = 28) {
   const first = profile[0], last = profile[profile.length - 1];
-  const rings = [...dome(first[0], first[1], first[2] ?? first[1], first[1] * 0.9, -1, 4, first[3] || 0), ...profile.map(([y, w, d, oz]) => [y, w, d ?? w, oz || 0]), ...dome(last[0], last[1], last[2] ?? last[1], last[1] * 0.9, 1, 4, last[3] || 0)];
+  const rings = [...dome(first[0], first[1], first[2] ?? first[1], first[1] * 0.9, -1, 6, first[3] || 0), ...profile.map(([y, w, d, oz]) => [y, w, d ?? w, oz || 0]), ...dome(last[0], last[1], last[2] ?? last[1], last[1] * 0.9, 1, 6, last[3] || 0)];
   return loft(rings, seg);
 }
 // Merging needs every piece indexed (or none); RoundedBoxGeometry comes without an index.
@@ -62,9 +92,9 @@ const prep = (g) => {
   if (!g.index) { const n = g.attributes.position.count, ix = []; for (let i = 0; i < n; i++) ix.push(i); g.setIndex(ix); }
   return g;
 };
-const ball = (r, sx = 1, sy = 1, sz = 1, ws = 18, hs = 12) => new THREE.SphereGeometry(r, ws, hs).scale(sx, sy, sz);
+const ball = (r, sx = 1, sy = 1, sz = 1, ws = 28, hs = 18) => new THREE.SphereGeometry(r, ws, hs).scale(sx, sy, sz);
 const at = (g, x, y, z, rx = 0, ry = 0, rz = 0) => { g.rotateX(rx); g.rotateY(ry); g.rotateZ(rz); g.translate(x, y, z); return g; };
-const capsule = (r, len) => new THREE.CapsuleGeometry(r, len, 3, 8);
+const capsule = (r, len) => new THREE.CapsuleGeometry(r, len, 4, 12);
 
 // A capsule from a base point along a direction, for finger segments.
 function seg(r, len, base, dir) {
@@ -77,7 +107,7 @@ function seg(r, len, base, dir) {
 // A hand in hand space: origin at the palm's centre, +Y toward the fingertips, +Z the thumb side,
 // palm facing palmSign * X. Fingers rest in a relaxed curl. grip (0..1) curls them further.
 export function handGeometry(palmSign = 1, { grip = 0, scale = 1 } = {}) {
-  const parts = [new RoundedBoxGeometry(0.03, 0.074, 0.07, 3, 0.012)];
+  const parts = [new RoundedBoxGeometry(0.03, 0.074, 0.07, 4, 0.013)];
   const zs = [0.025, 0.0085, -0.0085, -0.025], lens = [0.046, 0.05, 0.047, 0.038];
   const c1 = 0.22 + grip * 0.6, c2 = 0.5 + grip * 0.7;
   zs.forEach((z, i) => {
@@ -110,7 +140,7 @@ export function makeHand(material, palmSign = 1, opts) {
 
 // One sphere shaped into a head: full at the cranium, narrowing through the cheeks to a chin set a touch forward.
 function skull() {
-  const g = new THREE.SphereGeometry(0.1, 28, 20), a = g.attributes.position;
+  const g = new THREE.SphereGeometry(0.1, 48, 34), a = g.attributes.position;
   for (let i = 0; i < a.count; i++) {
     let x = a.getX(i) * 0.9, y = a.getY(i), z = a.getZ(i) * 0.98;
     if (y < 0) { const u = -y / 0.1; x *= 1 - 0.3 * u * u; z = z * (1 - 0.14 * u * u) + 0.014 * u; y *= 1 + 0.12 * u; } else y *= 1.04;
@@ -123,18 +153,34 @@ function skull() {
 function headParts(o) {
   const skin = [
     skull(),                                                           // cranium narrowing to the jaw and chin
-    at(ball(0.016, 0.8, 1.15, 1.25, 10, 8), 0, -0.008, 0.094),         // nose
-    at(ball(0.022, 0.42, 1, 0.74, 10, 8), -0.088, -0.004, -0.006),      // ears
-    at(ball(0.022, 0.42, 1, 0.74, 10, 8), 0.088, -0.004, -0.006),
+    at(ball(0.016, 0.8, 1.15, 1.25, 18, 12), 0, -0.008, 0.094),        // nose
+    at(ball(0.0075, 1, 0.8, 0.8, 12, 8), -0.009, -0.021, 0.094),        // nostrils' wings
+    at(ball(0.0075, 1, 0.8, 0.8, 12, 8), 0.009, -0.021, 0.094),
+    at(ball(0.022, 0.42, 1, 0.74, 18, 12), -0.088, -0.004, -0.006),     // ears
+    at(ball(0.022, 0.42, 1, 0.74, 18, 12), 0.088, -0.004, -0.006),
+    at(ball(0.012, 1.5, 0.7, 0.75, 16, 10), -0.034, 0.03, 0.084),       // brow ridge
+    at(ball(0.012, 1.5, 0.7, 0.75, 16, 10), 0.034, 0.03, 0.084),
   ];
+  // A soft closed mouth: a shallow curve of lip colour under the nose.
+  const mouth = [at(new THREE.CapsuleGeometry(0.0034, 0.02, 4, 10), 0, -0.047, 0.084, 0, 0, Math.PI / 2)];
   // hairCap sets how far the hair falls at the back and sides; the front hairline stays above the brows.
   const cap = o.hairCap ?? 0.52, tilt = Math.max(0.3, Math.PI * cap - 1.1);
-  const hairG = new THREE.SphereGeometry(0.106, 26, 14, 0, Math.PI * 2, 0, Math.PI * cap);
+  const hairG = new THREE.SphereGeometry(0.106, 48, 24, 0, Math.PI * 2, 0, Math.PI * cap);
   hairG.scale(0.93, 1.05, 1.01); hairG.rotateX(-tilt); hairG.translate(0, 0.022, -0.016);
+  // A little volume: soft lumps over the crown so the hair isn't a plain shell.
+  const ha = hairG.attributes.position;
+  for (let i = 0; i < ha.count; i++) {
+    const x = ha.getX(i), y = ha.getY(i), z = ha.getZ(i), l = Math.hypot(x, y - 0.022, z + 0.016) || 1;
+    const bump = 1 + 0.035 * Math.max(0, Math.sin(x * 140 + z * 60) * Math.sin(y * 90 + x * 30)) * clamp((y - 0.0) / 0.08);
+    ha.setXYZ(i, x * bump, 0.022 + (y - 0.022) * bump, -0.016 + (z + 0.016) * bump);
+  }
+  hairG.computeVertexNormals();
   const hair = [hairG,
     at(new THREE.BoxGeometry(0.036, 0.0075, 0.012), -0.034, 0.042, 0.087, 0, 0, 0.12),   // brows
     at(new THREE.BoxGeometry(0.036, 0.0075, 0.012), 0.034, 0.042, 0.087, 0, 0, -0.12)];
-  return { skin, hair };
+  // A swept fringe at the front for short hair; a beanie-length cap keeps a clean edge.
+  if (cap < 0.58) hair.push(at(ball(0.046, 1.3, 0.32, 0.62, 28, 14), 0.014, 0.07, 0.056, -0.7, 0, -0.2));
+  return { skin, hair, mouth };
 }
 
 // ---------------------------------------------------------------- the rig
@@ -271,35 +317,48 @@ function bodyParts(o = {}) {
       ...dome(-0.1, 0.13, 0.09, 0.05, -1, 4, 0.0),
       [-0.1, 0.13, 0.09, 0], [-0.05, 0.168, 0.105, -0.005], [0.02, 0.172, 0.108, -0.006], [0.07, 0.156, 0.098, 0], [0.1, 0.146, 0.092, 0.002],
       ...dome(0.1, 0.146, 0.092, 0.03, 1, 3, 0.002),
-    ], 22) },
+    ], 36) },
     // Chest and waist, with the shirt's hem falling over the waistband.
     { key: 'top', bones: [B.chest], blend: [B.pelvis, (y) => (y < -0.1 ? ((-0.1 - y) / 0.12) * 0.8 : 0)], geo: () => loft([
       ...dome(-0.21, 0.162, 0.106, 0.035, -1, 3, 0.004),
       [-0.21, 0.162, 0.106, 0.004], [-0.17, 0.158, Math.max(0.1, d * 0.8), 0.006], [-0.12, 0.148, d * 0.78, 0.008], [-0.02, 0.158, d * 0.86, 0.01],
       [0.07, 0.172, d * 0.94, 0.014], [0.13, 0.184, d * 0.92, 0.01], [0.175, 0.186, d * 0.8, 0.0], [0.21, 0.15, d * 0.62, -0.006],
       [0.236, 0.09, 0.07, -0.004], ...dome(0.236, 0.09, 0.07, 0.03, 1, 3, -0.004),
-    ], 24) },
+    ], 40) },
+    // A ribbed collar round the neck.
+    { key: 'top', bones: [B.chest], geo: () => at(new THREE.TorusGeometry(0.062, 0.012, 10, 36).scale(1, 0.86, 1), 0, 0.232, 0.002, Math.PI / 2 - 0.12) },
     // Deltoids: rounded caps where the arms meet the chest.
     { key: 'sleeve', bones: [B.chest], geo: () => mergeGeometries([-1, 1].map((sg) => prep(at(ball(0.056, 0.95, 0.95, 1.05, 16, 12), sg * 0.176, 0.152, -0.002)))) },
     { key: 'skin', bones: [B.neck], blend: [B.chest, (y) => (y < -0.03 ? (-0.03 - y) / 0.06 * 0.6 : 0)], geo: () => limb([[-0.07, 0.05, 0.046, -0.004], [0.0, 0.043, 0.042], [0.06, 0.044, 0.044, 0.004]], 14) },
     { key: 'skin', bones: [B.head], geo: () => mergeGeometries(hp.skin.map(prep)) },
+    { key: 'mouth', bones: [B.head], geo: () => mergeGeometries(hp.mouth.map(prep)) },
     { key: 'hair', bones: [B.head], geo: () => mergeGeometries(hp.hair.map(prep)) },
     { key: 'bun', bones: [B.head], geo: () => at(ball(0.056, 1, 0.92, 1, 16, 12), 0, 0.05, -0.098) },
     // Eyes sit on their own small bones so they can blink.
-    { key: 'eye', bones: B.eye, geo: () => ball(0.0115, 1, 1.15, 0.6, 12, 10) },
-    { key: 'sleeve', bones: B.ua, geo: () => limb([[-0.14, 0.054, 0.056], [-0.07, 0.056, 0.058], [0.03, 0.05, 0.051], [0.12, 0.043, 0.044]], 16) },
-    { key: 'fore', bones: B.fa, geo: () => limb([[-0.13, 0.042, 0.043], [-0.07, 0.045, 0.043], [0.03, 0.037, 0.034], [0.12, 0.029, 0.026]], 16) },
+    { key: 'eyeW', bones: B.eye, geo: () => ball(0.0132, 1, 0.98, 0.56, 20, 14) },
+    { key: 'eye', bones: B.eye, geo: () => at(ball(0.0072, 1, 1.08, 0.5, 16, 12), 0, -0.0006, 0.0052) },
+    { key: 'sleeve', bones: B.ua, geo: () => limb([[-0.14, 0.054, 0.056], [-0.09, 0.057, 0.06], [-0.03, 0.055, 0.06, 0.004], [0.04, 0.05, 0.054, 0.003], [0.1, 0.044, 0.046], [0.13, 0.042, 0.044]]) },
+    { key: 'fore', bones: B.fa, blend: [B.ua, (y) => (y < -0.075 ? clamp((-0.075 - y) / 0.065) * 0.58 : 0)], geo: () => limb([[-0.13, 0.041, 0.042], [-0.09, 0.045, 0.044], [-0.04, 0.044, 0.041], [0.03, 0.036, 0.033], [0.09, 0.03, 0.026], [0.125, 0.028, 0.024]]) },
     // The palm faces the body: -X on the left hand, +X on the right.
-    { key: 'hand', bones: B.hand, mirror: true, geo: (k) => handGeometry(k ? 1 : -1) },
-    { key: 'pants', bones: B.th, blend: [B.pelvis, (y) => (y < -0.14 ? (-0.14 - y) / 0.1 * 0.5 : 0)], geo: () => limb([[-0.2, 0.078, 0.08], [-0.12, 0.076, 0.078], [0.0, 0.066, 0.066], [0.12, 0.056, 0.056], [0.2, 0.05, 0.052, 0.004]], 18) },
-    { key: 'pants', bones: B.sh, geo: () => limb([[-0.2, 0.05, 0.052], [-0.12, 0.054, 0.058, -0.008], [0.0, 0.046, 0.046, -0.004], [0.12, 0.038, 0.038], [0.19, 0.036, 0.036]], 16) },
+    { key: 'hand', bones: B.hand, mirror: true, blend: [B.fa, (y) => (y < -0.028 ? clamp((-0.028 - y) / 0.02) * 0.4 : 0)], geo: (k) => handGeometry(k ? 1 : -1) },
+    { key: 'pants', bones: B.th, blend: [B.pelvis, (y) => (y < -0.14 ? (-0.14 - y) / 0.1 * 0.5 : 0)], geo: () => limb([[-0.2, 0.078, 0.08], [-0.14, 0.079, 0.081, 0.004], [-0.06, 0.074, 0.076, 0.006], [0.04, 0.066, 0.067, 0.004], [0.13, 0.056, 0.057], [0.2, 0.051, 0.054, 0.006]]) },
+    { key: 'pants', bones: B.sh, blend: [B.th, (y) => (y < -0.12 ? clamp((-0.12 - y) / 0.09) * 0.6 : 0)], geo: () => mergeGeometries([
+      limb([[-0.2, 0.05, 0.053], [-0.14, 0.054, 0.059, -0.008], [-0.07, 0.053, 0.058, -0.01], [0.02, 0.045, 0.047, -0.004], [0.11, 0.039, 0.039], [0.17, 0.04, 0.04], [0.195, 0.043, 0.043]]),
+      // A turned-up hem where the trousers break on the shoe.
+      at(new THREE.TorusGeometry(0.041, 0.0065, 8, 30), 0, 0.188, 0, Math.PI / 2),
+    ].map(prep)) },
     // Shoe (x across, y up, z toward the toe): sole, upper and a rounded toe.
     { key: 'shoe', bones: B.shoe, geo: () => {
       const g = mergeGeometries([
-        at(new RoundedBoxGeometry(0.104, 0.022, 0.272, 2, 0.009), 0, -0.027, 0.004),
-        at(new RoundedBoxGeometry(0.092, 0.066, 0.17, 3, 0.026), 0, 0.006, -0.038),
-        at(ball(0.05, 0.94, 0.6, 1.25, 16, 10), 0, -0.006, 0.07),
+        at(new RoundedBoxGeometry(0.092, 0.07, 0.17, 5, 0.028), 0, 0.008, -0.038),
+        at(ball(0.05, 0.94, 0.62, 1.28, 28, 16), 0, -0.004, 0.07),
+        at(ball(0.03, 1.4, 0.55, 1.2, 20, 12), 0, 0.03, 0.02),      // tongue and laces
       ].map(prep));
+      return ss !== 1 ? g.scale(ss, ss, ss) : g;
+    } },
+    // The sole: a lighter, wider cupsole with a rounded edge.
+    { key: 'sole', bones: B.shoe, geo: () => {
+      const g = at(new RoundedBoxGeometry(0.106, 0.026, 0.276, 4, 0.011), 0, -0.026, 0.004);
       return ss !== 1 ? g.scale(ss, ss, ss) : g;
     } },
   ];
@@ -317,7 +376,7 @@ export function makePerson(scene, o) {
   r.bones.forEach((b) => root.add(b));
   r.rest(); root.updateMatrixWorld(true);
   const restM = r.bones.map((b) => b.matrixWorld.clone());
-  const matOf = { pants: o.pants, top: o.top, sleeve: o.sleeve, fore: o.fore, skin: o.skin, hair: o.hairM, bun: o.hairM, eye: EYE, hand: o.handM || o.skin, shoe: o.shoeM };
+  const matOf = { pants: o.pants, top: o.top, sleeve: o.sleeve, fore: o.fore, skin: o.skin, hair: o.hairM, bun: o.hairM, eye: EYE, eyeW: EYEW, mouth: MOUTH, sole: o.soleM || SOLE, hand: o.handM || o.skin, shoe: o.shoeM };
 
   const groups = new Map();   // material -> [geometry]
   for (const part of bodyParts(o)) {
@@ -329,7 +388,7 @@ export function makePerson(scene, o) {
       for (let v = 0; v < n; v++) {
         const w2 = part.blend ? clamp(part.blend[1](ys[v * 3 + 1])) : 0;
         si[v * 4] = bi; sw[v * 4] = 1 - w2;
-        si[v * 4 + 1] = part.blend ? part.blend[0] : 0; sw[v * 4 + 1] = w2;
+        si[v * 4 + 1] = part.blend ? (Array.isArray(part.blend[0]) ? part.blend[0][k] : part.blend[0]) : 0; sw[v * 4 + 1] = w2;
       }
       g.applyMatrix4(restM[bi]);
       g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4));
@@ -367,7 +426,7 @@ export function makeCrowd(scene, list) {
     pants: (p) => p.pants, top: (p) => p.top, sleeve: (p) => p.sleeve ?? p.top, fore: (p) => p.fore ?? p.sleeve ?? p.top,
     skin: (p) => p.skin, hand: (p) => p.skin, hair: (p) => p.hair, bun: (p) => p.hair, shoe: (p) => p.shoe,
   };
-  const matOf = { skin: skinM, hand: skinM, shoe: shoeM, eye: EYE };
+  const matOf = { skin: skinM, hand: skinM, shoe: shoeM, eye: EYE, eyeW: EYEW, mouth: MOUTH, sole: SOLE };
   const rigs = list.map((p, i) => createRig({ seed: i * 7.31 + 1.7 }));
   // The pieces are modelled once, for an average build; each person's chest width is set per pose.
   const parts = [];
