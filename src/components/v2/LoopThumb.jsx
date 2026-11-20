@@ -2,6 +2,7 @@
 // rests on its still frame, and plays from the top on hover or focus (or when in view on touch screens).
 // Reduced-motion visitors only ever see the still frame.
 import React, { useEffect, useRef } from 'react';
+import { enhance } from './loop3d/hook.js';
 
 const cache = new Map();
 export const load = (slug) => {
@@ -41,10 +42,15 @@ export default function LoopThumb({ slug }) {
       svg.removeAttribute('role');
       svg.classList.add('hl-js');
       rest(svg);
+      // Projects with a lit loop swap in the 3D stage; the coded loop stays as the fallback.
+      const lit = enhance(box, slug);
+      const go = () => { play(svg); if (lit) lit.play(); };
+      const stop = () => { rest(svg); if (lit) lit.rest(); };
+      if (lit) cleanups.push(() => lit.rest());
       if (reduce) return;
       const host = box.closest('li') || box;
       if (canHover) {
-        const off = () => rest(svg);
+        const off = () => stop();
         // The card sits above its row (below it when there's no room under the nav) and slides
         // sideways with the cursor, so it never covers the row's own text.
         const place = (cx) => {
@@ -53,7 +59,7 @@ export default function LoopThumb({ slug }) {
           box.style.setProperty('--tx', Math.max(0, Math.min(r.width - w, x)) + 'px');
           box.style.setProperty('--ty', (r.top - h - 16 > 96 ? -h - 14 : r.height + 14) + 'px');
         };
-        const on = (e) => { place(e && e.clientX); play(svg); };
+        const on = (e) => { place(e && e.clientX); go(); };
         const move = (e) => place(e.clientX);
         const focus = () => on();
         const leave = () => { off(); box.style.removeProperty('--tx'); box.style.removeProperty('--ty'); };
@@ -70,7 +76,7 @@ export default function LoopThumb({ slug }) {
           host.removeEventListener('focusout', off);
         });
       } else {
-        const io = new IntersectionObserver((es) => es.forEach((e) => (e.intersectionRatio >= 0.75 ? play(svg) : rest(svg))), { threshold: [0, 0.75, 1] });
+        const io = new IntersectionObserver((es) => es.forEach((e) => (e.intersectionRatio >= 0.75 ? go() : stop())), { threshold: [0, 0.75, 1] });
         io.observe(box);
         cleanups.push(() => io.disconnect());
       }

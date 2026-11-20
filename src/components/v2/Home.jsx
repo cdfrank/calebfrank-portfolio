@@ -2,6 +2,7 @@
 import React from 'react';
 import Viewer from './Viewer.jsx';
 import { LOOP_SLUGS } from '../../data/loop-slugs.js';
+import { enhance } from './loop3d/hook.js';
 
 // Loop files load on demand, once each.
 const loopCache = new Map();
@@ -100,6 +101,7 @@ class Component extends DCLogic {
         if (!svg || box.dataset.loop !== slug) return;
         box.innerHTML = svg;
         const el = box.querySelector('svg.hl'); if (el) { el.removeAttribute('role'); el.setAttribute('aria-hidden', 'true'); }
+        const lit = enhance(box, slug); if (lit) lit.play();
         this.srStart();
       });
     });

@@ -2,13 +2,14 @@
 // or holds its poster frame for reduced-motion visitors.
 import React, { useEffect, useRef } from 'react';
 import { load } from './LoopThumb.jsx';
+import { enhance } from './loop3d/hook.js';
 
 export default function LoopPlay({ slug }) {
   const ref = useRef(null);
   useEffect(() => {
     const box = ref.current;
     if (!box || !slug) return undefined;
-    let alive = true;
+    let alive = true, lit = null;
     box.innerHTML = '';
     load(slug).then((markup) => {
       if (!alive || !markup) return;
@@ -17,13 +18,15 @@ export default function LoopPlay({ slug }) {
       if (!svg) return;
       svg.removeAttribute('role');
       svg.setAttribute('aria-hidden', 'true');
+      lit = enhance(box, slug);
+      if (lit) lit.play();
       if (!svg.getAnimations) return;
       const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const t = parseFloat(svg.dataset.poster || '5') * 1000;
       svg.classList.add('hl-js');
       svg.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
     });
-    return () => { alive = false; };
+    return () => { alive = false; if (lit) lit.rest(); };
   }, [slug]);
   return <div className="srx-pv" ref={ref} aria-hidden="true" />;
 }

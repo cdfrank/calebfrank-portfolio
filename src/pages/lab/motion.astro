@@ -1,0 +1,101 @@
+---
+// Direction test: today's coded loops beside the lit 3D loops, for two projects. Not linked from the site.
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/700.css';
+import '../../styles/v2/loops.css';
+import '../../styles/v2/lit-loops.css';
+
+const rows = [
+  { slug: 'self-initiated-street-signal', title: 'Street Signal', note: 'Scan a real ledge with the phone (its screen is a live camera view of the set), lock the spot, then skate it: grind in sparks, kickflip out, crane up to the spot map.' },
+  { slug: 'nyl-digital-playslip', title: 'New York Lottery Digital Playslip', note: 'A pencil marks the real Quick Draw slip, the slip breaks into its own colored flecks that stream into the phone, the four steps run with a live total, and the counter scanner reads the QR and prints the ticket.' },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Lit loops, direction test | Caleb Frank</title>
+    <style>
+      :root { color-scheme: dark; }
+      body { margin: 0; background: #0b0b0c; color: #f2efe8; font: 400 16px/1.5 Inter, system-ui, sans-serif; }
+      main { max-width: 1240px; margin: 0 auto; padding: 40px 16px 80px; }
+      h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; letter-spacing: -0.02em; }
+      .lede { color: #b9b4aa; max-width: 70ch; margin: 0 0 8px; }
+      .lede b { color: #d7ff3a; font-weight: 600; }
+      section { margin-top: 48px; }
+      h2 { font-size: 22px; margin: 0 0 4px; }
+      .note { color: #9a958c; margin: 0 0 18px; max-width: 80ch; font-size: 15px; }
+      .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+      figure { margin: 0; }
+      figcaption { display: flex; justify-content: space-between; font: 700 12px/1 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: #8d887f; margin: 0 0 8px; }
+      figcaption b { color: #d7ff3a; }
+      .box { border-radius: 8px; overflow: hidden; }
+      .box svg.hl { border-radius: 8px; }
+      .how { margin-top: 56px; border-top: 1px solid #2a2a2c; padding-top: 24px; color: #b9b4aa; max-width: 80ch; font-size: 15px; }
+      .how a { color: #d7ff3a; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Lit loops: a direction test</h1>
+      <p class="lede">Left is today's coded loop. Right is the same story as a <b>lit 3D set</b>: real light and materials, a moving camera, impacts and particles. The lit loop plays when its row is on screen.</p>
+      {rows.map((r) => (
+        <section>
+          <h2>{r.title}</h2>
+          <p class="note">{r.note}</p>
+          <div class="pair">
+            <figure><figcaption><span>Today</span><span>coded SVG</span></figcaption><div class="box" data-classic={r.slug}></div></figure>
+            <figure><figcaption><b>Lit</b><span>real-time 3D</span></figcaption><div class="box" data-lit={r.slug}></div></figure>
+          </div>
+        </section>
+      ))}
+      <p class="how">In place on the site: the same two projects play the lit version in the Home record card, the Work page hover card and the phone viewer on this preview. Every other project still plays its coded loop. Add <code>?loops=classic</code> to any page to switch the lit loops off.</p>
+    </main>
+    <script>
+      import { enhance } from '../../components/v2/loop3d/hook.js';
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const svgFor = (slug) => fetch(`/loops/${slug}.svg`).then((r) => (r.ok ? r.text() : ''));
+      const start = (box) => {
+        const svg = box.querySelector('svg.hl');
+        if (!svg || !svg.getAnimations) return svg;
+        svg.removeAttribute('role');
+        svg.classList.add('hl-js');
+        const t = parseFloat(svg.dataset.poster || '5') * 1000;
+        svg.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
+        return svg;
+      };
+      document.querySelectorAll<HTMLElement>('[data-classic]').forEach((box) => {
+        svgFor(box.dataset.classic!).then((m) => { box.innerHTML = m; start(box); });
+      });
+      const lits: { box: HTMLElement; ctl: ReturnType<typeof enhance>; ratio: number }[] = [];
+      let current: (typeof lits)[number] | null = null;
+      const pick = () => {
+        const best = lits.reduce<(typeof lits)[number] | null>((a, b) => (b.ratio > (a ? a.ratio : 0.35) ? b : a), null);
+        if (best === current) return;
+        if (current && current.ctl) current.ctl.rest();
+        current = best;
+        if (current && current.ctl) current.ctl.play();
+      };
+      const io = new IntersectionObserver((es) => {
+        es.forEach((e) => { const l = lits.find((x) => x.box === e.target); if (l) l.ratio = e.intersectionRatio; });
+        pick();
+      }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
+      document.querySelectorAll<HTMLElement>('[data-lit]').forEach((box) => {
+        const slug = box.dataset.lit!;
+        svgFor(slug).then((m) => {
+          box.innerHTML = m;
+          start(box);
+          const ctl = enhance(box, slug);
+          lits.push({ box, ctl, ratio: 0 });
+          io.observe(box);
+        });
+      });
+    </script>
+  </body>
+</html>
