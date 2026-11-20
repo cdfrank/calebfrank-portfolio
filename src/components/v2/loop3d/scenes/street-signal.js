@@ -86,7 +86,7 @@ export function build({ env, renderer }) {
   const asphalt = grainTex('#1d1e22', { size: 512, speck: 0.1, blot: 0.14, seed: 3, repeat: 6 });
   // Wet patches: low roughness where the blotches are, so the lamp and the sparks reflect in the street.
   const wet = grainTex('#9a9a9a', { size: 256, speck: 0.05, blot: 0.55, seed: 21, repeat: 3 });
-  const ground = mesh(new THREE.PlaneGeometry(60, 60), std(0xffffff, { map: asphalt, roughness: 0.55, roughnessMap: wet, metalness: 0.05, envMapIntensity: 0.6 }), { cast: false });
+  const ground = mesh(new THREE.PlaneGeometry(60, 60), std(0xffffff, { map: asphalt, roughness: 0.78, roughnessMap: wet, metalness: 0.0, envMapIntensity: 0.5 }), { cast: false });
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
   // Painted curb line, worn
@@ -144,7 +144,7 @@ export function build({ env, renderer }) {
   key.shadow.camera.near = 1; key.shadow.camera.far = 12;
   key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(B, 1.8);
+  const rim = new THREE.DirectionalLight(0x6a86d6, 1.2);
   rim.position.set(4, 3, -5);
   scene.add(rim);
   const fill = new THREE.DirectionalLight(0x8fa6ff, 0.25);
@@ -271,10 +271,11 @@ export function build({ env, renderer }) {
   ph.scale.setScalar(0.36);
   scene.add(ph);
   const rt = new THREE.WebGLRenderTarget(256, 512, { samples: 0 });
-  rt.texture.colorSpace = THREE.SRGBColorSpace;
+  rt.texture.colorSpace = THREE.LinearSRGBColorSpace;
   const lens = new THREE.PerspectiveCamera(48, 0.74 / 1.52, 0.05, 40);
   scene.add(lens);
   ph.userData.screen.material.map = rt.texture;
+  ph.userData.screen.material.toneMapped = true;
   const hud = canvasTex(256, 512);
   const hudPlane = new THREE.Mesh(new THREE.PlaneGeometry(ph.userData.sw, ph.userData.sh), new THREE.MeshBasicMaterial({ map: hud.tex, transparent: true, toneMapped: false, depthWrite: false }));
   hudPlane.position.z = ph.userData.d / 2 + 0.0045;
@@ -310,6 +311,7 @@ export function build({ env, renderer }) {
     [9.45, [0.1, 0, 0.4]], [10, [0.1, 0, 0.4], (x) => x],
   ]);
   const tgt = new THREE.Vector3();
+  const phLocal = new THREE.Vector3();
 
   function update(t) {
     // Camera, with handheld drift, a whip, and impact shake on landings.
@@ -385,13 +387,16 @@ export function build({ env, renderer }) {
     // Phone: rises in handheld, holds on the ledge, then drops out of frame for the whip.
     const out = ei(k(t, 3.1, 3.7));
     ph.visible = t < 3.75;
-    ph.position.set(-0.78 + Math.sin(t * 1.1) * 0.01, lerp(0.55, 1.08, eo(k(t, 0, 0.9))) - out * 1.1 + Math.sin(t * 1.9) * 0.005, 4.55);
-    ph.rotation.set(-0.08 + Math.sin(t * 1.5) * 0.012, 0.16 + Math.sin(t * 0.9) * 0.015, 0.04 + out * 0.4);
+    camera.updateMatrixWorld();
+    phLocal.set(-0.42 + Math.sin(t * 1.1) * 0.008, lerp(-0.85, -0.06, eo(k(t, 0, 0.9))) - out * 0.9 + Math.sin(t * 1.9) * 0.004, -1.6);
+    ph.position.copy(phLocal).applyMatrix4(camera.matrixWorld);
+    ph.quaternion.copy(camera.quaternion);
+    ph.rotateX(-0.04 + Math.sin(t * 1.5) * 0.01); ph.rotateY(0.12 + Math.sin(t * 0.9) * 0.012); ph.rotateZ(0.03 + out * 0.4);
     ph.userData.sheen.position.x = Math.sin(t * 0.8) * 0.05;
     if (ph.visible) {
       // Live viewfinder: render the set from the phone's lens into its screen.
       ph.updateMatrixWorld();
-      lens.position.copy(ph.position).add(new THREE.Vector3(0, 0.04, -0.03));
+      lens.position.copy(ph.position);
       lens.lookAt(0.2, 0.32, 0);
       const pct = Math.round(100 * eio(k(t, 0.5, 2.3)));
       drawHud(pct, t > 2.42);
