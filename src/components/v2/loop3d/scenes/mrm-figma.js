@@ -54,6 +54,8 @@ const Y = V(0, 1, 0);
 const fwdOf = (yaw, out = V(0, 0, 0)) => out.set(Math.sin(yaw), 0, Math.cos(yaw));
 const sideOf = (yaw, out = V(0, 0, 0)) => out.set(Math.cos(yaw), 0, -Math.sin(yaw));
 const ss = (x) => x * x * (3 - 2 * x);
+// Shortest signed turn from angle a to angle b.
+const angD = (a, b) => { let d = (b - a) % (2 * Math.PI); if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; return d; };
 
 // People come from the shared instanced crowd in ../person.js.
 
@@ -299,6 +301,8 @@ export function build({ env }) {
   // Where everyone's chest is once they stand on the top step: the ribbons start there.
   const CHEST_END = [];
 
+  // The camera rides with the group, about 4.4 m in front of it.
+  const CAM_Z = 4.4, camX = (t) => gx(t);
   function posePeople(t) {
     LEARN.forEach((L, i) => {
       const tt = t - L.dl;
@@ -308,9 +312,17 @@ export function build({ env }) {
       const s = x - X0 - L.dx;                    // distance walked so far
       const ph = (s / STRIDE) * Math.PI * 2 + i * 0.7;
       const ci = clamp(Math.floor((x + 1.8) / 1.2), 0, 2);
-      // At rest they turn a little toward the camera to watch the card; walking, they face +x.
+      // Look at the card above the step they are on, or ahead while walking; at the end, toward the pads.
       const rest = 1 - w;
-      const yaw = lerp(Math.PI / 2, 0.55 + (L.dz < 0 ? 0.25 : -0.05), ss(rest) * 0.85);
+      const cp = CARD_POS[ci];
+      look.set(lerp(x + 2, cp.x, rest), lerp(1.4 + hipG(x), cp.y, rest * 0.8), lerp(z, cp.z, rest));
+      const toPods = eio(k(t, RIB + 0.1, RIB + 0.7));
+      if (toPods > 0) look.lerp(tmp.set(PODS[L.d], 0.3, POD_Z), toPods);
+      // Walking, they face +x. At rest the whole body turns with the eyes: square to what they watch,
+      // opened well toward the camera so faces stay readable, and the neck only finishes the turn.
+      const yLook = Math.atan2(look.x - x, look.z - z);
+      const yView = yLook + angD(yLook, Math.atan2(camX(t) - x, CAM_Z - z)) * 0.42;
+      const yaw = Math.PI / 2 + angD(Math.PI / 2, yView) * ss(rest);
       fwdOf(yaw, F); sideOf(yaw, S);
       const cheer = Math.sin(Math.PI * k(t, CHEER + i * 0.06, CHEER + 0.8 + i * 0.06)) * (t > CHEER ? 1 : 0);
       const pump = [0, 1, 2].map((j) => Math.sin(Math.PI * k(t, CARD_T[j][2] + 0.05 + i * 0.05, CARD_T[j][2] + 0.5 + i * 0.05)));
@@ -322,11 +334,6 @@ export function build({ env }) {
       const fg = fxs.map((fx) => gAt(fx + 0.14 * w));
       const hg = Math.min(hipG(x), Math.min(fg[0], fg[1]) + 0.05);
       hipP.set(x + sway * S.x, 0.93 + hg + bob + breathe - 0.03 * cheer, z + sway * S.z);
-      // Look at the card above the step they are on, or ahead while walking; at the end, toward the pads.
-      const cp = CARD_POS[ci];
-      look.set(lerp(x + 2, cp.x, rest), lerp(1.4 + hipG(x), cp.y, rest * 0.8), lerp(z, cp.z, rest));
-      const toPods = eio(k(t, RIB + 0.1, RIB + 0.7));
-      if (toPods > 0) look.lerp(tmp.set(PODS[L.d], 0.3, POD_Z), toPods);
       crowd.pose(i, { t,
         hip: hipP, yaw, lean: 0.05 + 0.06 * w - 0.08 * cheer, tilt: 0.03 * Math.sin(t * 0.9 + i * 1.7) * rest,
         look, nod: 0.05 * Math.sin(Math.PI * k(t, CARD_T[ci][2], CARD_T[ci][2] + 0.4)),
