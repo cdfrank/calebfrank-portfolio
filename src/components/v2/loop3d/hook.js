@@ -14,6 +14,16 @@ export const LIT = new Set([
   'mrm-agent-relationship-management',
   'mrm-ux-team-ux-jam-sessions',
   'stella-alert-rework',
+  'self-initiated-tin-minnows-bearings-co',
+  'honeywell-building-automation-site-proposal',
+  'jayco-product-experience-proposal',
+  'self-initiated-shred-dice',
+  'new-york-lottery-live-drawing-and-integrity-pages',
+  'self-initiated-playable-figma-make-games',
+  'olympia-skate-shop-brand-web-and-nike-materials',
+  'self-initiated-tart',
+  'self-initiated-design-system-scanner',
+  'self-initiated-portfolios-please',
 ]);
 
 let rt = null;

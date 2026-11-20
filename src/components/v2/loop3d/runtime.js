@@ -21,6 +21,16 @@ const SCENES = {
   'mrm-agent-relationship-management': () => import('./scenes/agent-rm.js'),
   'mrm-ux-team-ux-jam-sessions': () => import('./scenes/ux-jam.js'),
   'stella-alert-rework': () => import('./scenes/stella-alert.js'),
+  'self-initiated-tin-minnows-bearings-co': () => import('./scenes/tin-minnows.js'),
+  'honeywell-building-automation-site-proposal': () => import('./scenes/honeywell-bas.js'),
+  'jayco-product-experience-proposal': () => import('./scenes/jayco.js'),
+  'self-initiated-shred-dice': () => import('./scenes/shred-dice.js'),
+  'new-york-lottery-live-drawing-and-integrity-pages': () => import('./scenes/nyl-live-drawing.js'),
+  'self-initiated-playable-figma-make-games': () => import('./scenes/figma-make-games.js'),
+  'olympia-skate-shop-brand-web-and-nike-materials': () => import('./scenes/olympia.js'),
+  'self-initiated-tart': () => import('./scenes/tart.js'),
+  'self-initiated-design-system-scanner': () => import('./scenes/ds-scanner.js'),
+  'self-initiated-portfolios-please': () => import('./scenes/portfolios-please.js'),
 };
 
 let R = null;          // { renderer, env }
