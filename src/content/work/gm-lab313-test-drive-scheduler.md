@@ -1,5 +1,5 @@
 ---
-title: "Test drive scheduler"
+title: "Test drive booking"
 client: "GM Lab313"
 kind: client
 employer: "Aimia / One10"
@@ -7,6 +7,5 @@ role: "Designer and strategist"
 start: 2018
 industry: "Automotive"
 disciplines: ["Product", "Service design"]
-summary: "Kickoff and early design for a scheduling tool, building on Test Drive My Way pilot lessons."
-confidential: true
+summary: "Picking a day and time for a test drive, with the vehicle brought from the dealer to the shopper's home."
 ---

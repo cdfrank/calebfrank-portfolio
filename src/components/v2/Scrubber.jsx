@@ -60,7 +60,7 @@ export default function Scrubber({ rows, sel, onPick }) {
   const cur = sel || 0;
   const focus = hover === null ? xs[cur] : hover.f;
   const show = hover === null ? cur : hover.i;
-  const name = (d) => (d[4] === 3 ? 'Under NDA' : d[5]);
+  const name = (d) => d[5];
   const tip = rows[show];
 
   return (

@@ -9,7 +9,6 @@ industry: "Agency"
 disciplines: ["AI", "Product", "Strategy"]
 summary: "Early UX for MRM's Agent Relationship Management platform, built for a world where AI systems help customers decide."
 outcome: "8+ concept flows, reviewed at holding-company CEO level"
-confidential: true
 caseStudy: true
 approved: false
 reviewNotes:

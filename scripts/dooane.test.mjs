@@ -40,13 +40,12 @@ test('work prompt provides a starting point and no outside knowledge', () => {
   assert.equal(answer.links.at(-1).href, '/work/');
 });
 
-test('the guide excludes held, draft, and confidential records and private fields', () => {
+test('the guide excludes held and draft records and private fields', () => {
   const data = { title: 'Public project', client: 'Client', summary: 'Public summary', disciplines: [], caseStudy: true, approved: true, reviewNotes: ['Private note'] };
   const selected = publicProjects([
     { id: 'public', data },
     { id: 'held', data: { ...data, approved: false } },
     { id: 'draft', data: { ...data, draft: true } },
-    { id: 'confidential', data: { ...data, confidential: true } },
   ]);
   assert.equal(selected.length, 1);
   assert.equal(selected[0].href, '/work/public/');

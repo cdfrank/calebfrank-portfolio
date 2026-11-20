@@ -5,7 +5,6 @@ employer: "MRM//McCann"
 role: "Strategy and design lead"
 industry: "Automotive"
 disciplines: ["Design systems"]
-confidential: true
 title: "One design language across GM's brands"
 start: 2024
 end: 2025

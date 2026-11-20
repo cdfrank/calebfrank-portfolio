@@ -1,5 +1,19 @@
-// Project title on the home map (DATA[i][5] in Home.jsx) -> its loop file in public/loops. NDA rows have none.
+// Project title on the home map (DATA[i][5] in Home.jsx) -> its loop file in public/loops.
 export const LOOP_SLUGS = {
+"Truck add-ons pilot": "gm-lab313-vehicle-add-ons-pilot",
+"Affordability check": "gm-lab313-affordability-check-pilot",
+"Help me choose": "gm-lab313-carveau",
+"Innovation workshop": "gm-lab313-disruptive-innovation-workshop",
+"Pickup in augmented reality": "gm-lab313-put-a-t1-anywhere",
+"Dealer learning path": "gm-lab313-center-of-learning",
+"Rewards card ideas": "gm-lab313-gm-card-ideation",
+"Accessory rentals pilot": "gm-lab313-rent-accessories-pilot",
+"Test drive booking": "gm-lab313-test-drive-scheduler",
+"Shared car costs": "gm-lab313-vehicle-venmo",
+"Keeping older cars connected": "general-motors-onstar-adapter-experience",
+"Project turnaround": "general-motors-onstar-experience-transformation",
+"Dealership visit companion": "gm-lab313-carcontrol",
+"Personal price builder": "gm-lab313-personalize-my-price",
 "Embrace 2013 microsite": "ball-state-university-embrace-2013-microsite",
 "Journalism program pages": "ball-state-university-journalism-program-pages",
 "President's Holiday Card": "ball-state-university-president-s-holiday-card",
@@ -82,12 +96,3 @@ export const LOOP_SLUGS = {
 "Shred & Dice": "self-initiated-shred-dice"
 };
 
-// NDA boxes on the home map (by DATA index) -> the concept loop for that confidential project, matched on employer and year.
-export const NDA_LOOPS = {
-31: "gm-lab313-vehicle-add-ons-pilot",
-35: "gm-lab313-affordability-check-pilot", 36: "gm-lab313-carveau", 37: "gm-lab313-disruptive-innovation-workshop",
-38: "gm-lab313-put-a-t1-anywhere", 39: "gm-lab313-center-of-learning", 40: "gm-lab313-gm-card-ideation",
-41: "gm-lab313-rent-accessories-pilot", 42: "gm-lab313-test-drive-scheduler", 43: "gm-lab313-vehicle-venmo",
-46: "general-motors-onstar-adapter-experience", 47: "general-motors-onstar-experience-transformation",
-48: "gm-lab313-carcontrol", 49: "gm-lab313-personalize-my-price",
-};

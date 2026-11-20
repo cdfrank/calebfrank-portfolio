@@ -5,7 +5,6 @@ employer: "MRM//McCann"
 role: "UX strategy and design"
 industry: "Automotive"
 disciplines: ["Product", "Research"]
-confidential: true
 title: "Rebuilding how people build a vehicle"
 start: 2024
 end: 2025

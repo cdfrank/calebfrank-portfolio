@@ -277,8 +277,6 @@ a{color:inherit;text-decoration:none}
 .sr .pv.own .sr-cards i{background:oklch(.97 .015 90 / .2)}
 .sr .pv.shot .shot{display:block}
 .sr .pv.shot .mk,.sr .pv.shot .logo,.sr .pv.shot .lt{display:none}
-/* NDA work keeps its sketch; only the client mark is held back. */
-.sr .pv.nda .logo,.sr .pv.nda .lt{display:none}
 
 /* Hero: Opener 1, Say it plain, with DOOANE */
 .o1p{background:#E9E4DA url(/v2/a47cf5cdee5bff56e4086ff608897d1b.jpg);color:#111;padding-bottom:0;display:flex;flex-direction:column;min-height:900px}

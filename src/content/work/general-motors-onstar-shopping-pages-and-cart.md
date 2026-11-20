@@ -9,7 +9,6 @@ industry: "Automotive"
 disciplines: ["E-commerce", "Web"]
 summary: "Earning the lead on OnStar's shopping pages and cart within months of joining, then launching 18+ pages around a new product catalog."
 outcome: "18+ pages launched; 20,000 to 30,000 more weekly views"
-confidential: true
 caseStudy: true
 approved: false
 reviewNotes:

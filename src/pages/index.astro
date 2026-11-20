@@ -7,7 +7,7 @@ import '../styles/hover-loops.css';
 import { allWork } from '../lib/data';
 import { publicProjects } from '../lib/dooane.mjs';
 
-// Public summaries and case-study links for the record's full-screen project view. Held, draft and confidential work never reaches the page.
+// Public summaries and case-study links for the record's full-screen project view. Held and draft work never reaches the page.
 const details = Object.fromEntries(publicProjects(await allWork()).map((p) => [`${p.client}|${p.title}`, { s: p.summary, h: p.href === '/work/' ? '' : p.href }]));
 ---
 <V2>

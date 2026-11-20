@@ -9,7 +9,6 @@ industry: "Automotive"
 disciplines: ["AI", "Mobile", "Product"]
 summary: "A design study that turns an AI voice agent's follow-ups into a clear work queue for dealership service teams."
 outcome: "Design study for leadership review, not yet shipped"
-confidential: true
 cover: "../../assets/work/stella-alerts/alerts-before-after.jpg"
 coverAlt: "Eight phone screens comparing the current STELLA alerts prototype with the redesign"
 caseStudy: true

@@ -35,6 +35,5 @@ const note = [showBrand ? d.client : undefined, showRole ? d.role : undefined].f
     <span class="job-year">{years(w)}</span>
     {d.caseStudy && <a class="flag flag-case" href={`/work/${w.id}/`} aria-label={`Read the ${d.title} case study`}>{d.approved ? 'Case study' : 'Draft'}</a>}
     {d.award && <span class="flag flag-award" title={d.award}>Award</span>}
-    {d.confidential && <span class="flag" title="Details under NDA">NDA</span>}
   </div>
 </li>

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 // Hover loop files live in public/loops/<project id>.svg. A row gets one only if its file exists.
 const loopOf = (id: string) => (existsSync(join(process.cwd(), 'public', 'loops', `${id}.svg`)) ? id : '');
 
-// The client record on /work/: approved work only, grouped like the archive. NDA rows keep only the client name.
+// The client record on /work/: approved work only, grouped like the archive.
 export function clientRecord(all: Work[]) {
   const work = all.filter((w) => w.data.approved !== false);
   const groups = groupByClient(work);
@@ -34,26 +34,21 @@ export function clientRecord(all: Work[]) {
 
   const W = work.map((w) => {
     const d = w.data;
-    const nda = Boolean(d.confidential);
     const g = groups[groupIndex.get(w.id)!];
     return {
-      t: nda ? 'Under NDA' : d.title,
+      t: d.title,
       loop: loopOf(w.id),
-      s: nda ? '' : d.summary ?? '',
+      s: d.summary ?? '',
       y: years(w),
       st: String(d.start),
       g: groupIndex.get(w.id)!,
       cs: Boolean(d.caseStudy),
-      aw: !nda && Boolean(d.award),
-      nda,
+      aw: Boolean(d.award),
       ind: d.industry ?? '',
       wh: whereOf(w),
       caps: capabilitiesOf(w),
-      href: nda ? '' : d.link ?? (d.caseStudy ? `/work/${w.id}/` : ''),
-      q: (nda
-        ? `${g.name} under nda ${d.industry ?? ''}`
-        : [g.name, d.client, d.title, d.summary, d.disciplines.join(' '), d.industry].join(' ')
-      ).toLowerCase(),
+      href: d.link ?? (d.caseStudy ? `/work/${w.id}/` : ''),
+      q: [g.name, d.client, d.title, d.summary, d.disciplines.join(' '), d.industry].join(' ').toLowerCase(),
     };
   });
 

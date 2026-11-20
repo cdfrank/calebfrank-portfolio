@@ -1,5 +1,5 @@
 ---
-title: "Put a T1 Anywhere"
+title: "Pickup in augmented reality"
 client: "GM Lab313"
 kind: client
 employer: "Aimia / One10"
@@ -7,6 +7,5 @@ role: "Designer and strategist"
 start: 2018
 industry: "Automotive"
 disciplines: ["AR", "Concept"]
-summary: "An augmented reality concept for placing a full-size truck in the real world."
-confidential: true
+summary: "Placing a full-size pickup in a driveway, at a campsite or on a city street through the phone's camera."
 ---

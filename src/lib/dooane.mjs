@@ -12,7 +12,7 @@ export const greeting = {
 };
 
 export function publicProjects(work) {
-  return work.filter(({ data }) => data.approved !== false && !data.draft && !data.confidential).map(({ id, data }) => ({
+  return work.filter(({ data }) => data.approved !== false && !data.draft).map(({ id, data }) => ({
     title: data.title, client: data.client, summary: data.summary, disciplines: data.disciplines,
     featured: data.featured !== undefined,
     rank: data.featured ?? 99,

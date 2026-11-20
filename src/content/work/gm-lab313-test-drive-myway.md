@@ -9,7 +9,6 @@ end: 2018
 industry: "Automotive"
 disciplines: ["Product", "Service design"]
 summary: "Chevrolet's at-home test drive pilot, where the customer's time became the design problem."
-confidential: true
 outcome: "Live in 3 California cities with the Bolt EV in 2017"
 caseStudy: true
 approved: false

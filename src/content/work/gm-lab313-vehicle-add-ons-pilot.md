@@ -1,5 +1,5 @@
 ---
-title: "GMC Add-Ons pilot"
+title: "Truck add-ons pilot"
 client: "GM Lab313"
 kind: client
 employer: "Aimia / One10"
@@ -8,6 +8,5 @@ start: 2017
 end: 2019
 industry: "Automotive"
 disciplines: ["Product", "Pilot"]
-summary: "Pilot materials and UX roadmap work for add-on sales at GMC retail."
-confidential: true
+summary: "Adding truck accessories to a purchase, with the monthly total updating as each one goes on."
 ---

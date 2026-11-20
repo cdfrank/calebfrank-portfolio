@@ -4,7 +4,6 @@ employer: "Aimia / One10"
 role: "Designer and strategist"
 industry: "Automotive"
 disciplines: ["Product", "Prototyping", "Research"]
-confidential: true
 title: "Who is the customer really talking to?"
 client: "GM Lab313"
 summary: "Testing 13 written hypotheses about buying a car online, and finding that the hardest design problem was trust."

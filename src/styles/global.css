@@ -137,7 +137,6 @@ button, input, select { font: inherit; color: inherit; }
 .row-summary { color: var(--quiet); font-size: 1rem; line-height: 1.45; margin-top: 3px; }
 .row-award { color: var(--lime); font-size: 0.92rem; margin-top: 3px; }
 .row-meta { font-size: 0.92rem; color: var(--quiet); line-height: 1.4; }
-.row-nda { display: block; margin-top: 3px; font-size: 0.84rem; }
 .empty { padding-block: 32px; color: var(--quiet); }
 .empty[hidden] { display: none; }
 

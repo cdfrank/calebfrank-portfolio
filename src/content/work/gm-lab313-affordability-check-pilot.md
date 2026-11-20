@@ -1,5 +1,5 @@
 ---
-title: "Affordability Check pilot"
+title: "Affordability check"
 client: "GM Lab313"
 kind: client
 employer: "Aimia / One10"
@@ -8,6 +8,5 @@ start: 2018
 end: 2019
 industry: "Automotive"
 disciplines: ["Pilot", "Service design"]
-summary: "A retail pilot built around helping shoppers understand affordability."
-confidential: true
+summary: "Showing shoppers which vehicles fit their monthly budget as they change the down payment and term."
 ---

@@ -1,5 +1,5 @@
 ---
-title: "OnStar experience transformation"
+title: "Project turnaround"
 client: "General Motors"
 kind: client
 employer: "MRM//McCann"
@@ -8,6 +8,5 @@ start: 2019
 end: 2020
 industry: "Automotive"
 disciplines: ["Product", "Architecture"]
-summary: "Led a GM-appointed project from midstream through IT handoff."
-confidential: true
+summary: "Joining a project partway through, getting it back on track, and handing it off to IT."
 ---

@@ -1,5 +1,5 @@
 ---
-title: "OnStar Adapter experience"
+title: "Keeping older cars connected"
 client: "General Motors"
 kind: client
 employer: "MRM//McCann"
@@ -8,6 +8,5 @@ start: 2019
 end: 2020
 industry: "Automotive"
 disciplines: ["Service design", "Strategy"]
-summary: "Experience work for keeping older vehicles connected after a network sunset."
-confidential: true
+summary: "An adapter that brings connected services back to older vehicles after a cellular network sunset."
 ---
