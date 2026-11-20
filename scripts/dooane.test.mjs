@@ -94,6 +94,9 @@ test('follow-ups stay on Street Signal until the visitor names something else', 
   assert.match(ask('What’s next for it?', 'street-signal').text, /April 2027/);
   assert.equal(ask('Tell me about BASF', 'street-signal').links[0].href, '/work/basf-salesx/');
   assert.equal(ask('How can I reach him?', 'street-signal').links[0].href, 'mailto:info@calebfrank.com');
+  const posters = { ...withGame, projects: [...withGame.projects, { client: 'CLC and A Bicycle Built for 95,000', title: 'Poster work', summary: 'Concept and event posters.', disciplines: [], featured: false, href: '/work/' }] };
+  assert.match(answerQuestion('How is it built?', posters, { topic: 'street-signal' }).text, /directed AI/);
+  assert.match(answerQuestion('Tell me about the poster work', posters, { topic: 'street-signal' }).text, /posters/);
 });
 
 test('Street Signal leads the featured work', () => {

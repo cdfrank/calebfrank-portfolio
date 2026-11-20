@@ -61,7 +61,9 @@ export function answerQuestion(question, portfolio, { topic } = {}) {
   }
   const ranked = rankProjects(q, portfolio.projects);
   // A follow-up about the game, unless the visitor has clearly moved on to a named project.
-  if (topic === 'street-signal' && !ranked.some(({ named }) => named)) {
+  // "How is it built?" points back at the game even if "built" also appears in a project name.
+  const pointsBack = /\b(it|its|it's|this|that|the game)\b/.test(q);
+  if (topic === 'street-signal' && (pointsBack || !ranked.some(({ named }) => named))) {
     const answer = answerStreetSignal(q, portfolio, { named: false });
     if (answer) return answer;
   }
