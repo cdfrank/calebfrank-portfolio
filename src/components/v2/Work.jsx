@@ -33,7 +33,7 @@ class Component extends DCLogic {
     this.VORD.forEach((n, i) => { this.VPOS[n] = i; });
     this.VROWS = this.VORD.map((n) => {
       const w = R.W[n], g = R.G[w.g];
-      return [(+w.st) - 2013, 0, 0, 0, w.nda ? 3 : w.cs ? 1 : g.id === 'self-initiated' ? 2 : 0, w.t, g.name];
+      return [(+w.st) - 2013, 0, 0, 0, w.nda ? 3 : w.cs ? 1 : g.id === 'own-work' ? 2 : 0, w.t, g.name];
     });
   }
   componentDidMount() {
