@@ -1,7 +1,6 @@
 // Generated from the Claude Design board Main-egx9.dc.html. The logic class is the board's own code.
 import React from 'react';
-import { createPortal } from 'react-dom';
-import Scrubber from './Scrubber.jsx';
+import Viewer from './Viewer.jsx';
 import { LOOP_SLUGS, NDA_LOOPS } from '../../data/loop-slugs.js';
 
 // Loop files load on demand, once each.
@@ -199,7 +198,7 @@ class Component extends DCLogic {
         shot: sh || '/dooane/pointing.webp', logo: lg || '/dooane/pointing.webp',
         t: nda ? 'Under NDA' : d[5], client: nda ? '' : d[6], cmd: nda ? '> under nda_' : '> ' + d[5].toLowerCase() + '_',
         w1: w(11), w2: w(12), w3: w(13),
-        cap: lp ? 'Concept loop' : nda ? 'Under NDA' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
+        cap: lp ? 'Concept loop' : nda ? '' : sh ? 'Screenshot' : 'Sketch, not a screenshot',
       };
     };
     const pv = picked ? pvOf(picked, sel) : { cls: '', ac: 'transparent', shot: '/dooane/pointing.webp', logo: '/dooane/pointing.webp', t: '', client: '', cmd: '', w1: '0%', w2: '0%', w3: '0%', cap: '', loop: '' };
@@ -574,11 +573,6 @@ export default class Board extends Component {
                 {"My own"}
               </span>
               {" "}
-              <span>
-                <i className={"n"}></i>
-                {"Under NDA"}
-              </span>
-              {" "}
             </div>
             {" "}
           </div>
@@ -945,27 +939,19 @@ export default class Board extends Component {
         {" "}
       </div>
       {" "}
-      {v.fx.on ? createPortal(
-        <div className={"sr srx"} role={"dialog"} aria-modal={"true"} aria-label={v.fx.label} style={{"--ox": v.fx.ox, "--oy": v.fx.oy}} onPointerDown={v.fx.down} onPointerUp={v.fx.up}>
-          <header className={"srx-top"}>
-            <span className={"yr"}>{v.cardKicker}</span>
-            <span className={"srx-n"}>{v.fx.count}</span>
-            <button className={"srx-x"} ref={(el) => { this.srX = el; }} onClick={v.fx.close} aria-label={"Close and go back to the map"}><span aria-hidden={"true"}>{"×"}</span></button>
-          </header>
-          <Scrubber rows={this.DATA} sel={this.state.sel} onPick={(n) => this.setState({ sel: n, origin: null })} />
-          <div className={"srx-body"} key={v.fx.key} aria-live={"polite"}>
-            {this.renderPv(v)}
-            <h3 className={"display"}>{v.pickTitle}</h3>
-            <p className={"srx-client"}>{v.pickSub}</p>
-            {v.fx.sum ? <p className={"srx-sum"}>{v.fx.sum}</p> : null}
-            {v.fx.href ? <a className={"srx-go"} href={v.fx.href}>{"Read the case study "}<span aria-hidden={"true"}>{"→"}</span></a> : null}
-          </div>
-          <footer className={"srx-nav"}>
-            <button onClick={v.fx.prev} aria-label={"Previous project"}><span aria-hidden={"true"}>{"←"}</span></button>
-            <button className={"srx-back"} onClick={v.fx.close}>{"Back to the map"}</button>
-            <button onClick={v.fx.next} aria-label={"Next project"}><span aria-hidden={"true"}>{"→"}</span></button>
-          </footer>
-        </div>, document.body) : null}
+      {v.fx.on ? (
+        <Viewer label={v.fx.label} ox={v.fx.ox} oy={v.fx.oy} kicker={v.cardKicker} count={v.fx.count}
+          rows={this.DATA} sel={this.state.sel} onPick={(n) => this.setState({ sel: n, origin: null })}
+          onClose={v.fx.close} onPrev={v.fx.prev} onNext={v.fx.next}
+          backLabel={"Back to the map"} closeLabel={"Close and go back to the map"} closeRef={(el) => { this.srX = el; }}
+          bodyKey={v.fx.key} onPointerDown={v.fx.down} onPointerUp={v.fx.up}>
+          {this.renderPv(v)}
+          <h3 className={"display"}>{v.pickTitle}</h3>
+          <p className={"srx-client"}>{v.pickSub}</p>
+          {v.fx.sum ? <p className={"srx-sum"}>{v.fx.sum}</p> : null}
+          {v.fx.href ? <a className={"srx-go"} href={v.fx.href}>{"Read the case study "}<span aria-hidden={"true"}>{"→"}</span></a> : null}
+        </Viewer>
+      ) : null}
       </>
     );
   }

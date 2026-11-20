@@ -1,6 +1,8 @@
 // Generated from the Claude Design board Work-j593.dc.html. The logic class is the board's own code.
 import React from 'react';
 import LoopThumb from './LoopThumb.jsx';
+import Viewer from './Viewer.jsx';
+import LoopPlay from './LoopPlay.jsx';
 
 class DCLogic extends React.Component {
   constructor(props) { super(props); this.state = {}; }
@@ -19,8 +21,76 @@ class Component extends DCLogic {
     this.REC = props.rec;
     this.setup();
     this.recSetup();
+    this.viewSetup();
+  }
+  // Phones and tablets: a record row with no case study opens the full-screen viewer (the same one as the home map),
+  // playing its coded preview loop. The viewer walks every project oldest to newest, like the home map's timeline.
+  viewSetup() {
+    const R = this.REC;
+    Object.assign(this.state, { vsel: null, vfull: false, vorigin: null, narrow: false });
+    this.VORD = R.W.map((w, n) => n).sort((a, b) => (+R.W[a].st) - (+R.W[b].st) || a - b);
+    this.VPOS = {};
+    this.VORD.forEach((n, i) => { this.VPOS[n] = i; });
+    this.VROWS = this.VORD.map((n) => {
+      const w = R.W[n], g = R.G[w.g];
+      return [(+w.st) - 2013, 0, 0, 0, w.nda ? 3 : w.cs ? 1 : g.id === 'self-initiated' ? 2 : 0, w.t, g.name];
+    });
+  }
+  componentDidMount() {
+    this.vMq = window.matchMedia('(max-width: 1000px)');
+    this.vNarrow = () => this.setState({ narrow: this.vMq.matches, vfull: this.vMq.matches && this.state.vfull });
+    this.vMq.addEventListener('change', this.vNarrow);
+    this.vNarrow();
+    this.vKey = (e) => {
+      if (!this.state.vfull) return;
+      if (e.key === 'Escape') this.vClose();
+      else if (e.key === 'ArrowRight') this.vStep(1);
+      else if (e.key === 'ArrowLeft') this.vStep(-1);
+    };
+    window.addEventListener('keydown', this.vKey);
+  }
+  componentDidUpdate(prevProps, prevState) {
+    // Hold the page still behind the viewer, and hand focus in, then back to the row that opened it.
+    if (prevState.vfull !== this.state.vfull) {
+      document.documentElement.style.overflow = this.state.vfull ? 'hidden' : '';
+      if (this.state.vfull) { if (this.vX) this.vX.focus({ preventScroll: true }); }
+      else if (this.vFrom && this.vFrom.isConnected) this.vFrom.focus({ preventScroll: true });
+    }
+  }
+  vOpen(n, e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    this.vFrom = e.currentTarget.querySelector('.tx-open') || e.currentTarget;
+    this.setState({ vsel: this.VPOS[n], vfull: true, vorigin: [Math.round(r.left + r.width / 2), Math.round(r.top + Math.min(r.height, 120) / 2)] });
+  }
+  vClose() { this.setState({ vfull: false, vorigin: null }); }
+  vStep(by) { const k = this.VORD.length; this.setState({ vsel: ((this.state.vsel || 0) + by + k) % k, vorigin: null }); }
+  viewVals() {
+    const { vsel, vfull, vorigin } = this.state, R = this.REC;
+    if (!vfull || vsel === null) return { von: false };
+    const n = this.VORD[vsel], w = R.W[n], g = R.G[w.g];
+    return {
+      von: true,
+      vkey: vsel,
+      vlabel: w.t + ', ' + g.name,
+      vkicker: 'Project, ' + w.y,
+      vcount: (vsel + 1) + ' of ' + this.VORD.length,
+      vox: vorigin ? vorigin[0] + 'px' : '50%', voy: vorigin ? vorigin[1] + 'px' : '40%',
+      vloop: w.loop, vt: w.t, vclient: g.name,
+      vsum: w.nda ? 'Counted in the record. The details stay private.' : w.s,
+      vhref: w.href, vgo: w.cs ? 'Read the case study ' : 'Open the project ',
+      vdown: (e) => { this.vsx = e.clientX; this.vsy = e.clientY; },
+      vup: (e) => {
+        if (this.vsx === undefined) return;
+        const dx = e.clientX - this.vsx, dy = e.clientY - this.vsy;
+        this.vsx = undefined;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) this.vStep(dx < 0 ? 1 : -1);
+      },
+    };
   }
   componentWillUnmount() {
+    if (this.vMq) this.vMq.removeEventListener('change', this.vNarrow);
+    window.removeEventListener('keydown', this.vKey);
+    document.documentElement.style.overflow = '';
     (this.timers || []).forEach(clearTimeout);
     if (this.raf) cancelAnimationFrame(this.raf);
     if (this.cleanup) this.cleanup();
@@ -131,7 +201,8 @@ class Component extends DCLogic {
       const w = W[n], g = R.G[w.g];
       return { t: w.t, s: w.s, y: w.y, note: compact ? g.name : note, href: w.href || '#rec', link: w.href ? 'on' : '', cls: 'rjob' + (w.nda ? ' nda' : ''),
         cs: w.cs ? 'on' : '', aw: w.aw ? 'on' : '', nda: w.nda ? 'on' : '',
-        lsrc: g.logo ? g.logo.src : '', lcls: g.logo ? (g.logo.w ? 'logo white' : 'logo') : 'none', lname: g.name, loop: w.loop || '' };
+        lsrc: g.logo ? g.logo.src : '', lcls: g.logo ? (g.logo.w ? 'logo white' : 'logo') : 'none', lname: g.name, loop: w.loop || '',
+        open: !w.href && this.state.narrow ? (e) => this.vOpen(n, e) : undefined };
     };
     const groups = R.G.map((g) => {
       const rows = g.items.map((it) => { const k = it.indexOf('|'); return { n: +it.slice(0, k), note: it.slice(k + 1) }; }).filter((r) => hit[r.n]);
@@ -165,7 +236,7 @@ class Component extends DCLogic {
       remptyCls: shown ? '' : 'on',
     };
   }
-  renderVals() { return Object.assign(this.listVals(), this.recVals()); }
+  renderVals() { return Object.assign(this.listVals(), this.recVals(), this.viewVals()); }
   listVals() {
     const { by, sel, filter, q } = this.state;
     const DATA = this.DATA, SUM = this.SUM;
@@ -423,7 +494,7 @@ export default class Board extends Component {
                       {" "}
                       {(g.jobs || []).map((j, i10) => (
                         <React.Fragment key={i10}>
-                          <li className={j.cls}>
+                          <li className={j.cls + (j.open ? ' opens' : '')} onClick={j.open}>
                             {" "}
                             <LoopThumb slug={j.loop} />
                             {" "}
@@ -436,9 +507,7 @@ export default class Board extends Component {
                                     </a>
                                   </>
                                 ) : null}
-                                <span className={`tx ${j.link}`}>
-                                  {`${j.t}`}
-                                </span>
+                                {j.open ? <button type={"button"} className={"tx-open"} aria-haspopup={"dialog"}>{j.t}</button> : <span className={`tx ${j.link}`}>{j.t}</span>}
                               </h4>
                               <p className={"rnote"}>
                                 {`${j.note}`}
@@ -458,9 +527,6 @@ export default class Board extends Component {
                               </span>
                               <span className={`flag award ${j.aw}`}>
                                 {"Award"}
-                              </span>
-                              <span className={`flag nda ${j.nda}`}>
-                                {"NDA"}
                               </span>
                             </div>
                             {" "}
@@ -486,7 +552,7 @@ export default class Board extends Component {
             {" "}
             {(v.ryear || []).map((j, i11) => (
               <React.Fragment key={i11}>
-                <li className={j.cls}>
+                <li className={j.cls + (j.open ? ' opens' : '')} onClick={j.open}>
                   {" "}
                   <LoopThumb slug={j.loop} />
                   {" "}
@@ -506,9 +572,7 @@ export default class Board extends Component {
                           </a>
                         </>
                       ) : null}
-                      <span className={`tx ${j.link}`}>
-                        {`${j.t}`}
-                      </span>
+                      {j.open ? <button type={"button"} className={"tx-open"} aria-haspopup={"dialog"}>{j.t}</button> : <span className={`tx ${j.link}`}>{j.t}</span>}
                     </h4>
                     <p className={"rnote"}>
                       {`${j.note}`}
@@ -529,9 +593,6 @@ export default class Board extends Component {
                     <span className={`flag award ${j.aw}`}>
                       {"Award"}
                     </span>
-                    <span className={`flag nda ${j.nda}`}>
-                      {"NDA"}
-                    </span>
                   </div>
                   {" "}
                 </li>
@@ -545,9 +606,20 @@ export default class Board extends Component {
           </p>
           {" "}
         </main>
-        {" "}
       </div>
-      {" "}
+      {v.von ? (
+        <Viewer label={v.vlabel} ox={v.vox} oy={v.voy} kicker={v.vkicker} count={v.vcount}
+          rows={this.VROWS} sel={this.state.vsel} onPick={(i) => this.setState({ vsel: i, vorigin: null })}
+          onClose={() => this.vClose()} onPrev={() => this.vStep(-1)} onNext={() => this.vStep(1)}
+          backLabel={"Back to the record"} closeLabel={"Close and go back to the record"} closeRef={(el) => { this.vX = el; }}
+          bodyKey={v.vkey} onPointerDown={v.vdown} onPointerUp={v.vup}>
+          <LoopPlay slug={v.vloop} />
+          <h3 className={"display"}>{v.vt}</h3>
+          <p className={"srx-client"}>{v.vclient}</p>
+          {v.vsum ? <p className={"srx-sum"}>{v.vsum}</p> : null}
+          {v.vhref ? <a className={"srx-go"} href={v.vhref}>{v.vgo}<span aria-hidden={"true"}>{"→"}</span></a> : null}
+        </Viewer>
+      ) : null}
       </>
     );
   }

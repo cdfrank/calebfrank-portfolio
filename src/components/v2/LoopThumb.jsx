@@ -4,7 +4,7 @@
 import React, { useEffect, useRef } from 'react';
 
 const cache = new Map();
-const load = (slug) => {
+export const load = (slug) => {
   if (!cache.has(slug)) cache.set(slug, fetch(`/loops/${slug}.svg`).then((r) => (r.ok ? r.text() : '')).catch(() => ''));
   return cache.get(slug);
 };
