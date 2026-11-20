@@ -151,7 +151,7 @@ export function build({ env }) {
       d.light.material.color.setHex(TINT[i]).multiplyScalar(0.15 + 0.7 * lit);
     });
     const askP = eo(k(t, 1.3, 1.8)) * (1 - ei(k(t, 2.7, 3.1)));
-    ask.position.set(lerp(-0.2, 0.5, k(t, 1.3, 3.1)), 1.98, 0.55); ask.lookAt(camera.position);
+    ask.position.set(lerp(-0.2, 0.5, k(t, 1.3, 3.1)), 1.78, 0.6); ask.lookAt(camera.position);
     ask.material.opacity = askP; ask.visible = askP > 0.01;
 
     // Act 2: gold motes gather into one key.
