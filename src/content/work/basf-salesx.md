@@ -12,7 +12,7 @@ summary: "One platform replaced the scattered tools a national agriculture sales
 coverAlt: "Angled SalesX screens showing a territory map, customer accounts, and sales charts"
 outcome: "From a pilot of 40 users to 800+ sales professionals"
 cover: "../../assets/work/basf-salesx/mobile-screens.jpg"
-featured: 1
+featured: 2
 caseStudy: true
 ---
 BASF wanted to change how agriculture thought of it: from a giant chemical supplier to a trusted advisor. That change would succeed or fail with the sales team in the field. Those reps were planning seasons across scattered tools, and even good tools were not getting used.

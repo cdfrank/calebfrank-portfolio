@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { answerQuestion, greeting, suggestions } from '../lib/dooane.mjs';
+import { answerQuestion, greeting, suggestionsFor } from '../lib/dooane.mjs';
 import '../styles/dooane.css';
 
 function Mascot({ state = 'idle', small = false, onWaveEnd }) {
@@ -20,6 +20,8 @@ export default function DooaneChat({ portfolio }) {
   const input = useRef(null);
   const transcript = useRef(null);
   const pending = useRef(null);
+  // What the last answer was about, so follow-ups like "where can I play it?" stay on that topic.
+  const [topic, setTopic] = useState(null);
 
   useEffect(() => () => clearTimeout(pending.current), []);
   // Touch screens: opening the guide must not summon the keyboard. The field takes focus only when the visitor taps it.
@@ -72,7 +74,9 @@ export default function DooaneChat({ portfolio }) {
     // Brief animation gives the visitor visible feedback; replies are local and prepared.
     pending.current = setTimeout(() => {
       pending.current = null;
-      setMessages((history) => [...history, { role: 'assistant', ...answerQuestion(question, portfolio) }]);
+      const answer = answerQuestion(question, portfolio, { topic });
+      setTopic(answer.topic ?? null);
+      setMessages((history) => [...history, { role: 'assistant', ...answer }]);
       setBusy(false);
       (typing ? input : panel).current?.focus({ preventScroll: true });
     }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420);
@@ -93,7 +97,7 @@ export default function DooaneChat({ portfolio }) {
         </div>)}
         {busy && <p className="dooane-thinking" role="status">Finding your next stop…</p>}
       </div>
-      <div className="dooane-suggestions" aria-label="Suggested questions">{suggestions.map((question) => <button key={question} disabled={busy} onClick={() => ask(question)}>{question}</button>)}</div>
+      <div className="dooane-suggestions" aria-label="Suggested questions">{suggestionsFor(topic).map((question) => <button key={question} disabled={busy} onClick={() => ask(question)}>{question}</button>)}</div>
       <form className="dooane-form" onSubmit={(event) => { event.preventDefault(); ask(draft); }}>
         <label className="dooane-sr" htmlFor="dooane-question">Ask about Caleb’s portfolio</label>
         <input id="dooane-question" ref={input} value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={400} placeholder="Ask about a project or skill…" autoComplete="off" enterKeyHint="send" />

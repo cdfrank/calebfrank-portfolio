@@ -367,7 +367,7 @@ export default class Board extends Component {
                 </h1>
                 <p className={"ss-s"}>{"A skate game I’m designing and building in Ann Arbor. Scan a real skate spot, then skate it."}</p>
                 <div className={"ctas"}>
-                  <a className={"btn ss-play"} href={"https://skate-spotter-teal.vercel.app"} target={"_blank"} rel={"noopener"}>
+                  <a className={"btn ss-play"} href={"https://streetsignalgame.com"} target={"_blank"} rel={"noopener"}>
                     {"Play the prototype "}
                     <span aria-hidden={"true"}>{"→"}</span>
                   </a>
@@ -605,6 +605,25 @@ export default class Board extends Component {
           {" "}
           <div className={"cards"}>
             {" "}
+            <a className={"card lead-ss"} href={"/work/street-signal/"}>
+              <div className={"body"}>
+                <p className={"lead-k"}>{"Featured case study · In development"}</p>
+                <h3 className={"display"}>{"Street Signal"}</h3>
+                <p className={"lead-s"}>{"Your city is the skatepark. A skate game I’m designing and building that turns real streets and skate spots into playable maps, from one ledge to a whole downtown."}</p>
+                <div className={"tags"}>
+                  <span className={"tag"}>{"Game design"}</span>
+                  <span className={"tag"}>{"AI-directed build"}</span>
+                  <span className={"tag"}>{"Three.js"}</span>
+                </div>
+                <span className={"lead-go"}>{"Read the case study "}<span aria-hidden={"true"}>{"→"}</span></span>
+              </div>
+              <div className={"lead-shots"} aria-hidden={"true"}>
+                <img src={"/work/street-signal/media/tricks.jpg"} alt={""} loading={"lazy"} />
+                <img src={"/work/street-signal/media/atlas.jpg"} alt={""} loading={"lazy"} />
+                <img src={"/work/street-signal/media/detroit.jpg"} alt={""} loading={"lazy"} />
+              </div>
+            </a>
+            {" "}
             <a className={"card"} href={"/work/nyl-digital-playslip/"}>
               {" "}
               <div className={"pic"}>
@@ -688,7 +707,7 @@ export default class Board extends Component {
               <div className={"body"} style={{"justifyContent": "space-between", "minHeight": "340px", "padding": "28px"}}>
                 {" "}
                 <h3 className={"display"} style={{"fontSize": "54px", "fontWeight": "400"}}>
-                  {"92 more"}
+                  {"91 more"}
                   <br />
                   {"where that"}
                   <br />

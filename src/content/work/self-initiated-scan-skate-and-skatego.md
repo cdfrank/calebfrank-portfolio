@@ -8,6 +8,7 @@ industry: "Games"
 disciplines: ["Games", "Mobile", "AI"]
 summary: "A skateboarding game that turns real streets and skate spots into playable maps."
 status: "Playable"
+featured: 1
 caseStudy: true
 link: "/work/street-signal/"
 ---

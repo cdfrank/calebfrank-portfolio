@@ -12,7 +12,7 @@ summary: "A paper form every player knows became a mobile flow that ends in a QR
 coverAlt: "Digital Playslip screen for Quick Draw, asking how many spots to play as a numbered first step"
 outcome: "Designed for all 10 draw games"
 cover: "../../assets/work/nyl-digital-playslip/digital-playslip-cover.jpg"
-featured: 2
+featured: 3
 caseStudy: true
 ---
 Every lottery player in New York knows the paper playslip. You fill in small bubbles, carry it to a retailer, and hand it over. It has rules and options printed in tiny type, and it varies from game to game. Our job was to rebuild that ritual on a phone without losing the retailer at the end of it.
