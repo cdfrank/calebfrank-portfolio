@@ -1,7 +1,9 @@
 // Fujifilm direct-to-consumer platform lit loop, 10 s. "Your photo, on the things you keep."
 // A film boutique after hours: a walnut wall of cubbies lit by warm strips, each holding a film box.
-// One box slides out with a little hitch, spins to the camera and drops into a kraft mailer on the
-// stone counter. The lid slams, green tape seals it, and the mailer spins away as the light turns to
+// Seen over a shopper's shoulder, two hands raise a green disposable film camera, wind it with a thumb
+// and take the shot; the flash pops across the film wall. The photo slides out of the camera as a print,
+// develops into a mountain lake, and sails into a kraft mailer on the stone counter. The lid slams, green
+// tape seals it, and the mailer spins away as the light turns to
 // golden hour. The lid pops again, warm light spills out, and personalized goods rise out of it: a mug,
 // a folded fleece blanket and a throw pillow, each printing the customer's lake photo onto itself while
 // the title settles above them.
@@ -16,7 +18,6 @@ const SANS = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", monospace
 const GREEN = '#1f8a4c', GREEN_H = 0x1f8a4c, KRAFT = '#a77a4c', PLUM = 0x1d1216;
 const SH = new THREE.Vector3(-0.3, 0.2, -0.55);   // shelf: bottom centre
 const COLS = 5, ROWS = 3, CW = 0.26, CH = 0.3, BOARD = 0.02;
-const HERO = [2, 1];                               // column, row of the box that gets picked
 const BOX = [0.16, 0.22, 0.1];
 const BOX_COLS = [0x1f8a4c, 0xb8235a, 0x1e5aa8, 0xd99a1e, 0xc23a2b, 0x5a3e9a, 0x2a9a8a, 0x1f8a4c, 0xd99a1e, 0x1e5aa8, 0xb8235a, 0x2a9a8a, 0xc23a2b, 0x1f8a4c, 0x5a3e9a];
 const MAIL = new THREE.Vector3(0.66, 0, 0.24);
@@ -56,24 +57,31 @@ function drawLake(c, w, h) {
 }
 
 // The front of every film box on the wall: a white band with a film-strip run through it.
-function drawDecal(c, w, h, hero) {
+function drawDecal(c, w, h) {
   c.clearRect(0, 0, w, h);
-  if (hero) {
-    c.fillStyle = GREEN; c.fillRect(0, 0, w, h);
-    const g = c.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'rgba(255,255,255,0.14)'); g.addColorStop(0.5, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,0.18)');
-    c.fillStyle = g; c.fillRect(0, 0, w, h);
-  }
   c.fillStyle = '#f2efe8'; c.fillRect(0, h * 0.56, w, h * 0.2);
   c.fillStyle = '#16181b'; c.fillRect(w * 0.08, h * 0.6, w * 0.84, h * 0.12);
   c.fillStyle = '#f2efe8';
   for (let i = 0; i < 7; i++) { c.fillRect(w * 0.12 + i * w * 0.115, h * 0.612, w * 0.05, h * 0.022); c.fillRect(w * 0.12 + i * w * 0.115, h * 0.686, w * 0.05, h * 0.022); }
   c.fillStyle = 'rgba(242,239,232,0.92)'; roundRect(c, w * 0.1, h * 0.1, w * 0.36, h * 0.06, h * 0.03); c.fill();
   roundRect(c, w * 0.1, h * 0.2, w * 0.56, h * 0.035, h * 0.017); c.fill();
-  if (hero) {
-    c.fillStyle = '#f2efe8'; c.beginPath(); c.arc(w * 0.74, h * 0.34, w * 0.12, 0, 7); c.fill();
-    c.fillStyle = GREEN; c.beginPath(); c.arc(w * 0.74, h * 0.34, w * 0.06, 0, 7); c.fill();
-  }
-  c.fillStyle = hero ? 'rgba(242,239,232,0.9)' : 'rgba(242,239,232,0.6)'; c.fillRect(0, h * 0.9, w, h * 0.02);
+  c.fillStyle = 'rgba(242,239,232,0.6)'; c.fillRect(0, h * 0.9, w, h * 0.02);
+}
+
+// The cardboard wrap on the back of the disposable camera: green, a white band with the film speed, a
+// film-strip stripe and a flash bolt.
+function drawWrap(c, w, h) {
+  const g = c.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#24a05c'); g.addColorStop(1, '#14703c');
+  c.fillStyle = g; c.fillRect(0, 0, w, h);
+  c.fillStyle = '#f4f1ea'; c.fillRect(0, h * 0.42, w, h * 0.3);
+  c.fillStyle = '#14703c'; c.font = `900 ${h * 0.26}px ${SANS}`; c.textBaseline = 'middle'; c.fillText('400', w * 0.06, h * 0.575);
+  c.fillStyle = '#1b1d20'; c.font = `700 ${h * 0.09}px ${MONO}`; c.fillText('27 EXP', w * 0.42, h * 0.52); c.fillText('COLOR', w * 0.42, h * 0.635);
+  c.fillStyle = '#d8402c'; c.beginPath(); c.moveTo(w * 0.86, h * 0.45); c.lineTo(w * 0.79, h * 0.6); c.lineTo(w * 0.84, h * 0.6); c.lineTo(w * 0.8, h * 0.7); c.lineTo(w * 0.9, h * 0.54); c.lineTo(w * 0.85, h * 0.54); c.closePath(); c.fill();
+  c.fillStyle = '#16181b'; c.fillRect(0, h * 0.8, w, h * 0.11);
+  c.fillStyle = '#f4f1ea';
+  for (let i = 0; i < 14; i++) { c.fillRect(w * 0.02 + i * w * 0.072, h * 0.815, w * 0.032, h * 0.02); c.fillRect(w * 0.02 + i * w * 0.072, h * 0.875, w * 0.032, h * 0.02); }
+  c.fillStyle = 'rgba(255,255,255,0.85)'; c.font = `800 ${h * 0.12}px ${SANS}`; c.fillText('FILM', w * 0.06, h * 0.22);
+  c.fillStyle = 'rgba(255,255,255,0.55)'; c.fillRect(w * 0.06, h * 0.31, w * 0.3, h * 0.025);
 }
 
 export function build({ env }) {
@@ -126,9 +134,9 @@ export function build({ env }) {
 
   // The boxes: one instanced body and one instanced front decal for the whole wall.
   const cells = [];
-  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (!(c === HERO[0] && r === HERO[1])) cells.push([c, r]);
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) cells.push([c, r]);
   const boxIM = new THREE.InstancedMesh(new THREE.BoxGeometry(...BOX), std(0xffffff, { roughness: 0.42 }), cells.length);
-  const decalTex = canvasTex(128, 176, (c, w, h) => drawDecal(c, w, h, false)).tex;
+  const decalTex = canvasTex(128, 176, drawDecal).tex;
   const decalIM = new THREE.InstancedMesh(new THREE.PlaneGeometry(BOX[0], BOX[1]), std(0xffffff, { map: decalTex, transparent: true, roughness: 0.4 }), cells.length);
   const col = new THREE.Color();
   cells.forEach(([c, r], i) => {
@@ -142,15 +150,63 @@ export function build({ env }) {
   boxIM.castShadow = boxIM.receiveShadow = true; decalIM.receiveShadow = true;
   unit.add(boxIM, decalIM);
 
-  // The hero box.
-  const hero = new THREE.Group(); hero.rotation.order = 'YXZ'; scene.add(hero);
-  hero.add(mesh(new THREE.BoxGeometry(...BOX), std(GREEN_H, { roughness: 0.38 })));
-  const heroDecal = canvasTex(256, 352, (c, w, h) => drawDecal(c, w, h, true)).tex;
-  const hFace = new THREE.Mesh(new THREE.PlaneGeometry(BOX[0], BOX[1]), std(0xffffff, { map: heroDecal, roughness: 0.35, emissive: 0xffffff, emissiveMap: heroDecal, emissiveIntensity: 0 }));
-  hFace.position.z = BOX[2] / 2 + 0.001; hFace.receiveShadow = true; hero.add(hFace);
-  const heroGlow = glow(0x6affb0, 0.8, 0, 0.45); heroGlow.position.z = -0.06; hero.add(heroGlow);
-  const home = cellPos(HERO[0], HERO[1]);
-  const out = new THREE.Vector3(home.x + 0.04, home.y + 0.1, -0.12);
+  // ----------------------------------------------------------- the shooter
+  // Over the shoulder: two hands holding a disposable film camera up to the eye, lens toward the film wall.
+  const DW = 0.13, DH = 0.07, DD = 0.042;
+  const SHOOT = new THREE.Vector3(-0.37, 0.72, 1.12);
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const shooter = new THREE.Group(); scene.add(shooter);
+  const rig = new THREE.Group(); shooter.add(rig);
+  rig.add(mesh(new RoundedBoxGeometry(DW, DH, DD, 4, 0.009), std(0x1a8a4c, { roughness: 0.55 })));
+  const wrapTex = canvasTex(512, 280, drawWrap).tex;
+  const wrapFace = mesh(new THREE.PlaneGeometry(DW * 0.9, DH * 0.82), std(0xffffff, { map: wrapTex, roughness: 0.62, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), { cast: false });
+  wrapFace.position.z = DD / 2 + 0.0008; rig.add(wrapFace);
+  const darkGlass = std(0x0a0c0f, { roughness: 0.08, metalness: 0.4 });
+  const finder = mesh(new RoundedBoxGeometry(0.022, 0.015, 0.006, 2, 0.002), darkGlass); finder.position.set(-DW * 0.33, DH * 0.27, DD / 2 + 0.002); rig.add(finder);
+  const lens = mesh(new THREE.CylinderGeometry(0.014, 0.015, 0.008, 28), darkGlass); lens.rotation.x = Math.PI / 2; lens.position.set(DW * 0.1, -0.002, -DD / 2 - 0.003); rig.add(lens);
+  const flashM = new THREE.MeshBasicMaterial({ color: 0x8c949c, toneMapped: false });
+  const flashWin = new THREE.Mesh(new THREE.PlaneGeometry(0.032, 0.015), flashM); flashWin.rotation.y = Math.PI; flashWin.position.set(-DW * 0.3, DH * 0.26, -DD / 2 - 0.0012); rig.add(flashWin);
+  const button = mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.005, 20), std(0x15171a, { roughness: 0.4 })); button.position.set(DW * 0.3, DH / 2 + 0.002, -0.006); rig.add(button);
+  const ribs = canvasTex(64, 16, (c, w, h) => { c.fillStyle = '#16181b'; c.fillRect(0, 0, w, h); c.fillStyle = '#3b3f45'; c.fillRect(0, 0, w * 0.45, h); });
+  ribs.tex.wrapS = THREE.RepeatWrapping; ribs.tex.repeat.set(14, 1);
+  const wheel = mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.011, 28), std(0xffffff, { map: ribs.tex, roughness: 0.5 })); wheel.position.set(DW / 2 - 0.021, DH / 2 + 0.001, DD / 2 - 0.009); rig.add(wheel);
+  const ledM = new THREE.MeshBasicMaterial({ color: 0x000000, toneMapped: false });
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.0026, 10, 8), ledM); led.position.set(DW * 0.06, DH * 0.33, DD / 2 + 0.002); rig.add(led);
+  const flashGlow = glow(0xeef4ff, 0.5, 0, 0.4); flashGlow.position.set(-DW * 0.3, DH * 0.26, -DD / 2 - 0.03); rig.add(flashGlow);
+  const flashL = new THREE.PointLight(0xeef4ff, 0, 4, 1.2); flashL.position.set(-DW * 0.3, DH * 0.26, -DD / 2 - 0.05); rig.add(flashL);
+  const wallHit = glow(0xf4f8ff, 1.3, 0, 0.5); wallHit.position.set(-0.32, 0.72, -0.42); scene.add(wallHit);
+
+  // Hands: soft stylized skin, hoodie sleeves running out of frame toward the viewer.
+  const skin = new THREE.MeshPhysicalMaterial({ color: 0xc68b68, roughness: 0.55, sheen: 0.5, sheenColor: new THREE.Color(0xffc8a8) });
+  const sleeveM = std(0x2b3037, { roughness: 0.95 }), cuffM = std(0x3a4048, { roughness: 0.9 });
+  const UP = new THREE.Vector3(0, 1, 0), dv = new THREE.Vector3();
+  const aim = (m, a, b) => { m.position.copy(a); m.quaternion.setFromUnitVectors(UP, dv.subVectors(b, a).normalize()); };
+  const limb = (r, a, b, mat, parent = rig) => {
+    const len = a.distanceTo(b), g = new THREE.CapsuleGeometry(r, len, 4, 12); g.translate(0, len / 2, 0);
+    const m = mesh(g, mat); aim(m, a, b); parent.add(m); return m;
+  };
+  const hand = (sx) => {
+    const X = (x) => x * sx;
+    const palm = mesh(new RoundedBoxGeometry(0.027, 0.08, 0.066, 3, 0.012), skin); palm.position.set(X(DW / 2 + 0.012), -0.006, 0.008); rig.add(palm);
+    // Fingers wrap around the front of the camera; the right hand keeps its index finger for the shutter.
+    for (let j = sx > 0 ? 1 : 0; j < 4; j++) {
+      const y = 0.022 - j * 0.017;
+      limb(0.0078, V(X(DW / 2 + 0.006), y, -DD / 2 - 0.007), V(X(DW / 2 - 0.028), y - 0.002, -DD / 2 - 0.009), skin);
+    }
+    limb(0.021, V(X(DW / 2 + 0.014), -0.032, 0.034), V(X(DW / 2 + 0.07), -0.2, 0.3), skin);
+    limb(0.037, V(X(DW / 2 + 0.03), -0.082, 0.1), V(X(DW / 2 + 0.11), -0.33, 0.56), sleeveM);
+    limb(0.04, V(X(DW / 2 + 0.024), -0.068, 0.078), V(X(DW / 2 + 0.03), -0.082, 0.1), cuffM);
+  };
+  hand(-1); hand(1);
+  // Left thumb rests on the back.
+  limb(0.0095, V(-DW / 2 - 0.008, -0.02, DD / 2 + 0.013), V(-DW / 2 + 0.013, -0.007, DD / 2 + 0.013), skin);
+  limb(0.0085, V(-DW / 2 + 0.013, -0.007, DD / 2 + 0.013), V(-DW / 2 + 0.031, 0.001, DD / 2 + 0.008), skin);
+  // Right thumb winds the wheel; right index finger finds the shutter.
+  const tBase = V(DW / 2 + 0.008, -0.018, DD / 2 + 0.013), tKnk = V(DW / 2 - 0.004, 0.004, DD / 2 + 0.015);
+  const thumbA = limb(0.0095, tBase, tKnk, skin), thumbB = limb(0.0085, tKnk, V(DW / 2 - 0.016, DH / 2 - 0.006, DD / 2 + 0.008), skin);
+  const iBase = V(DW / 2 + 0.006, DH / 2 - 0.006, -0.013), iKnk = V(DW / 2 - 0.01, DH / 2 + 0.013, -0.011);
+  const idxA = limb(0.0082, iBase, iKnk, skin), idxB = limb(0.0076, iKnk, V(DW * 0.3 + 0.004, DH / 2 + 0.008, -0.006), skin);
+  const kV = new THREE.Vector3(), tV = new THREE.Vector3();
 
   // ----------------------------------------------------------- the mailer
   const mailG = new THREE.Group(); mailG.position.copy(MAIL); mailG.rotation.y = -0.22; scene.add(mailG);
@@ -257,6 +313,38 @@ export function build({ env }) {
   const canL = mesh(new THREE.CylinderGeometry(0.0345, 0.0345, 0.05, 28), std(GREEN_H, { roughness: 0.35 })); canL.position.y = 0.053; can.add(canL);
   const leader = mesh(new THREE.BoxGeometry(0.07, 0.05, 0.002), std(0x241a14, { roughness: 0.6 })); leader.position.set(0.06, 0.053, 0.022); leader.rotation.y = -0.3; can.add(leader);
 
+
+  // ----------------------------------------------------------- the print
+  // The shot slides out of the top of the camera as a print, develops from dark to the lake, and sails
+  // into the mailer.
+  const PW = 0.11, PH = 0.074;
+  const printG = new THREE.Group(); printG.rotation.order = 'YXZ'; scene.add(printG);
+  const printTex = canvasTex(440, 296);
+  let printKey = '';
+  const drawPrint = (dev) => {
+    const key = String(Math.round(dev * 40)); if (key === printKey) return; printKey = key;
+    printTex.redraw((c, w, h) => {
+      c.fillStyle = '#f6f2ea'; c.fillRect(0, 0, w, h);
+      const b = w * 0.035, iw = w - 2 * b, ih = h - 2 * b;
+      c.fillStyle = '#26170f'; c.fillRect(b, b, iw, ih);
+      if (dev > 0) {
+        c.save(); c.globalAlpha = dev; const sc = Math.max(iw / IW, ih / IH);
+        c.beginPath(); c.rect(b, b, iw, ih); c.clip();
+        c.drawImage(photo.cv, b + (iw - IW * sc) / 2, b + (ih - IH * sc) / 2, IW * sc, IH * sc); c.restore();
+        c.fillStyle = `rgba(255,150,70,${0.4 * dev * (1 - dev) * 2})`; c.fillRect(b, b, iw, ih);
+      }
+    });
+  };
+  const printFront = mesh(new THREE.PlaneGeometry(PW, PH), std(0xffffff, { map: printTex.tex, roughness: 0.3 }), { cast: false });
+  printFront.position.z = 0.0006; printG.add(printFront);
+  const printBack = mesh(new THREE.PlaneGeometry(PW, PH), std(0xefe9de, { roughness: 0.8 }));
+  printBack.rotation.y = Math.PI; printBack.position.z = -0.0006; printG.add(printBack);
+  const printHalo = glow(0xffb070, 0.32, 0, 0.5); printHalo.position.z = -0.02; printG.add(printHalo);
+  // Where the top of the camera sits once it is raised, and where the print hovers before it flies.
+  shooter.position.copy(SHOOT); shooter.rotation.set(0, 0.06, -0.03); shooter.updateMatrixWorld();
+  const P0 = shooter.localToWorld(V(0, 0, 0)), P1 = shooter.localToWorld(V(0, DH / 2 + PH / 2 + 0.004, 0));
+  const P2 = P1.clone().add(V(0.03, 0.07, 0.07));
+
   // ----------------------------------------------------------- title
   const kicker = label('Fujifilm', { font: `700 56px ${MONO}`, fg: '#7fe0b0', h: 0.1, track: 6 });
   const title = label('Direct-to-consumer platform', { font: `800 72px ${SANS}`, fg: '#fbf1e2', h: 0.13, track: 1 });
@@ -272,19 +360,19 @@ export function build({ env }) {
   // ----------------------------------------------------------- camera
   const L = (x) => x;
   const camPos = (t) => kf(t, [
-    [0, [-0.42, 0.78, 1.72]], [1.2, [-0.36, 0.76, 1.62], L],
-    [2.3, [-0.02, 0.74, 1.72]], [3.5, [0.5, 0.78, 1.62]],
+    [0, [-0.4, 0.86, 1.86]], [1.6, [-0.37, 0.84, 1.8], L],
+    [2.6, [-0.05, 0.82, 1.86]], [3.5, [0.5, 0.78, 1.62]],
     [5.3, [0.86, 0.66, 1.5], L], [6.9, [0.6, 0.7, 1.95]],
     [8.2, [0.5, 0.8, 2.5]], [10, [0.46, 0.81, 2.58], L],
   ]);
   const camTgt = (t) => kf(t, [
-    [0, [-0.3, 0.64, -0.45]], [1.2, [-0.3, 0.64, -0.4], L],
-    [2.3, [0.0, 0.58, -0.2]], [3.5, [0.6, 0.18, 0.18]],
+    [0, [-0.32, 0.62, -0.4]], [1.6, [-0.3, 0.62, -0.36], L],
+    [2.6, [0.05, 0.5, 0.4]], [3.5, [0.6, 0.18, 0.18]],
     [5.3, [0.66, 0.16, 0.22], L], [6.9, [0.55, 0.45, 0.3]],
     [8.2, [0.5, 0.64, 0.1]], [10, [0.49, 0.64, 0.1], L],
   ]);
   const tgt = new THREE.Vector3(), a = new THREE.Vector3(), mid = new THREE.Vector3(), lk = new THREE.Vector3();
-  const inBox = new THREE.Vector3(0, WALL + BOX[2] / 2, 0.02);
+  const inBox = new THREE.Vector3(0, WALL + 0.004, 0.01);
   mailG.updateMatrixWorld();
   const LAND = mailG.localToWorld(inBox.clone());
 
@@ -294,29 +382,52 @@ export function build({ env }) {
     tgt.set(q[0], q[1], q[2]); camera.lookAt(tgt);
     setDip(Math.max(1 - k(t, 0, 0.35), k(t, 9.55, 10)));
 
-    // Beat 1: the hero box hitches back, slides out, spins to camera.
-    const hitch = Math.sin(Math.PI * k(t, 0.85, 1.05)) * 0.025;
-    const slide = back(k(t, 1.05, 1.7));
-    const spin = back(k(t, 1.4, 2.25));
-    const fly = eio(k(t, 2.4, 3.3));
+    // Beat 1: the hands raise the disposable, wind it, take the shot; the flash pops across the wall.
+    const raise = back(k(t, 0.25, 1.0)), lower = ei(k(t, 2.55, 3.25));
+    const flash = t > 1.5 ? Math.exp(-9 * (t - 1.5)) : 0;
+    shooter.position.set(SHOOT.x, SHOOT.y - 0.32 * (1 - raise) - 0.42 * lower + Math.sin(t * 1.3) * 0.002 * clamp(raise), SHOOT.z + 0.05 * (1 - clamp(raise)));
+    shooter.rotation.set(0.35 * (1 - clamp(raise)) + 0.4 * lower, 0.06, -0.03);
+    shooter.visible = t > 0.2 && t < 3.3;
+    rig.rotation.set(-0.03 * flash * Math.sin(t * 70), 0, 0.012 * flash * Math.sin(t * 55));
+    rig.position.y = -0.003 * flash;
+    const wind = Math.sin(Math.PI * k(t, 0.95, 1.3));
+    wheel.rotation.y = -eio(k(t, 0.95, 1.3)) * 2.6;
+    kV.copy(tKnk).x -= wind * 0.004; tV.set(DW / 2 - 0.016 - wind * 0.014, DH / 2 - 0.006, DD / 2 + 0.008);
+    aim(thumbA, tBase, kV); aim(thumbB, kV, tV);
+    const reach = eio(k(t, 1.2, 1.42)), press = Math.sin(Math.PI * k(t, 1.42, 1.62));
+    kV.copy(iKnk).y += 0.01 * (1 - reach) - 0.002 * press;
+    tV.set(DW * 0.3 + 0.004, DH / 2 + 0.008 + 0.014 * (1 - reach) - 0.003 * press, -0.006);
+    aim(idxA, iBase, kV); aim(idxB, kV, tV);
+    button.position.y = DH / 2 + 0.002 - 0.002 * press;
+    const charge = eo(k(t, 0.6, 1.1)) * (t < 1.5 ? 1 : 0);
+    ledM.color.setRGB(1.6 * charge * (0.8 + 0.2 * Math.sin(t * 18)), 0.12 * charge, 0.06 * charge);
+    flashM.color.setRGB(0.55 + 7 * flash, 0.58 + 7 * flash, 0.61 + 7 * flash);
+    flashGlow.material.opacity = 0.95 * flash; flashGlow.scale.setScalar(0.35 + 0.4 * flash);
+    flashL.intensity = 28 * flash;
+    wallHit.material.opacity = 0.55 * flash;
+
+    // The print slides up out of the camera, develops, then sails into the mailer.
+    const em = eo(k(t, 1.7, 2.15)), ho = eio(k(t, 2.1, 2.55)), fly = eio(k(t, 2.55, 3.35));
+    drawPrint(eio(k(t, 1.95, 2.8)));
     if (fly <= 0) {
-      const bob = clamp(slide) * (1 - k(t, 2.0, 2.4));
-      hero.position.set(lerp(home.x, out.x, clamp(slide)), lerp(home.y, out.y, eo(k(t, 1.3, 1.85))) + Math.sin(t * 2.2) * 0.008 * bob, lerp(home.z, out.z, slide) - hitch);
-      hero.rotation.set(-0.06 * clamp(slide), spin * Math.PI * 2 - 0.25 * clamp(slide), 0.04 * Math.sin(t * 1.7) * bob);
+      a.lerpVectors(P0, P1, em).add(mid.subVectors(P2, P1).multiplyScalar(ho));
+      printG.position.copy(a);
+      printG.rotation.set(0.05 * ho * Math.sin(t * 3), 0.06 - 0.31 * ho, -0.03 + 0.06 * ho * Math.sin(t * 2.4));
+      printG.scale.setScalar(1);
     } else {
-      mid.lerpVectors(out, LAND, 0.5); mid.y = 0.62;
+      mid.lerpVectors(P2, LAND, 0.5); mid.y = 0.78;
       a.set(
-        (1 - fly) * (1 - fly) * out.x + 2 * (1 - fly) * fly * mid.x + fly * fly * LAND.x,
-        (1 - fly) * (1 - fly) * out.y + 2 * (1 - fly) * fly * mid.y + fly * fly * LAND.y,
-        (1 - fly) * (1 - fly) * out.z + 2 * (1 - fly) * fly * mid.z + fly * fly * LAND.z,
+        (1 - fly) * (1 - fly) * P2.x + 2 * (1 - fly) * fly * mid.x + fly * fly * LAND.x,
+        (1 - fly) * (1 - fly) * P2.y + 2 * (1 - fly) * fly * mid.y + fly * fly * LAND.y,
+        (1 - fly) * (1 - fly) * P2.z + 2 * (1 - fly) * fly * mid.z + fly * fly * LAND.z,
       );
-      const bounce = t > 3.3 ? Math.abs(Math.sin((t - 3.3) * 12)) * Math.exp(-7 * (t - 3.3)) * 0.04 : 0;
-      hero.position.copy(a); hero.position.y += bounce;
-      hero.rotation.set(lerp(-0.06, -Math.PI / 2, fly), lerp(Math.PI * 2 - 0.25, Math.PI * 2 + (-0.22 + eio(k(t, 4.45, 5.35)) * Math.PI * 2), fly), 0);
+      const bounce = t > 3.35 ? Math.abs(Math.sin((t - 3.35) * 12)) * Math.exp(-7 * (t - 3.35)) * 0.025 : 0;
+      printG.position.copy(a); printG.position.y += bounce;
+      printG.rotation.set(lerp(0, -Math.PI / 2, fly), lerp(-0.25, -0.22, fly), Math.sin(Math.PI * fly) * 0.7);
+      printG.scale.setScalar(lerp(1, 1.5, fly));
     }
-    hFace.material.emissiveIntensity = 0.25 * Math.sin(Math.PI * k(t, 1.1, 3.3));
-    heroGlow.material.opacity = 0.55 * Math.sin(Math.PI * k(t, 1.05, 3.2));
-    hero.visible = t < 4.0;
+    printHalo.material.opacity = 0.5 * Math.sin(Math.PI * k(t, 1.75, 3.2));
+    printG.visible = t > 1.68 && t < 4.0;
 
     // Beat 2: lid slams, tape seals, the mailer spins away into golden hour.
     const shut = spring(k(t, 3.45, 4.05));
