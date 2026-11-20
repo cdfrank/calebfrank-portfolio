@@ -6,6 +6,7 @@ import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, roundRect, std, mesh, phone, dip,
 } from '../kit.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const D = 10;
 const NAVY = '#0f2557', BLUE = '#2a5ea8', GOLD = '#ffc629', RED = 0xff2b2b;
@@ -26,7 +27,7 @@ export function build({ env }) {
   const setDip = dip(camera);
 
   // ----------------------------------------------------------- set
-  const lam = grainTex('#141a2c', { size: 256, speck: 0.12, blot: 0.06, seed: 21, repeat: 5 });
+  const lam = grainTex('#10162a', { size: 512, speck: 0.035, blot: 0.09, seed: 21, repeat: 3 });
   const counter = mesh(new THREE.PlaneGeometry(14, 8), std(0xffffff, { map: lam, roughness: 0.3, metalness: 0.15 }), { cast: false });
   counter.rotation.x = -Math.PI / 2;
   scene.add(counter);
@@ -43,7 +44,7 @@ export function build({ env }) {
   key.shadow.camera.near = 0.5; key.shadow.camera.far = 5;
   key.shadow.bias = -0.0003; key.shadow.normalBias = 0.01;
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(0x4f7dff, 2.2);
+  const rim = new THREE.DirectionalLight(0x4f7dff, 1.3);
   rim.position.set(1.5, 1.2, -2.5);
   scene.add(rim);
   const laserLight = new THREE.PointLight(RED, 0, 1.2, 1.5);
@@ -78,7 +79,7 @@ export function build({ env }) {
   paper.rotation.y = 0.14;
   scene.add(paper);
   const cut = new THREE.Plane(new THREE.Vector3(0, 0, 1), 10);
-  const paperMesh = mesh(new THREE.PlaneGeometry(PW, PH), std(0xffffff, { map: slip.tex, roughness: 0.85, clippingPlanes: [cut], side: THREE.DoubleSide }), { cast: false });
+  const paperMesh = mesh(new THREE.PlaneGeometry(PW, PH), std(0xe4dfd6, { map: slip.tex, roughness: 0.85, clippingPlanes: [cut], side: THREE.DoubleSide }), { cast: false });
   paperMesh.rotation.x = -Math.PI / 2;
   paper.add(paperMesh);
   const shadowCard = mesh(new THREE.PlaneGeometry(PW, PH), new THREE.ShadowMaterial({ opacity: 0 }), { cast: true, receive: false });
@@ -241,10 +242,16 @@ export function build({ env }) {
 
   // ----------------------------------------------------------- scanner and printer
   const scanner = new THREE.Group();
-  const housing = mesh(new THREE.BoxGeometry(0.34, 0.42, 0.24), std(0x1a1d26, { roughness: 0.55, metalness: 0.2 }));
+  const housing = mesh(new RoundedBoxGeometry(0.34, 0.42, 0.24, 4, 0.035), std(0x0d0f15, { roughness: 0.22, metalness: 0.35, envMapIntensity: 1.2 }));
   housing.position.y = 0.21; scanner.add(housing);
+  const bezel = mesh(new RoundedBoxGeometry(0.27, 0.27, 0.012, 3, 0.02), std(0x050608, { roughness: 0.4 }), { cast: false });
+  bezel.position.set(0, 0.25, 0.117); scanner.add(bezel);
+  const foot = mesh(new RoundedBoxGeometry(0.38, 0.03, 0.28, 3, 0.012), std(0x07080b, { roughness: 0.5 }));
+  foot.position.y = 0.015; scanner.add(foot);
+  const strip = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.006), new THREE.MeshBasicMaterial({ color: 0x2a5ea8, toneMapped: false }));
+  strip.position.set(0, 0.075, 0.1215); scanner.add(strip);
   const windowM = mesh(new THREE.PlaneGeometry(0.24, 0.24), std(0x220608, { roughness: 0.05, metalness: 0.4, emissive: RED, emissiveIntensity: 0.2 }), { cast: false });
-  windowM.position.set(0, 0.25, 0.121); scanner.add(windowM);
+  windowM.position.set(0, 0.25, 0.1235); scanner.add(windowM);
   const led = mesh(new THREE.SphereGeometry(0.012, 12, 8), new THREE.MeshBasicMaterial({ color: 0x18a957, toneMapped: false }));
   led.position.set(0.12, 0.39, 0.121); scanner.add(led);
   const ledGlow = glow(0x18ff7a, 0.25, 0); ledGlow.position.copy(led.position); scanner.add(ledGlow);
@@ -277,7 +284,7 @@ export function build({ env }) {
   // ----------------------------------------------------------- camera
   const camPos = (t) => kf(t, [
     [0, [0.42, 1.18, 1.02]], [2.4, [0.3, 1.0, 0.86], (x) => x],
-    [3.4, [0.12, 0.7, 1.72]], [6.3, [-0.06, 0.64, 1.6], (x) => x],
+    [3.4, [0.12, 0.62, 1.46]], [6.3, [-0.05, 0.58, 1.38], (x) => x],
     [7.3, [0.12, 0.76, 1.6]], [10, [0.28, 0.8, 1.5], (x) => x],
   ]);
   const camTgt = (t) => kf(t, [
