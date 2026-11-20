@@ -619,7 +619,7 @@ export default class Board extends Component {
               </div>
               <div className={"lead-shots"} aria-hidden={"true"}>
                 <img src={"/work/street-signal/media/tricks.jpg"} alt={""} loading={"lazy"} />
-                <img src={"/work/street-signal/media/atlas.jpg"} alt={""} loading={"lazy"} />
+                <img src={"/work/street-signal/media/world.jpg"} alt={""} loading={"lazy"} />
                 <img src={"/work/street-signal/media/detroit.jpg"} alt={""} loading={"lazy"} />
               </div>
             </a>
