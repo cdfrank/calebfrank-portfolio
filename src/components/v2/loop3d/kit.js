@@ -195,18 +195,16 @@ export function lite() {
   return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || Math.min(s.width || 1e4, s.height || 1e4) < 700;
 }
 export function pixelRatio(w, h, scale = 1, force = false) {
-  const budget = lite() && !force ? 1.4e6 : 4.2e6;
+  // force (review pages) lifts phones a little, never to the desktop budget, so a phone keeps its GPU memory.
+  const budget = lite() ? (force ? 2.0e6 : 1.4e6) : 4.2e6;
   return Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(budget / Math.max(1, w * h))) * scale;
 }
-// Sharper, softer-edged shadows on desktop: double each shadow map (up to 4096) and widen the PCF blur a
-// touch. Run once after a scene is built and before its first render.
-export function hiShadows(scene, force = false) {
-  if (lite() && !force) return;
+// Softer-edged shadows on desktop. Map sizes stay as each scene set them: the site and the review pages
+// keep every built scene in memory, so doubling them would cost hundreds of MB of GPU memory.
+export function hiShadows(scene) {
+  if (lite()) return;
   scene.traverse((o) => {
     if (!o.isLight || !o.castShadow || !o.shadow) return;
-    const m = o.shadow.mapSize, n = Math.min(4096, Math.max(2048, m.x * 2));
-    m.set(n, n);
     o.shadow.radius = Math.max(o.shadow.radius || 1, 2.5);
-    if (o.shadow.map) { o.shadow.map.dispose(); o.shadow.map = null; }
   });
 }
