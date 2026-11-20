@@ -115,11 +115,11 @@ export function mesh(geo, material, { cast = true, receive = true } = {}) {
   return m;
 }
 // A modern phone: graphite frame, glass face, a glowing screen plane that takes any texture.
-export function phone({ w = 0.74, h = 1.52, d = 0.075, frame = 0x2a2c31 } = {}) {
+export function phone({ w = 0.74, h = 1.52, d = 0.075, frame = 0x2a2c31, notch = true, r = 0.09 } = {}) {
   const g = new THREE.Group();
-  const body = mesh(new RoundedBoxGeometry(w, h, d, 4, 0.09), std(frame, { metalness: 0.85, roughness: 0.32 }));
+  const body = mesh(new RoundedBoxGeometry(w, h, d, 4, r), std(frame, { metalness: 0.85, roughness: 0.32 }));
   g.add(body);
-  const glass = mesh(new RoundedBoxGeometry(w - 0.02, h - 0.02, 0.006, 3, 0.08), std(0x050506, { roughness: 0.08, metalness: 0.2 }), { cast: false });
+  const glass = mesh(new RoundedBoxGeometry(w - 0.02, h - 0.02, 0.006, 3, r - 0.01), std(0x050506, { roughness: 0.08, metalness: 0.2 }), { cast: false });
   glass.position.z = d / 2 - 0.001;
   g.add(glass);
   const sw = w - 0.07, sh = h - 0.07;
@@ -127,17 +127,19 @@ export function phone({ w = 0.74, h = 1.52, d = 0.075, frame = 0x2a2c31 } = {}) 
   screen.position.z = d / 2 + 0.004;
   g.add(screen);
   // Rounded screen corners: a black mask frame drawn over the screen edges.
-  const mask = canvasTex(256, 512, (c, W, H) => {
+  // Mask and sheen canvases follow the screen's own aspect, so a landscape tablet keeps round corners.
+  const MW = Math.round(512 * sw / Math.max(sw, sh)), MH = Math.round(512 * sh / Math.max(sw, sh));
+  const mask = canvasTex(MW, MH, (c, W, H) => {
     c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
     c.globalCompositeOperation = 'destination-out'; roundRect(c, 0, 0, W, H, 34); c.fill();
     c.globalCompositeOperation = 'source-over';
-    c.fillStyle = '#000'; roundRect(c, W / 2 - 34, 12, 68, 20, 10); c.fill();
+    if (notch) { c.fillStyle = '#000'; roundRect(c, W / 2 - 34, 12, 68, 20, 10); c.fill(); }
   }).tex;
   const cover = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), new THREE.MeshBasicMaterial({ map: mask, transparent: true, toneMapped: false, depthWrite: false }));
   cover.position.z = d / 2 + 0.005;
   g.add(cover);
   // Glass sheen: a soft diagonal highlight that slides as the phone turns.
-  const sheen = canvasTex(256, 512, (c, W, H) => {
+  const sheen = canvasTex(MW, MH, (c, W, H) => {
     const gr = c.createLinearGradient(0, 0, W, H);
     gr.addColorStop(0.3, 'rgba(255,255,255,0)'); gr.addColorStop(0.42, 'rgba(255,255,255,0.13)');
     gr.addColorStop(0.47, 'rgba(255,255,255,0.03)'); gr.addColorStop(0.6, 'rgba(255,255,255,0)');
@@ -155,4 +157,32 @@ export function dip(camera) {
   m.position.z = -0.5; m.renderOrder = 999;
   camera.add(m);
   return (o) => { m.material.opacity = o; m.visible = o > 0.001; };
+}
+
+// Sky dome: a vertical gradient on a big inside-out sphere, so the horizon stays put as the camera moves.
+// stops: [[0..1 from top to bottom, css color], ...]
+export function skyDome(stops, radius = 40) {
+  const { tex } = canvasTex(8, 512, (c, w, h) => {
+    const g = c.createLinearGradient(0, 0, 0, h);
+    stops.forEach(([p, col]) => g.addColorStop(p, col));
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  });
+  const m = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 16), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+  m.renderOrder = -1;
+  return m;
+}
+// Wind sway for instanced foliage: bends each instance by its own world spot, driven by a time uniform
+// the scene sets from t, so the field moves the same way on every frame of the loop.
+export function sway(material, uT, amount = 0.07) {
+  material.onBeforeCompile = (sh) => {
+    sh.uniforms.uT = uT;
+    sh.vertexShader = 'uniform float uT;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+#ifdef USE_INSTANCING
+  vec2 ip = instanceMatrix[3].xz;
+  float swy = sin(uT * 1.6 + ip.x * 0.35 + ip.y * 0.22) * 0.5 + sin(uT * 2.7 + ip.y * 0.6) * 0.25;
+  transformed.x += swy * ${amount.toFixed(3)} * position.y * position.y;
+  transformed.z += swy * ${(amount * 0.4).toFixed(3)} * position.y;
+#endif`);
+  };
+  return material;
 }

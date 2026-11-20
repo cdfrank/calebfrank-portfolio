@@ -1,7 +1,10 @@
 // Lit loops: the small piece the page loads up front. It knows which projects have a lit loop and
 // upgrades a coded SVG loop box in place. three.js and the scene only load once a lit loop is needed.
 // The coded SVG stays underneath as the fallback for no WebGL, a lost GPU context or any load error.
-export const LIT = new Set(['self-initiated-street-signal', 'nyl-digital-playslip']);
+export const LIT = new Set([
+  'self-initiated-street-signal', 'nyl-digital-playslip', 'basf-salesx',
+  'general-motors-build-price-platform-redesign', 'honeywell-product-selector-and-tools', 'new-york-lottery-single-sign-on',
+]);
 
 let rt = null;
 const runtime = () => (rt ||= import('./runtime.js'));

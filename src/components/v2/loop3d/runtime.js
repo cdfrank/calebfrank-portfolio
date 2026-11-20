@@ -7,6 +7,10 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 const SCENES = {
   'self-initiated-street-signal': () => import('./scenes/street-signal.js'),
   'nyl-digital-playslip': () => import('./scenes/playslip.js'),
+  'basf-salesx': () => import('./scenes/salesx.js'),
+  'general-motors-build-price-platform-redesign': () => import('./scenes/build-price.js'),
+  'honeywell-product-selector-and-tools': () => import('./scenes/honeywell.js'),
+  'new-york-lottery-single-sign-on': () => import('./scenes/nyl-sso.js'),
 };
 
 let R = null;          // { renderer, env }
