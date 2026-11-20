@@ -180,11 +180,12 @@ export function build({ env }) {
   const barrel = mesh(new THREE.CylinderGeometry(0.25, 0.265, 0.17, 64), new THREE.MeshPhysicalMaterial({ color: 0xa3ddcf, roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.3 }));
   barrel.rotation.x = Math.PI / 2; barrel.position.set(0.03, 0.42, BD / 2 + 0.085); cam.add(barrel);
   const lensRing = mesh(new THREE.TorusGeometry(0.19, 0.022, 12, 64), std(0x1b1f24, { roughness: 0.35, metalness: 0.4 }));
-  lensRing.position.set(0.03, 0.42, BD / 2 + 0.172); cam.add(lensRing);
-  const glass = new THREE.Mesh(new THREE.CircleGeometry(0.175, 48), new THREE.MeshPhysicalMaterial({ color: 0x0b1016, roughness: 0.05, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.03 }));
-  glass.position.set(0.03, 0.42, BD / 2 + 0.168); cam.add(glass);
-  const inner = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.1, 40), new THREE.MeshPhysicalMaterial({ color: 0x23384e, roughness: 0.1, metalness: 0.6, clearcoat: 1 }));
-  inner.position.set(0.03, 0.42, BD / 2 + 0.17); cam.add(inner);
+  lensRing.position.set(0.03, 0.42, BD / 2 + 0.178); cam.add(lensRing);
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(0.175, 48), new THREE.MeshPhysicalMaterial({ color: 0x0b1016, roughness: 0.05, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.03, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+  // Glass and inner ring sit clear of the barrel's front cap (at +0.17) so they don't z-fight with it.
+  glass.position.set(0.03, 0.42, BD / 2 + 0.176); cam.add(glass);
+  const inner = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.1, 40), new THREE.MeshPhysicalMaterial({ color: 0x23384e, roughness: 0.1, metalness: 0.6, clearcoat: 1, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
+  inner.position.set(0.03, 0.42, BD / 2 + 0.181); cam.add(inner);
   const glint = glow(0xcfe6ff, 0.16, 0.5, 0.25); glint.position.set(-0.03, 0.48, BD / 2 + 0.19); cam.add(glint);
   const flashTex = canvasTex(128, 80, (c, w, h) => {
     c.fillStyle = '#e9eef0'; c.fillRect(0, 0, w, h);
