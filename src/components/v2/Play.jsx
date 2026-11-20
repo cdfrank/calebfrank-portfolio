@@ -9,7 +9,6 @@ class Component extends DCLogic {
   renderVals() {
     return {
       items: [
-        { t: 'Street Signal', st: 'Playable', d: 'A skate game that turns real streets and skate spots into playable maps.', y: '2025', cls: '' },
         { t: 'Playable Figma Make games', st: 'Playable prototypes', d: 'Escape the Frame, Grinds & Gambles, Kickflip Chaos, Skateshop Empire, and UX Dungeon Crawler.', y: '2025', cls: '' },
         { t: 'Shred & Dice', st: 'Concept', d: 'A skateboarding roguelike built on tricks, dice, and real places.', y: '2025', cls: '' },
         { t: 'Indoor skatepark proposal', st: 'Proposal', d: 'A proposal for a year-round skate and creative space in Ann Arbor.', y: '2024', cls: 'pp' },
