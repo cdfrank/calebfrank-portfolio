@@ -28,7 +28,7 @@ export function build({ env }) {
 
   // ----------------------------------------------------------- set
   const lam = grainTex('#10162a', { size: 512, speck: 0.035, blot: 0.09, seed: 21, repeat: 3 });
-  const counter = mesh(new THREE.PlaneGeometry(14, 8), std(0xffffff, { map: lam, roughness: 0.3, metalness: 0.15 }), { cast: false });
+  const counter = mesh(new THREE.PlaneGeometry(14, 8), std(0xffffff, { map: lam, roughness: 0.42, metalness: 0.1 }), { cast: false });
   counter.rotation.x = -Math.PI / 2;
   scene.add(counter);
   // Store lights behind, out of focus.
@@ -44,7 +44,7 @@ export function build({ env }) {
   key.shadow.camera.near = 0.5; key.shadow.camera.far = 5;
   key.shadow.bias = -0.0003; key.shadow.normalBias = 0.01;
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(0x4f7dff, 1.3);
+  const rim = new THREE.DirectionalLight(0x4f7dff, 0.75);
   rim.position.set(1.5, 1.2, -2.5);
   scene.add(rim);
   const laserLight = new THREE.PointLight(RED, 0, 1.2, 1.5);
