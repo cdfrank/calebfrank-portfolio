@@ -131,3 +131,15 @@ export async function play(host, slug) {
 export function rest(host) {
   if (active && active.host === host) stopActive();
 }
+
+// Review aid: render one frame of a loop at time t as an image (used by the lab page's contact sheet).
+export async function still(slug, t, w = 480, h = 300) {
+  if (!renderer()) return '';
+  const s = await scene(slug);
+  if (s.ready) await s.ready;
+  fit(w, h);
+  draw(s, t, w, h);
+  const url = R.renderer.domElement.toDataURL('image/jpeg', 0.85);
+  if (active) { active.w = 0; frame(); }
+  return url;
+}

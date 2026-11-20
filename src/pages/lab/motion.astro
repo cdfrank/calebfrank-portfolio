@@ -67,6 +67,22 @@ const rows = [
         addEventListener('unhandledrejection', (e) => ((window as any).__l3dErrors ||= []).push('rej: ' + String(e.reason && (e.reason.stack || e.reason))));
         setInterval(() => { d.textContent = 'debug ' + performance.now().toFixed(0) + '\n' + ((window as any).__l3dErrors || []).join('\n---\n'); }, 500);
       }
+      const sheet = new URLSearchParams(location.search).get('sheet');
+      if (sheet) {
+        // Contact sheet: one loop rendered at fixed times, for reviewing framing and light frame by frame.
+        const from = parseFloat(new URLSearchParams(location.search).get('from') || '0');
+        const step = parseFloat(new URLSearchParams(location.search).get('step') || '0.5');
+        const n = parseInt(new URLSearchParams(location.search).get('n') || '20');
+        document.querySelector('main')!.innerHTML = '<div id="sh" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div>';
+        const sh = document.getElementById('sh')!;
+        import('../../components/v2/loop3d/runtime.js').then(async (rt) => {
+          for (let i = 0; i < n; i++) {
+            const t = from + i * step;
+            const url = await rt.still(sheet, t);
+            sh.insertAdjacentHTML('beforeend', `<figure style="margin:0"><img src="${url}" style="width:100%;display:block"><figcaption style="font:11px monospace;color:#999">${t.toFixed(2)}s</figcaption></figure>`);
+          }
+        });
+      }
       const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const svgFor = (slug) => fetch(`/loops/${slug}.svg`).then((r) => (r.ok ? r.text() : ''));
       const start = (box) => {
@@ -78,7 +94,7 @@ const rows = [
         svg.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = still ? t : 0; if (still) a.pause(); else a.play(); });
         return svg;
       };
-      document.querySelectorAll<HTMLElement>('[data-classic]').forEach((box) => {
+      if (!sheet) document.querySelectorAll<HTMLElement>('[data-classic]').forEach((box) => {
         svgFor(box.dataset.classic!).then((m) => { box.innerHTML = m; start(box); });
       });
       const lits: { box: HTMLElement; ctl: ReturnType<typeof enhance>; ratio: number }[] = [];
@@ -94,7 +110,7 @@ const rows = [
         es.forEach((e) => { const l = lits.find((x) => x.box === e.target); if (l) l.ratio = e.intersectionRatio; });
         pick();
       }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
-      document.querySelectorAll<HTMLElement>('[data-lit]').forEach((box) => {
+      if (!sheet) document.querySelectorAll<HTMLElement>('[data-lit]').forEach((box) => {
         const slug = box.dataset.lit!;
         svgFor(slug).then((m) => {
           box.innerHTML = m;
