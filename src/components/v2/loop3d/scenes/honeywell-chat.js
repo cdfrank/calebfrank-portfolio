@@ -195,11 +195,12 @@ export function build({ env }) {
 
   // Brass desk lamp on the left: the warm practical that motivates the key.
   const brass = std(0xb8893e, { metalness: 0.9, roughness: 0.3 });
-  const lampBase = mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.02, 32), brass); lampBase.position.set(-0.42, 0.77, -0.32); scene.add(lampBase);
-  const armA = V(-0.42, 0.78, -0.32), armB = V(-0.36, 1.2, -0.38), armC = V(-0.22, 1.3, -0.2);
+  const lampBase = mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.02, 32), brass); lampBase.position.set(-0.5, 0.77, -0.46); scene.add(lampBase);
+  // Base sits behind the monitor's left corner and the arm stays outside the screen's width, so it never passes through it.
+  const armA = V(-0.5, 0.78, -0.46), armB = V(-0.56, 1.22, -0.48), armC = V(-0.58, 1.36, -0.27);
   [[armA, armB], [armB, armC]].forEach(([a, b]) => { const c2 = mesh(new THREE.CylinderGeometry(0.009, 0.009, a.distanceTo(b), 10), brass); c2.position.addVectors(a, b).multiplyScalar(0.5); c2.quaternion.setFromUnitVectors(Y, b.clone().sub(a).normalize()); scene.add(c2); });
   const shade = mesh(new THREE.ConeGeometry(0.07, 0.1, 28, 1, true), new THREE.MeshStandardMaterial({ color: 0x1d4a3c, metalness: 0.5, roughness: 0.4, side: THREE.DoubleSide }));
-  shade.position.copy(armC); shade.quaternion.setFromUnitVectors(Y, V(-0.3, 1, -0.35).normalize()); scene.add(shade);
+  shade.position.copy(armC); shade.quaternion.setFromUnitVectors(Y, V(-0.45, 1, -0.3).normalize()); scene.add(shade);
   const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.022, 14, 10), new THREE.MeshBasicMaterial({ color: 0xffd9a0, toneMapped: false }));
   bulb.position.copy(armC).add(V(0.012, -0.03, 0.014)); scene.add(bulb);
   const bulbGlow = glow(0xffb870, 0.42, 0.6, 0.45); bulbGlow.position.copy(bulb.position); scene.add(bulbGlow);
