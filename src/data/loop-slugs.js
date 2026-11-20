@@ -78,7 +78,7 @@ export const LOOP_SLUGS = {
 "Design System Scanner": "self-initiated-design-system-scanner",
 "Playable Figma Make games": "self-initiated-playable-figma-make-games",
 "Portfolios Please": "self-initiated-portfolios-please",
-"Street Signal and SkateGO": "self-initiated-scan-skate-and-skatego",
+"Street Signal": "self-initiated-street-signal",
 "Shred & Dice": "self-initiated-shred-dice"
 };
 

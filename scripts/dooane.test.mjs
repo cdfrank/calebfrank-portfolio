@@ -58,7 +58,7 @@ test('a flagship case study leads summary-only matches for the same client', () 
   assert.equal(answerQuestion('BASF', data).links[0].label, 'SalesX');
 });
 
-const withGame = { ...portfolio, projects: [...portfolio.projects, { client: 'Self-initiated', title: 'Street Signal and SkateGO', summary: 'A skateboarding game that turns real streets and skate spots into playable maps.', disciplines: ['Games'], featured: true, rank: 1, href: '/work/street-signal/' }] };
+const withGame = { ...portfolio, projects: [...portfolio.projects, { client: 'Self-initiated', title: 'Street Signal', summary: 'A skateboarding game that turns real streets and skate spots into playable maps.', disciplines: ['Games'], featured: true, rank: 1, href: '/work/street-signal/' }] };
 const ask = (q, topic) => answerQuestion(q, withGame, { topic });
 
 test('Street Signal questions get prepared answers that link to the case study or the game', () => {
