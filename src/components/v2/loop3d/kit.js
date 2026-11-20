@@ -186,3 +186,27 @@ export function sway(material, uT, amount = 0.07) {
   };
   return material;
 }
+
+// Render quality. Phones (coarse pointer or a small screen) keep the light 1.4 MP budget; desktops render
+// at the screen's full pixel ratio up to about 4 MP, so people and edges stay sharp on retina displays.
+export function lite() {
+  if (typeof window === 'undefined') return true;
+  const s = window.screen || {};
+  return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || Math.min(s.width || 1e4, s.height || 1e4) < 700;
+}
+export function pixelRatio(w, h, scale = 1) {
+  const budget = lite() ? 1.4e6 : 4.2e6;
+  return Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(budget / Math.max(1, w * h))) * scale;
+}
+// Sharper, softer-edged shadows on desktop: double each shadow map (up to 4096) and widen the PCF blur a
+// touch. Run once after a scene is built and before its first render.
+export function hiShadows(scene) {
+  if (lite()) return;
+  scene.traverse((o) => {
+    if (!o.isLight || !o.castShadow || !o.shadow) return;
+    const m = o.shadow.mapSize, n = Math.min(4096, Math.max(2048, m.x * 2));
+    m.set(n, n);
+    o.shadow.radius = Math.max(o.shadow.radius || 1, 2.5);
+    if (o.shadow.map) { o.shadow.map.dispose(); o.shadow.map = null; }
+  });
+}

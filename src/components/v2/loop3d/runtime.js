@@ -1,7 +1,7 @@
 // Lit loops runtime. One WebGL renderer for the whole page: its canvas moves into whichever loop
 // is playing, so the site never holds more than one GPU context however many loops it shows.
 // Resting loops show a poster frame rendered once per project and kept as an image.
-import { THREE } from './kit.js';
+import { THREE, pixelRatio, hiShadows } from './kit.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const SCENES = {
@@ -99,7 +99,7 @@ export const ok = () => !!renderer();
 
 function scene(slug) {
   if (!built.has(slug)) {
-    built.set(slug, Promise.all([SCENES[slug](), document.fonts ? Promise.all([document.fonts.load('700 32px Inter'), document.fonts.load('600 20px Inter'), document.fonts.load('700 20px "JetBrains Mono"')]).catch(() => null) : null]).then(([mod]) => mod.build({ THREE, env: R.env, renderer: R.renderer })));
+    built.set(slug, Promise.all([SCENES[slug](), document.fonts ? Promise.all([document.fonts.load('700 32px Inter'), document.fonts.load('600 20px Inter'), document.fonts.load('700 20px "JetBrains Mono"')]).catch(() => null) : null]).then(([mod]) => (() => { const sc = mod.build({ THREE, env: R.env, renderer: R.renderer }); hiShadows(sc.scene); return sc; })())));
   }
   return built.get(slug);
 }
@@ -108,8 +108,7 @@ function scene(slug) {
 // viewer costs about the same as a desktop card, and the adaptive scale trims it further if frames run long.
 function fit(w, h, scale = 1) {
   const { renderer: r } = R;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(1.4e6 / Math.max(1, w * h))) * scale;
-  r.setPixelRatio(dpr);
+  r.setPixelRatio(pixelRatio(w, h, scale));
   r.setSize(w, h, false);
 }
 
