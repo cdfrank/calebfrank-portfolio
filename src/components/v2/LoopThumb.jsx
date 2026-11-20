@@ -57,7 +57,10 @@ export default function LoopThumb({ slug }) {
           const r = host.getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
           const x = cx == null ? r.width - w - 128 : cx - r.left - w / 2;
           box.style.setProperty('--tx', Math.max(0, Math.min(r.width - w, x)) + 'px');
-          box.style.setProperty('--ty', (r.top - h - 16 > 96 ? -h - 14 : r.height + 14) + 'px');
+          // Clear the nav and the sticky filter bar, whichever reaches lower.
+          const bar = document.querySelector('.rec .rtools');
+          const top = Math.max(96, bar ? bar.getBoundingClientRect().bottom + 8 : 0);
+          box.style.setProperty('--ty', (r.top - h - 16 > top ? -h - 14 : r.height + 14) + 'px');
         };
         const on = (e) => { place(e && e.clientX); go(); };
         const move = (e) => place(e.clientX);
