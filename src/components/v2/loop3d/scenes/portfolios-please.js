@@ -10,6 +10,7 @@ import {
   canvasTex, grainTex, glow, roundRect, std, mesh, dip,
 } from '../kit.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { makePerson, makeCrowd } from '../person.js';
 
 const D = 10;
 const MONO = '"JetBrains Mono", monospace', SANS = 'Inter, system-ui, sans-serif';
@@ -117,16 +118,16 @@ export function build({ env }) {
   const rGeo = new THREE.BufferGeometry(); rGeo.setAttribute('position', new THREE.BufferAttribute(rpos, 3));
   const rain = new THREE.LineSegments(rGeo, new THREE.LineBasicMaterial({ color: 0x9fb6e0, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
   rain.frustumCulled = false; scene.add(rain);
-  // The queue: waiting figures in the rain.
-  const queueM = std(0x12161f, { roughness: 0.7 });
-  const queue = [[-0.55, -2.15], [-0.85, -2.6], [-1.2, -3.0]].map(([x, z], i) => {
-    const g = new THREE.Group();
-    const b = mesh(new THREE.CapsuleGeometry(0.19, 0.42, 6, 16), queueM, { cast: false }); b.position.y = 0.95; g.add(b);
-    const h = mesh(new THREE.SphereGeometry(0.15, 20, 14), queueM, { cast: false }); h.position.y = 1.5; g.add(h);
-    if (i === 1) { const u = mesh(new THREE.ConeGeometry(0.42, 0.14, 20, 1, true), std(0x1a2030, { roughness: 0.4, side: THREE.DoubleSide }), { cast: false }); u.position.y = 1.85; g.add(u); }
-    g.position.set(x, 0, z); scene.add(g);
-    return g;
-  });
+  // The queue: three people waiting in the rain, one under an umbrella.
+  const QP = [[-0.55, -2.15], [-0.85, -2.6], [-1.2, -3.0]];
+  const queue = makeCrowd(scene, [
+    { skin: 0xc68b68, top: 0x2b3240, pants: 0x1c1f26, hair: 0x2a1a12, shoe: 0x1b1d20, chest: 0.15 },
+    { skin: 0x5e3a28, top: 0x3a3340, pants: 0x23262d, hair: 0x0e0b0a, shoe: 0xe9e4da, bun: true, chest: 0.14 },
+    { skin: 0xe2b08e, top: 0x2f3a33, pants: 0x262a33, hair: 0x7a3b1c, shoe: 0x1b1d20, chest: 0.146 },
+  ]);
+  const umb = mesh(new THREE.ConeGeometry(0.42, 0.14, 20, 1, true), std(0x1a2030, { roughness: 0.4, side: THREE.DoubleSide }), { cast: false });
+  const umbPole = mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.62, 6), std(0x15171c, { roughness: 0.5 }), { cast: false });
+  scene.add(umb, umbPole);
 
   // ----------------------------------------------------------- lights
   scene.add(new THREE.HemisphereLight(0x5a6a8a, 0x1a140c, 0.3));
@@ -301,25 +302,19 @@ export function build({ env }) {
   });
 
   // ----------------------------------------------------------- candidates
-  const mkCand = ({ coat, skin, hat, cap }) => {
-    const g = new THREE.Group(); scene.add(g);
-    const body = new THREE.Group(); g.add(body);
-    const torso = mesh(new THREE.CapsuleGeometry(0.21, 0.4, 8, 20), std(coat, { roughness: 0.75 })); torso.position.y = 0.86; body.add(torso);
-    const collar = mesh(new THREE.TorusGeometry(0.15, 0.04, 10, 24), std(coat, { roughness: 0.8 })); collar.rotation.x = Math.PI / 2; collar.position.y = 1.24; body.add(collar);
-    const head = new THREE.Group(); head.position.y = 1.4; body.add(head);
-    head.add(mesh(new THREE.SphereGeometry(0.16, 28, 20), std(skin, { roughness: 0.6 })));
-    const eyeM = std(0x0a0a0a, { roughness: 0.2 });
-    [-0.055, 0.055].forEach((x) => { const e = mesh(new THREE.SphereGeometry(0.018, 10, 8), eyeM, { cast: false }); e.position.set(x, 0.015, 0.148); head.add(e); });
-    if (cap) {
-      const top = mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.07, 24), std(hat, { roughness: 0.7 })); top.position.y = 0.11; top.rotation.x = -0.12; head.add(top);
-      const brim = mesh(new THREE.BoxGeometry(0.22, 0.012, 0.12), std(hat, { roughness: 0.7 })); brim.position.set(0, 0.085, 0.17); head.add(brim);
-    } else {
-      const beanie = mesh(new THREE.SphereGeometry(0.168, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), std(hat, { roughness: 0.85 })); beanie.position.y = 0.03; head.add(beanie);
-      const pom = mesh(new THREE.SphereGeometry(0.045, 12, 10), std(0xe8d8b0, { roughness: 0.9 })); pom.position.y = 0.21; head.add(pom);
-    }
-    return { g, body, head };
+  const skinOf = (c) => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.55, sheen: 0.5, sheenColor: new THREE.Color(0xffc8a8) });
+  const mkCand = ({ coat, skin, hat, pants, shoe, cap }) => {
+    const coatM = std(coat, { roughness: 0.78 });
+    return makePerson(scene, { skin: skinOf(skin), top: coatM, sleeve: coatM, fore: coatM, pants: std(pants, { roughness: 0.85 }),
+      shoeM: std(shoe, { roughness: 0.55 }), hairM: std(hat, { roughness: 0.85 }), hairCap: cap ? 0.5 : 0.62, chestR: cap ? 0.152 : 0.145, seed: cap ? 2.2 : 5.1 });
   };
-  const cands = [mkCand({ coat: 0xb8892f, skin: 0xc99a7a, hat: 0x2f6f6a, cap: false }), mkCand({ coat: 0x566a8a, skin: 0x8a5a40, hat: 0x5a4030, cap: true })];
+  const cands = [
+    mkCand({ coat: 0xb8892f, skin: 0xc99a7a, hat: 0x2f6f6a, pants: 0x2b2f3a, shoe: 0xe9e4da, cap: false }),
+    mkCand({ coat: 0x566a8a, skin: 0x8a5a40, hat: 0x2a1a12, pants: 0x3b3226, shoe: 0x1b1d20, cap: true }),
+  ];
+  const PV = (x, y, z) => new THREE.Vector3(x, y, z);
+  const cHip = PV(0, 0, 0), cLook = PV(0, 0, 0), cF = PV(0, 0, 0), cS = PV(0, 0, 0), cT = PV(0, 0, 0), cT2 = PV(0, 0, 0), cRoot = PV(0, 0, 0);
+  const CS = 0.92, CZ = -1.2;
 
   // ----------------------------------------------------------- camera
   const L = (x) => x;
@@ -363,21 +358,71 @@ export function build({ env }) {
     const nx = Math.max(call(0.3, 1.25), call(4.5, 5.6), call(8.8, 10));
     nextM.color.setScalar(0.25 + 0.75 * nx); nextGlow.material.opacity = 0.8 * nx; nextL.intensity = 0.9 * nx;
 
-    // Candidates step up to the glass, react, and leave.
+    // Candidates walk up to the glass, pass their portfolio through the slot, react, and walk off.
     cands.forEach((cd, i) => {
       const C = CAND[i], ts = SLAM[i];
-      const x = t < C.out[0] ? lerp(-1.5, 0, eo(k(t, C.in[0], C.in[1]))) : lerp(0, 1.7, ei(k(t, C.out[0], C.out[1])));
-      const moving = (t > C.in[0] && t < C.in[1]) || (t > C.out[0] && t < C.out[1]);
-      const bob = moving ? Math.abs(Math.sin(t * 13)) * 0.035 : Math.sin(t * 2 + i) * 0.004;
-      const hop = i === 0 ? Math.sin(Math.PI * k(t, ts + 0.1, ts + 0.5)) * 0.1 + Math.sin(Math.PI * k(t, ts + 0.5, ts + 0.8)) * 0.04 : 0;
-      const slump = i === 1 ? eo(k(t, ts + 0.15, ts + 0.7)) : 0;
-      cd.g.position.set(x, bob + hop - slump * 0.04, -1.2);
-      cd.body.rotation.z = moving ? Math.sin(t * 6.5) * 0.04 : 0;
-      cd.head.rotation.x = slump * 0.42 - (i === 0 ? Math.sin(Math.PI * k(t, ts + 0.1, ts + 0.5)) * 0.15 : 0);
-      cd.head.rotation.y = Math.sin(t * 0.9 + i * 2) * 0.12 * (1 - slump);
-      cd.g.visible = t > C.in[0] && t < C.out[1];
+      const pin = eo(k(t, C.in[0], C.in[1])), pout = ei(k(t, C.out[0], C.out[1]));
+      const x = t < C.out[0] ? lerp(-1.5, 0, pin) : lerp(0, 1.7, pout);
+      const walking = (t > C.in[0] && t < C.in[1]) || (t > C.out[0] && t < C.out[1]);
+      const stride = Math.max(Math.sin(Math.PI * pin) * (t < C.out[0] ? 1 : 0), Math.sin(Math.PI * pout));
+      const mv = walking ? clamp(stride * 1.6) : 0;
+      const dist = 1.5 * pin + 1.7 * pout;
+      const ph = dist / CS * Math.PI / 0.6 + i;
+      // Face along the walk, turn to the window to stand.
+      const face = t < C.out[0] ? 1 - eio(k(t, C.in[1] - 0.35, C.in[1] + 0.1)) : eio(k(t, C.out[0] - 0.05, C.out[0] + 0.3));
+      const yaw = face * Math.PI / 2;
+      cF.set(Math.sin(yaw), 0, Math.cos(yaw)); cS.set(Math.cos(yaw), 0, -Math.sin(yaw));
+      const hop = i === 0 ? Math.sin(Math.PI * k(t, ts + 0.1, ts + 0.5)) * 0.12 + Math.sin(Math.PI * k(t, ts + 0.5, ts + 0.8)) * 0.04 : 0;
+      const yay = i === 0 ? Math.sin(Math.PI * k(t, ts + 0.05, ts + 1.0)) : 0;
+      const slump = i === 1 ? eo(k(t, ts + 0.15, ts + 0.7)) * (1 - k(t, C.out[0], C.out[0] + 0.2)) : 0;
+      const give = Math.sin(Math.PI * k(t, C.pin[0] - 0.25, C.pin[1]));
+      cRoot.set(x, hop * 0.6, CZ);
+      // Work in their own unscaled space: hip at standing height above their floor point.
+            cHip.set(x / CS, 0.93 + hop / CS + 0.025 * mv * Math.abs(Math.cos(ph)) - 0.03 * slump, CZ / CS).addScaledVector(cS, 0.02 * Math.sin(ph) * mv);
+      cLook.set(0.1 / CS, (DESK + 0.1) / CS, -0.3 / CS);
+      if (walking) cLook.copy(cHip).addScaledVector(cF, 3).add(cT.set(0, 0.62, 0));
+      cd.pose({ t, hip: cHip, yaw, lean: 0.03 + 0.05 * mv + 0.18 * slump + 0.12 * give - 0.1 * yay, tilt: 0.04 * slump, look: cLook, nod: 0.35 * slump,
+        kneePole: cT2.copy(cHip).addScaledVector(cF, 1),
+        feet: (f, out) => {
+          const sg = f ? 1 : -1, s2 = Math.sin(ph + (f ? Math.PI : 0));
+          out.set(x / CS, 0, CZ / CS).addScaledVector(cS, sg * 0.1).addScaledVector(cF, 0.2 * s2 * mv + (1 - mv) * (f ? 0.03 : -0.02));
+          out.y = hop / CS + 0.085 + 0.07 * Math.max(0, Math.cos(ph + (f ? Math.PI : 0))) * mv;
+          return hop / CS;
+        },
+        hands: (h, sh, out) => {
+          const sg = h ? 1 : -1;
+          out.copy(sh).add(cT.set(0, -0.56, 0)).addScaledVector(cS, sg * 0.05).addScaledVector(cF, 0.04 + 0.15 * mv * Math.sin(ph + (h ? 0 : Math.PI)));
+          // Hand the portfolio through the slot.
+          if (h === 0 && give > 0) out.lerp(cT.set(0.08 / CS, (DESK + 0.02) / CS, (WZ - 0.24) / CS), give);
+          // Hired: both fists up. Denied: arms hang.
+          if (yay > 0) out.lerp(cT.copy(sh).add(cT2.set(0, 0.5, 0)).addScaledVector(cS, sg * 0.14).addScaledVector(cF, 0.06), yay);
+        },
+      });
+      cd.body.parent.scale.setScalar(CS);
+      cd.setVisible(t > C.in[0] && t < C.out[1]);
     });
-    queue.forEach((q, i) => { q.position.y = Math.sin(t * 1.7 + i * 2) * 0.006; q.rotation.y = Math.sin(t * 0.6 + i) * 0.15; });
+    // The queue shifts its weight in the rain; one holds an umbrella over all of it.
+    QP.forEach(([qx, qz], i) => {
+      const yaw = 0.5 + Math.sin(t * 0.6 + i) * 0.15;
+      cF.set(Math.sin(yaw), 0, Math.cos(yaw)); cS.set(Math.cos(yaw), 0, -Math.sin(yaw));
+      const sw = Math.sin(t * 0.9 + i * 2);
+      cRoot.set(qx, 0, qz);
+      cHip.set(qx, 0.93 + 0.004 * Math.sin(t * 1.7 + i * 2), qz).addScaledVector(cS, 0.025 * sw);
+      cLook.copy(cHip).add(cT.set(0.6, 0.62 + (i === 2 ? -0.4 : 0), 2.5));
+      queue.pose(i, { t, root: cRoot, hip: cHip, yaw, lean: 0.08, tilt: 0.03 * sw, look: cLook, nod: 0.05,
+        kneePole: cT2.copy(cHip).addScaledVector(cF, 1),
+        feet: (f, out) => { out.copy(cRoot).addScaledVector(cS, (f ? 1 : -1) * 0.11).addScaledVector(cF, f ? 0.03 : -0.02); out.y = 0.085; return 0; },
+        hands: (h, sh, out) => {
+          const sg = h ? 1 : -1;
+          out.copy(cHip).add(cT.set(0, 0.12, 0)).addScaledVector(cF, 0.17).addScaledVector(cS, sg * 0.05);
+          if (i === 1 && h === 1) out.copy(sh).add(cT.set(0, -0.12, 0)).addScaledVector(cF, 0.3).addScaledVector(cS, -0.05);
+        },
+      });
+    });
+    queue.commit();
+    umbPole.position.copy(queue.hand[1][1]).add(cT.set(0, 0.3, 0));
+    umb.position.copy(queue.hand[1][1]).add(cT.set(0, 0.62, 0));
+    umb.rotation.z = Math.sin(t * 0.8) * 0.04;
 
     // Portfolios: slide in through the slot, fall open, get stamped, close, slide back out.
     folios.forEach((f, i) => {

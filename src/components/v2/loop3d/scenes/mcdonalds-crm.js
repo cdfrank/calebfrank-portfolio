@@ -8,6 +8,7 @@ import {
   THREE, k, kf, lerp, eo, eio, ei, back, rnd, clamp,
   canvasTex, grainTex, glow, label, roundRect, std, mesh, phone, dip,
 } from '../kit.js';
+import { makePerson } from '../person.js';
 
 const D = 10;
 const FS = 'Inter, system-ui, sans-serif', FM = '"JetBrains Mono", monospace';
@@ -71,12 +72,20 @@ export function build({ env }) {
 
   // ----------------------------------------------------------- the customer
   const who = new THREE.Group(); scene.add(who);
-  const skin = std(0xa89c92, { roughness: 0.55 });
   const plinth = mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.06, 48), std(0x2a0f0b, { roughness: 0.35, metalness: 0.3 })); plinth.position.y = TOP + 0.03; scene.add(plinth);
-  const torso = mesh(new THREE.CapsuleGeometry(0.105, 0.24, 8, 24), skin); torso.position.y = 0.405; who.add(torso);
-  const head = mesh(new THREE.SphereGeometry(0.08, 32, 24), skin); head.position.y = 0.72; who.add(head);
-  const heart = glow(0xffc24a, 0.2, 0, 0.3); heart.position.set(0, 0.47, 0.11); who.add(heart);
-  const heartL = new THREE.PointLight(0xffb040, 0, 1.4, 1.6); heartL.position.set(0, 0.5, 0.25); scene.add(heartL);
+  // A real guest: hoodie, jeans and sneakers, scaled to stand on the plinth.
+  const PSC = 0.37, PY = TOP + 0.06;
+  const body = new THREE.Group(); body.position.y = PY; body.scale.setScalar(PSC); who.add(body);
+  const hoodie = std(0xe7dccb, { roughness: 0.9 });
+  const guest = makePerson(body, {
+    skin: new THREE.MeshPhysicalMaterial({ color: 0xc68b68, roughness: 0.55, sheen: 0.5, sheenColor: new THREE.Color(0xffc8a8) }),
+    top: hoodie, sleeve: hoodie, fore: hoodie, pants: std(0x34465e, { roughness: 0.85 }),
+    shoeM: std(0xb3141c, { roughness: 0.55 }), hairM: std(0x2a1a12, { roughness: 0.9 }), hairCap: 0.52, chestR: 0.148, seed: 3.3,
+  });
+  const CHEST = PY + 1.3 * PSC;
+  const heart = glow(0xffc24a, 0.2, 0, 0.3); heart.position.set(0, CHEST, 0.08); who.add(heart);
+  const heartL = new THREE.PointLight(0xffb040, 0, 1.4, 1.6); heartL.position.set(0, CHEST + 0.03, 0.25); scene.add(heartL);
+  const gHip = new THREE.Vector3(), gLook = new THREE.Vector3(), gTmp = new THREE.Vector3(), gTmp2 = new THREE.Vector3();
 
   // ----------------------------------------------------------- the four touchpoints
   const pos = new THREE.Vector3();
@@ -210,7 +219,7 @@ export function build({ env }) {
     const th = theta(t), v = visitAt(t);
     const into = eio(k(t, T1, T1 + 0.45));
     const a = th + into * Math.PI * 0.9;
-    posOn(a, R * (1 - into), lerp(TOP + 0.05, 0.47, into), pos);
+    posOn(a, R * (1 - into), lerp(TOP + 0.05, CHEST, into), pos);
     token.position.copy(pos); tokGlow.position.copy(pos);
     const boom = k(t, T1 + 0.45, T1 + 1.4);
     const alive = t > T0 - 0.35 && boom <= 0;
@@ -220,7 +229,7 @@ export function build({ env }) {
     tokL.position.copy(pos); tokL.position.y += 0.08; tokL.intensity = alive ? 2.2 * clamp(born) : 0;
     trail.forEach((s, j) => {
       const tt = t - (j + 1) * 0.04, aj = theta(tt) + eio(k(tt, T1, T1 + 0.45)) * Math.PI * 0.9, ij = eio(k(tt, T1, T1 + 0.45));
-      posOn(aj, R * (1 - ij), lerp(TOP + 0.05, 0.47, ij), s.position);
+      posOn(aj, R * (1 - ij), lerp(TOP + 0.05, CHEST, ij), s.position);
       const moving = t > T0 && tt > T0 - 0.05;
       s.material.opacity = alive && moving ? 0.55 * (1 - j / TRN) * clamp((t - T0) * 3) : 0;
     });
@@ -260,11 +269,30 @@ export function build({ env }) {
     heart.material.opacity = clamp(0.15 + 0.35 * warm);
     heart.scale.setScalar(0.18 + 0.14 * warm);
     heartL.intensity = 0.6 * warm;
+    // The guest watches the token come round, perks up at each visit, and throws their arms open
+    // when the last one lands in them.
+    who.updateMatrixWorld(true);
+    const cheer = eo(k(t, T1 + 0.4, T1 + 0.75)) * (1 - 0.35 * eio(k(t, T1 + 1.6, T1 + 2.4)));
+    const perk = VISIT_T.reduce((m, tv) => Math.max(m, Math.sin(Math.PI * k(t, tv - 0.05, tv + 0.5))), 0);
+    body.worldToLocal(gLook.copy(alive ? pos : camera.position));
+    gLook.lerp(body.worldToLocal(gTmp.copy(camera.position)), cheer);
+    gHip.set(0.015 * Math.sin(t * 0.9), 0.93 + 0.012 * perk - 0.03 * Math.sin(Math.PI * k(t, T1 + 0.3, T1 + 0.5)), 0);
+    guest.pose({ t, hip: gHip, yaw: 0, lean: 0.02 - 0.08 * cheer, tilt: 0.02 * Math.sin(t * 0.7), look: gLook, nod: 0.06 * perk,
+      kneePole: gTmp2.set(0, 0.5, 1),
+      feet: (f, out) => { out.set((f ? 1 : -1) * 0.11, 0.085, f ? 0.03 : -0.02); return 0; },
+      hands: (h, sh, out) => {
+        const sg = h ? 1 : -1;
+        // Relaxed, then one hand up with the phone at each visit, then both arms open.
+        out.set(sg * 0.24, 0.86, 0.06);
+        if (h === 1) out.lerp(gTmp.set(0.16, 1.18, 0.26), 0.55 * perk * (1 - cheer));
+        out.lerp(gTmp.copy(sh).add(gTmp2.set(sg * 0.42, 0.34, 0.12)), cheer);
+      },
+    });
 
     // The burst when the third visit lands.
     for (let i = 0; i < BN; i++) {
       const [dx, dy, dz, sp] = DIRS[i], e = eo(boom) * sp;
-      bposA[i * 3] = dx * e * 1.1; bposA[i * 3 + 1] = 0.53 + dy * e * 0.9 - boom * boom * 0.25; bposA[i * 3 + 2] = dz * e * 1.1;
+      bposA[i * 3] = dx * e * 1.1; bposA[i * 3 + 1] = CHEST + 0.04 + dy * e * 0.9 - boom * boom * 0.25; bposA[i * 3 + 2] = dz * e * 1.1;
     }
     bGeo.attributes.position.needsUpdate = true;
     burst.visible = boom > 0 && boom < 1; burst.material.opacity = 1 - ei(boom);

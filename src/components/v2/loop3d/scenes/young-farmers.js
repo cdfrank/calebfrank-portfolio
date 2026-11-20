@@ -10,6 +10,7 @@ import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, label, roundRect, std, mesh, dip, skyDome,
 } from '../kit.js';
+import { makePerson } from '../person.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const D = 10;
@@ -26,78 +27,7 @@ const RISE = [0.45, 1.45], LAMPS = [1.7, 1.86], UNROLL = [2.75, 3.45];
 const SET = 4.55, GLANCE = 4.95, BACK = 5.25, TOP = 6.0, IMPACT = 6.2, FINISH = 6.55;
 const LANDT = 7.0, HOPT = 7.18, CUPT = 7.64, DROPT = 7.74;
 
-// A stylized person built from capsules, posed entirely from inputs each frame (after farxiga.js).
-function makePerson(scene, o) {
-  const bone = (r, len, m) => { const b = mesh(new THREE.CapsuleGeometry(r, len, 4, 12), m); scene.add(b); return b; };
-  const LT = 0.44, LS = 0.43, LU = 0.29, LF = 0.27;
-  const p = {
-    pelvis: bone(0.1, 0.12, o.pants),
-    torso: bone(o.chestR, 0.3, o.top),
-    neck: bone(0.042, 0.05, o.skin),
-    head: mesh(new THREE.SphereGeometry(0.102, 28, 20), o.skin),
-    nose: mesh(new THREE.SphereGeometry(0.018, 10, 8), o.skin),
-    hair: mesh(new THREE.SphereGeometry(0.109, 28, 14, 0, Math.PI * 2, 0, Math.PI * o.hairCap), o.hairM),
-    ua: [bone(0.05, 0.21, o.sleeve), bone(0.05, 0.21, o.sleeve)],
-    fa: [bone(0.042, 0.2, o.fore), bone(0.042, 0.2, o.fore)],
-    hand: [0, 1].map(() => { const h = mesh(new THREE.SphereGeometry(0.04, 14, 10), o.handM || o.skin); h.scale.set(0.8, 1.15, 1); scene.add(h); return h; }),
-    th: [bone(0.07, 0.34, o.pants), bone(0.07, 0.34, o.pants)],
-    sh: [bone(0.056, 0.34, o.pants), bone(0.056, 0.34, o.pants)],
-    shoe: [0, 1].map(() => { const s = mesh(new RoundedBoxGeometry(0.1, 0.075, 0.26, 3, 0.03), o.shoeM); s.rotation.order = 'YXZ'; scene.add(s); return s; }),
-    extra: [],
-  };
-  [p.head, p.nose, p.hair].forEach((m) => scene.add(m));
-  const va = V(0, 0, 0), vb = V(0, 0, 0), vc = V(0, 0, 0), vd = V(0, 0, 0);
-  const place = (m, a, b) => { m.position.addVectors(a, b).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(Y, vd.subVectors(b, a).normalize()); };
-  const ik = (a, b, l1, l2, pole, out) => {
-    const dv = vc.subVectors(b, a); const d = Math.min(dv.length(), l1 + l2 - 0.001); dv.normalize();
-    const along = (l1 * l1 - l2 * l2 + d * d) / (2 * d), off = Math.sqrt(Math.max(0, l1 * l1 - along * along));
-    const n = vb.copy(pole).addScaledVector(dv, -pole.dot(dv)).normalize();
-    return out.copy(a).addScaledVector(dv, along).addScaledVector(n, off);
-  };
-  const F = V(0, 0, 0), S = V(0, 0, 0), Dn = V(0, 0, 0), top = V(0, 0, 0), hipI = V(0, 0, 0), jnt = V(0, 0, 0), wr = V(0, 0, 0), pole = V(0, 0, 0), ank = V(0, 0, 0);
-  p.lookD = V(0, 0, 1);
-  p.shoulder = [V(0, 0, 0), V(0, 0, 0)];
-  p.headPos = V(0, 0, 0);
-  p.pose = ({ hip, yaw, lean, feet, hands, look, nod = 0, kneePole }) => {
-    fwdOf(yaw, F); sideOf(yaw, S);
-    place(p.pelvis, va.copy(hip).addScaledVector(S, -0.08), vb.copy(hip).addScaledVector(S, 0.08));
-    for (let i = 0; i < 2; i++) {
-      const sg = i ? 1 : -1;
-      hipI.copy(hip).addScaledVector(S, sg * 0.1);
-      feet(i, ank);
-      pole.copy(kneePole || F).addScaledVector(S, sg * 0.08);
-      ik(hipI, ank, LT, LS, pole, jnt);
-      place(p.th[i], hipI, jnt); place(p.sh[i], jnt, ank);
-      p.shoe[i].position.copy(ank).addScaledVector(F, 0.05); p.shoe[i].position.y = Math.max(0.038, ank.y - 0.045);
-      p.shoe[i].rotation.set(0, yaw, 0);
-    }
-    Dn.copy(F).multiplyScalar(lean).add(Y).normalize();
-    top.copy(hip).addScaledVector(Dn, 0.5);
-    place(p.torso, va.copy(hip).addScaledVector(Dn, 0.1), top);
-    for (const e of p.extra) e(hip, top, F, S, Dn);
-    p.headPos.copy(top).addScaledVector(Dn, 0.16).addScaledVector(F, 0.015);
-    place(p.neck, top, p.headPos);
-    const lookD = p.lookD;
-    lookD.subVectors(look, p.headPos); lookD.y = clamp(lookD.y / Math.max(0.01, Math.hypot(lookD.x, lookD.z)), -0.9, 0.5) * Math.hypot(lookD.x, lookD.z);
-    lookD.normalize(); lookD.y -= nod; lookD.normalize();
-    p.headPos.addScaledVector(lookD, 0.012);
-    p.head.position.copy(p.headPos);
-    p.nose.position.copy(p.headPos).addScaledVector(lookD, 0.098);
-    p.hair.position.copy(p.headPos).addScaledVector(lookD, -0.014).add(vb.set(0, 0.012, 0));
-    p.hair.quaternion.setFromUnitVectors(Y, vb.copy(Y).addScaledVector(lookD, -0.4).normalize());
-    for (let i = 0; i < 2; i++) {
-      const sg = i ? 1 : -1;
-      const sh = p.shoulder[i].copy(top).addScaledVector(Dn, -0.04).addScaledVector(S, sg * 0.19);
-      hands(i, sh, wr);
-      pole.copy(Y).multiplyScalar(-1).addScaledVector(S, sg * 0.7).addScaledVector(F, -0.35);
-      ik(sh, wr, LU, LF, pole, jnt);
-      place(p.ua[i], sh, jnt); place(p.fa[i], jnt, wr);
-      p.hand[i].position.copy(wr).addScaledVector(vb.subVectors(wr, jnt).normalize(), 0.035);
-      p.hand[i].quaternion.setFromUnitVectors(Y, vb);
-    }
-  };
-  return p;
-}
+// People come from the shared rig in ../person.js.
 
 // The club's sign: cream board, red barn emblem, the club's name.
 function drawSign(c, w, h) {
@@ -449,7 +379,7 @@ export function build({ env }) {
     if (t < IMPACT + 0.12) look.copy(BALL).lerp(tmp.copy(G).setY(0.6), glance * (t < GLANCE + 0.6 ? 1 : 0));
     else look.copy(bp).lerp(tmp.copy(G).setY(0.3), eio(k(t, CUPT, DROPT)));
     if (t < SET - 0.4) look.copy(BALL).lerp(tmp.set(-1.65, 1.4, 0.1), 0.5 * Math.sin(Math.PI * k(t, 1.6, 3.6)));
-    golfer.pose({
+    golfer.pose({ t,
       hip: hipP, yaw, lean, look,
       feet: (i, out) => {
         const sg = i ? 1 : -1;

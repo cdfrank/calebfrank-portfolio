@@ -12,6 +12,7 @@ import {
   THREE, k, kf, lerp, eo, eio, ei, back, rnd, clamp,
   canvasTex, grainTex, glow, label, roundRect, std, mesh, phone, dip,
 } from '../kit.js';
+import { makePerson } from '../person.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
@@ -36,77 +37,7 @@ const sideOf = (yaw, out = new THREE.Vector3()) => out.set(Math.cos(yaw), 0, -Ma
 const hex = (s) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16));
 const mix = (a, b, p) => { const A = hex(a), B = hex(b); return `rgb(${A.map((x, i) => Math.round(lerp(x, B[i], p))).join(',')})`; };
 
-// A stylized person built from capsules (after the Farxiga loop): every part is placed in world space from
-// a few inputs (hip, facing, lean, ankle and wrist targets, where they look), so any frame stands alone.
-function makePerson(scene, o) {
-  const bone = (r, len, m) => { const b = mesh(new THREE.CapsuleGeometry(r, len, 4, 12), m); scene.add(b); return b; };
-  const LT = 0.44, LS = 0.43, LU = 0.29, LF = 0.27;
-  const p = {
-    pelvis: bone(0.1, 0.12, o.pants),
-    torso: bone(o.chestR, 0.3, o.top),
-    neck: bone(0.042, 0.05, o.skin),
-    head: mesh(new THREE.SphereGeometry(0.102, 28, 20), o.skin),
-    nose: mesh(new THREE.SphereGeometry(0.018, 10, 8), o.skin),
-    hair: mesh(new THREE.SphereGeometry(0.109, 28, 14, 0, Math.PI * 2, 0, Math.PI * o.hairCap), o.hairM),
-    bun: mesh(new THREE.SphereGeometry(0.058, 16, 12), o.hairM),
-    ua: [bone(0.05, 0.21, o.sleeve), bone(0.05, 0.21, o.sleeve)],
-    fa: [bone(0.042, 0.2, o.fore), bone(0.042, 0.2, o.fore)],
-    hand: [0, 1].map(() => { const h = mesh(new THREE.SphereGeometry(0.04, 14, 10), o.skin); h.scale.set(0.8, 1.15, 1); scene.add(h); return h; }),
-    th: [bone(0.07, 0.34, o.pants), bone(0.07, 0.34, o.pants)],
-    sh: [bone(0.056, 0.34, o.pants), bone(0.056, 0.34, o.pants)],
-    shoe: [0, 1].map(() => { const s = mesh(new RoundedBoxGeometry(0.1, 0.075, 0.26, 3, 0.03), o.shoeM); scene.add(s); return s; }),
-  };
-  [p.head, p.nose, p.hair, p.bun].forEach((m) => scene.add(m));
-  const va = V(0, 0, 0), vb = V(0, 0, 0), vc = V(0, 0, 0), vd = V(0, 0, 0);
-  const place = (m, a, b) => { m.position.addVectors(a, b).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(Y, vd.subVectors(b, a).normalize()); };
-  const ik = (a, b, l1, l2, pole, out) => {
-    const dv = vc.subVectors(b, a); const d = Math.min(dv.length(), l1 + l2 - 0.001); dv.normalize();
-    const along = (l1 * l1 - l2 * l2 + d * d) / (2 * d), off = Math.sqrt(Math.max(0, l1 * l1 - along * along));
-    const n = vb.copy(pole).addScaledVector(dv, -pole.dot(dv)).normalize();
-    return out.copy(a).addScaledVector(dv, along).addScaledVector(n, off);
-  };
-  const F = V(0, 0, 0), S = V(0, 0, 0), Dn = V(0, 0, 0), top = V(0, 0, 0), hipI = V(0, 0, 0), jnt = V(0, 0, 0), wr = V(0, 0, 0), pole = V(0, 0, 0), ank = V(0, 0, 0), lookD = V(0, 0, 0);
-  p.shoulder = [V(0, 0, 0), V(0, 0, 0)];
-  p.headPos = V(0, 0, 0);
-  p.pose = ({ hip, yaw, lean, feet, hands, look, nod = 0 }) => {
-    fwdOf(yaw, F); sideOf(yaw, S);
-    place(p.pelvis, va.copy(hip).addScaledVector(S, -0.08), vb.copy(hip).addScaledVector(S, 0.08));
-    for (let i = 0; i < 2; i++) {
-      const sg = i ? 1 : -1;
-      hipI.copy(hip).addScaledVector(S, sg * 0.1);
-      feet(i, ank);
-      pole.copy(F).addScaledVector(S, sg * 0.08);
-      ik(hipI, ank, LT, LS, pole, jnt);
-      place(p.th[i], hipI, jnt); place(p.sh[i], jnt, ank);
-      p.shoe[i].position.copy(ank).addScaledVector(F, 0.05); p.shoe[i].position.y = Math.max(0.038, ank.y - 0.045);
-      p.shoe[i].rotation.set(0, yaw, 0);
-    }
-    Dn.copy(F).multiplyScalar(lean).add(Y).normalize();
-    top.copy(hip).addScaledVector(Dn, 0.5);
-    place(p.torso, va.copy(hip).addScaledVector(Dn, 0.1), top);
-    p.headPos.copy(top).addScaledVector(Dn, 0.16).addScaledVector(F, 0.015);
-    place(p.neck, top, p.headPos);
-    lookD.subVectors(look, p.headPos); lookD.y = clamp(lookD.y / Math.max(0.01, Math.hypot(lookD.x, lookD.z)), -1.1, 0.5) * Math.hypot(lookD.x, lookD.z);
-    lookD.normalize(); lookD.y -= nod; lookD.normalize();
-    p.headPos.addScaledVector(lookD, 0.012);
-    p.head.position.copy(p.headPos);
-    p.nose.position.copy(p.headPos).addScaledVector(lookD, 0.098);
-    p.hair.position.copy(p.headPos).addScaledVector(lookD, -0.014).add(vb.set(0, 0.012, 0));
-    p.hair.quaternion.setFromUnitVectors(Y, vb.copy(Y).addScaledVector(lookD, -0.4).normalize());
-    p.bun.position.copy(p.headPos).addScaledVector(lookD, -0.1).add(vb.set(0, 0.04, 0));
-    for (let i = 0; i < 2; i++) {
-      const sg = i ? 1 : -1;
-      const sh = p.shoulder[i].copy(top).addScaledVector(Dn, -0.04).addScaledVector(S, sg * 0.19);
-      hands(i, sh, wr);
-      pole.copy(Y).multiplyScalar(-1).addScaledVector(S, sg * 0.7).addScaledVector(F, -0.35);
-      ik(sh, wr, LU, LF, pole, jnt);
-      place(p.ua[i], sh, jnt); place(p.fa[i], jnt, wr);
-      p.hand[i].position.copy(wr).addScaledVector(vb.subVectors(wr, jnt).normalize(), 0.035);
-      p.hand[i].quaternion.setFromUnitVectors(Y, vb);
-    }
-  };
-  return p;
-}
+// People come from the shared rig in ../person.js.
 
 // The one-page guideline: a mark, three color dots and nine lines of rules. Each part fades from the
 // page as it lifts off: a = [dots, first lines, the rest, mark], 1 = still printed.
@@ -555,7 +486,7 @@ export function build({ env }) {
     lookAt(t, lk);
     const nod = 0.25 * Math.sin(Math.PI * k(t, 6.25, 6.65)) + 0.2 * Math.sin(Math.PI * k(t, 1.62, 1.92));
     fwdOf(0, F);
-    des.pose({
+    des.pose({ t,
       hip: hipP, yaw: 0, lean, look: lk, nod,
       feet: (i, out) => { out.set(ROOT.x + (i ? 1 : -1) * 0.115, 0.085, ROOT.z + (i ? -0.04 : 0.03)); },
       hands: (i, shp, out) => {

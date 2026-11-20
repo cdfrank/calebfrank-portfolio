@@ -10,6 +10,7 @@ import {
   canvasTex, grainTex, glow, roundRect, std, mesh, dip,
 } from '../kit.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { makeCrowd } from '../person.js';
 
 const D = 10;
 const FLOOR = -0.42;
@@ -29,8 +30,8 @@ const FIGS = [
   [1.64, -0.22, 5.2, 0xff6fae, 0.97],
   [-1.64, 0.3, 6.0, 0xff9a3c, 1.03],
   [1.64, 0.3, 6.15, 0x9be15d, 0.96],
-  [-1.16, 0.82, 6.3, 0xffe066, 1.0],
-  [1.16, 0.82, 6.45, 0x7b8cff, 1.02],
+  [-1.16, 0.72, 6.3, 0xffe066, 1.0],
+  [1.16, 0.72, 6.45, 0x7b8cff, 1.02],
 ];
 // The table card: one face per stage of the story. Every line comes from the case study.
 const CARD = [
@@ -172,13 +173,16 @@ export function build({ env }) {
   scene.add(shades, cords, bulbs);
 
   // ----------------------------------------------------------- people
-  const bodies = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.08, 0.34, 6, 16), std(0xffffff, { roughness: 0.42 }), FIGS.length);
-  const heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.068, 24, 16), std(0xffffff, { roughness: 0.38 }), FIGS.length);
+  // Real bodies, standing at the tall worktable. Their shirt is their team color.
+  const SKIN = [0xc68b68, 0x8a5a3e, 0xe2b08e, 0x5e3a28, 0xd6a083, 0xa86e4a, 0xf0c4a0, 0x7a4a30];
+  const HAIR = [0x2a1a12, 0x15100d, 0x7a3b1c, 0x0e0b0a, 0x4a2a1a, 0xb88a4a];
+  const PANTS = [0x2b2f3a, 0x30343c, 0x262a33, 0x3b3226, 0x3a3340];
   const white = new THREE.Color(0xffffff);
-  FIGS.forEach(([, , , col], i) => { const c = new THREE.Color(col); bodies.setColorAt(i, c); heads.setColorAt(i, c.clone().lerp(white, 0.3)); });
-  bodies.castShadow = heads.castShadow = true; bodies.receiveShadow = heads.receiveShadow = true;
-  bodies.frustumCulled = heads.frustumCulled = false;
-  scene.add(bodies, heads);
+  const crowd = makeCrowd(scene, FIGS.map(([, , , col], i) => ({
+    skin: SKIN[(i * 5) % SKIN.length], top: col, pants: PANTS[i % PANTS.length], hair: HAIR[(i * 3) % HAIR.length],
+    shoe: i % 3 ? 0x1b1d20 : 0xe9e4da, bun: i % 3 === 1, chest: 0.136 + rnd(i, 95) * 0.016,
+  })));
+  const FS = 0.52;   // figure scale against the room: the table top lands at hip height
 
   // ----------------------------------------------------------- sticky notes
   const scribble = canvasTex(128, 128, (c, w, h) => {
@@ -323,6 +327,10 @@ export function build({ env }) {
   ]);
   const tgt = new THREE.Vector3(), S = new THREE.Vector3(), P = new THREE.Vector3(), M = new THREE.Vector3(), white2 = new THREE.Color(), warm = new THREE.Color(0xfff0d8), off = new THREE.Color(0x221810);
   const lv = [0, 0, 0, 0, 0];
+  const root = new THREE.Vector3(), hipP = new THREE.Vector3(), look = new THREE.Vector3(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3(), tbl = new THREE.Vector3(), F = new THREE.Vector3(), Sd = new THREE.Vector3(), F2v = new THREE.Vector3();
+  const fwdOf = (yaw, out) => out.set(Math.sin(yaw), 0, Math.cos(yaw));
+  const sideOf = (yaw, out) => out.set(Math.cos(yaw), 0, -Math.sin(yaw));
+  const F2of = (yaw) => F2v.set(Math.sin(yaw), 0, Math.cos(yaw));
   const figPos = (i, t) => {
     const [x, z, A, , sz] = FIGS[i];
     const p = k(t, A, A + 0.8);
@@ -351,32 +359,65 @@ export function build({ env }) {
     lampL[1].intensity = 2.0 * lv[2];
     lampL[2].intensity = 1.5 * (lv[3] + lv[4]) / 2;
 
-    // People: each one drops in with a spring, bobs a little, squashes when they throw a note,
-    // and in the last beat the whole table does a little wave.
+    // People: each one drops in with a spring and settles at the table, hands on the edge. To post a
+    // note they turn to the board and flick it up with one hand; in the last beat the table waves.
     for (let i = 0; i < FIGS.length; i++) {
       const { x, z, p, sz, show } = figPos(i, t);
-      let sq = 0;
-      for (let n = 0; n < NN; n++) if (NOTE[n].src === i) sq = Math.max(sq, Math.sin(Math.PI * k(t, NOTE[n].L - 0.12, NOTE[n].L + 0.16)));
-      const hop = Math.sin(Math.PI * k(t, 8.15 + i * 0.05, 8.5 + i * 0.05));
-      const s = show ? Math.max(0.001, spring(p)) * sz : 0.001;
-      const yoff = (1 - eo(p)) * 0.3 + hop * 0.07;
-      const rz = Math.sin(t * 1.3 + i * 1.9) * 0.035;
-      const sy = s * (1 - sq * 0.1), sxz = s * (1 + sq * 0.07);
-      const hb = 0.25 * sy, hh = 0.5 * sy + 0.064 * s;
-      q4.setFromEuler(e4.set(0, 0, rz));
-      m4.compose(p4.set(x - Math.sin(rz) * hb, FLOOR + yoff + Math.cos(rz) * hb, z), q4, s4.set(sxz, sy, sxz));
-      bodies.setMatrixAt(i, m4);
-      m4.compose(p4.set(x - Math.sin(rz) * hh, FLOOR + yoff + Math.cos(rz) * hh, z), q4, s4.set(s, s, s));
-      heads.setMatrixAt(i, m4);
+      const sc = show ? Math.max(0.001, spring(p)) * sz * FS : 0;
+      root.set(x, FLOOR + (1 - eo(p)) * 0.3, z);
+      // Facing: the back row looks across the table at the camera side, the ends look in, the front row faces the board.
+      const yaw0 = z < -0.5 ? 0 : z > 0.6 ? Math.PI : x < 0 ? Math.PI / 2 : -Math.PI / 2;
+      // How far into a throw they are, and which board slot it goes to.
+      let th = 0, slot = null;
+      for (let n = 0; n < NN; n++) if (NOTE[n].src === i) {
+        const w = Math.sin(Math.PI * k(t, NOTE[n].L - 0.32, NOTE[n].L + 0.22));
+        if (w > th) { th = w; slot = NOTE[n].slot; }
+      }
+      const rel = (wx, wy, wz, out) => out.set(root.x + (wx - root.x) / Math.max(sc, 0.01), root.y + (wy - root.y) / Math.max(sc, 0.01), root.z + (wz - root.z) / Math.max(sc, 0.01));
+      // Board direction from where they stand, as a twist from their facing.
+      let tw = 0;
+      if (slot) { const by = Math.atan2(slot[0] - x, BZ - z); tw = Math.atan2(Math.sin(by - yaw0), Math.cos(by - yaw0)); }
+      const twist = clamp(tw, -1.25, 1.25) * th * 0.75;
+      const wave = Math.sin(Math.PI * k(t, 8.1 + i * 0.05, 9.0 + i * 0.05));
+      const ph = t * 1.1 + i * 1.7;
+      fwdOf(yaw0, F); sideOf(yaw0, Sd);
+      hipP.copy(root).add(tmp.set(0, 0.93 - 0.01 * th, 0)).addScaledVector(Sd, 0.015 * Math.sin(ph * 0.6));
+      // Where they look: across the table, at the timer early on, at the board when they post.
+      rel(Math.sin(i * 2.1) * 0.6, 0.15, 0.4, look);
+      if (t < 3) look.lerp(rel(0.4, 0.12, 0.24, tmp), 0.6);
+      if (slot) look.lerp(rel(slot[0], slot[1], BZ, tmp), th);
+      rel(0, 0, 0, tbl);     // the table top in their own scale
+      const gap = yaw0 === 0 ? -0.55 - z : yaw0 === Math.PI ? z - 0.55 : Math.abs(x) - 1.55;
+      const reachF = clamp(gap / Math.max(sc, 0.01) + 0.1, 0.22, 0.46);
+      const handSide = (i % 2) ? 1 : -1;
+      crowd.pose(i, { t, sc, root,
+        hip: hipP, yaw: yaw0, twist, lean: 0.12 + 0.03 * Math.sin(ph * 0.5) - 0.12 * th - 0.05 * wave, tilt: 0.02 * Math.sin(ph * 0.4),
+        look, nod: 0.05 * Math.max(0, Math.sin(ph * 0.9)),
+        kneePole: tmp2.copy(hipP).addScaledVector(F, 1),
+        feet: (f, out) => { out.copy(root).addScaledVector(Sd, (f ? 1 : -1) * 0.11).addScaledVector(F, f ? 0.04 : -0.02); out.y = root.y + 0.085; return root.y; },
+        hands: (h, sh, out) => {
+          const sg = h ? 1 : -1;
+          // Resting on the table edge in front of them.
+          out.copy(root).addScaledVector(F, reachF).addScaledVector(Sd, sg * 0.17); out.y = tbl.y + 0.03;
+          if (h === (handSide > 0 ? 1 : 0)) {
+            if (th > 0 && slot) {
+              // Wind down, then flick up toward the board above the shoulder.
+              const up = clamp(th * 1.3);
+              out.lerp(tmp.copy(sh).add(tmp3.set(0, 0.32, 0)).addScaledVector(F2of(yaw0 + twist), 0.22), up);
+            }
+            if (wave > 0) out.lerp(tmp.copy(sh).add(tmp3.set(0, 0.42, 0)).addScaledVector(Sd, sg * (0.12 + 0.08 * Math.sin(t * 16 + i))).addScaledVector(F, 0.08), wave);
+          }
+        },
+      });
     }
-    bodies.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true;
+    crowd.commit();
 
     // Notes: thrown from a person's hands in an arc, slapped onto the board, a wobble to settle.
     for (let i = 0; i < NN; i++) {
       const { L, src, slot } = NOTE[i];
       if (t < L) { m4.makeScale(0.0001, 0.0001, 0.0001); notes.setMatrixAt(i, m4); continue; }
       const f = k(t, L, L + 0.55), e = 1 - (1 - f) * (1 - f);
-      S.set(FIGS[src][0], 0.12, FIGS[src][1] + 0.1);
+      S.set(FIGS[src][0], FLOOR + 1.62 * FS * FIGS[src][4], FIGS[src][1] - 0.04);
       P.set(slot[0], slot[1], BZ + 0.004);
       M.set((S.x + P.x) / 2, Math.max(S.y, P.y) + 0.32, lerp(S.z, P.z, 0.5) + 0.2);
       p4.set(

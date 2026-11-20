@@ -10,6 +10,7 @@ import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, label, roundRect, std, mesh, dip,
 } from '../kit.js';
+import { makeCrowd } from '../person.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
@@ -40,118 +41,7 @@ const fwdOf = (yaw, out = V(0, 0, 0)) => out.set(Math.sin(yaw), 0, Math.cos(yaw)
 const sideOf = (yaw, out = V(0, 0, 0)) => out.set(Math.cos(yaw), 0, -Math.sin(yaw));
 const ss = (x) => x * x * (3 - 2 * x);
 
-// People, instanced. Adapted from the capsule figures in farxiga.js: every body part of every person shares
-// one InstancedMesh per part, so a whole crowd costs about a dozen draw calls. Each person is posed in
-// world space from a few inputs (hip, facing, lean, ankle and wrist targets, where they look) with two-bone
-// IK for knees and elbows, so every frame stands alone. list: [{ skin, top, sleeve, fore, pants, shoe, hair,
-// chest, bun }] as hex colors. sc scales a whole person about their floor point, for pop-ins.
-function makeCrowd(scene, list) {
-  const N = list.length;
-  const skinM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.55, sheen: 0.5, sheenColor: new THREE.Color(0xffc8a8) });
-  const clothM = std(0xffffff, { roughness: 0.86 });
-  const shoeM = std(0xffffff, { roughness: 0.5 });
-  const col = new THREE.Color();
-  const part = (geo, mat, per, colorOf) => {
-    const im = new THREE.InstancedMesh(geo, mat, N * per);
-    im.castShadow = true; im.receiveShadow = true; im.frustumCulled = false;
-    for (let i = 0; i < N; i++) for (let j = 0; j < per; j++) im.setColorAt(i * per + j, col.set(colorOf(list[i], j)));
-    scene.add(im);
-    return im;
-  };
-  const LT = 0.44, LS = 0.43, LU = 0.29, LF = 0.27;
-  const P = {
-    pelvis: part(new THREE.CapsuleGeometry(0.1, 0.12, 4, 10), clothM, 1, (p) => p.pants),
-    torso: part(new THREE.CapsuleGeometry(0.145, 0.3, 4, 14), clothM, 1, (p) => p.top),
-    neck: part(new THREE.CapsuleGeometry(0.042, 0.05, 3, 8), skinM, 1, (p) => p.skin),
-    head: part(new THREE.SphereGeometry(0.102, 24, 18), skinM, 1, (p) => p.skin),
-    nose: part(new THREE.SphereGeometry(0.018, 8, 6), skinM, 1, (p) => p.skin),
-    hair: part(new THREE.SphereGeometry(0.109, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.56), clothM, 1, (p) => p.hair),
-    bun: part(new THREE.SphereGeometry(0.058, 12, 10), clothM, 1, (p) => p.hair),
-    ua: part(new THREE.CapsuleGeometry(0.05, 0.21, 4, 10), clothM, 2, (p) => p.sleeve ?? p.top),
-    fa: part(new THREE.CapsuleGeometry(0.042, 0.2, 4, 10), clothM, 2, (p) => p.fore ?? p.sleeve ?? p.top),
-    hand: part(new THREE.SphereGeometry(0.04, 12, 10), skinM, 2, (p) => p.skin),
-    th: part(new THREE.CapsuleGeometry(0.07, 0.34, 4, 10), clothM, 2, (p) => p.pants),
-    sh: part(new THREE.CapsuleGeometry(0.056, 0.34, 4, 10), clothM, 2, (p) => p.pants),
-    shoe: part(new RoundedBoxGeometry(0.1, 0.075, 0.26, 2, 0.03), shoeM, 2, (p) => p.shoe),
-  };
-  const ALL = Object.values(P);
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), zero = new THREE.Matrix4().makeScale(0, 0, 0);
-  const R = V(0, 0, 0), pv = V(0, 0, 0), sv = V(1, 1, 1), mid = V(0, 0, 0);
-  let SC = 1;
-  const xf = (v, out) => out.copy(v).sub(R).multiplyScalar(SC).add(R);
-  const put = (im, idx, pos, quat, sx = 1, sy = 1, sz = 1) => { m4.compose(xf(pos, pv), quat, sv.set(sx * SC, sy * SC, sz * SC)); im.setMatrixAt(idx, m4); };
-  const va = V(0, 0, 0), vb = V(0, 0, 0), vc = V(0, 0, 0), vd = V(0, 0, 0);
-  const seg = (im, idx, a, b, sx = 1, sz = 1) => { mid.addVectors(a, b).multiplyScalar(0.5); q.setFromUnitVectors(Y, vd.subVectors(b, a).normalize()); put(im, idx, mid, q, sx, 1, sz); };
-  // Two-bone reach: the middle joint (knee or elbow) bends toward the pole.
-  const ik = (a, b, l1, l2, pole, out) => {
-    const dv = vc.subVectors(b, a); const d = Math.max(0.001, Math.min(dv.length(), l1 + l2 - 0.001)); dv.normalize();
-    const along = (l1 * l1 - l2 * l2 + d * d) / (2 * d), off = Math.sqrt(Math.max(0, l1 * l1 - along * along));
-    const n = vb.copy(pole).addScaledVector(dv, -pole.dot(dv)).normalize();
-    return out.copy(a).addScaledVector(dv, along).addScaledVector(n, off);
-  };
-  const F = V(0, 0, 0), S = V(0, 0, 0), Dn = V(0, 0, 0), top = V(0, 0, 0), hipI = V(0, 0, 0), jnt = V(0, 0, 0), wr = V(0, 0, 0), pole = V(0, 0, 0), ank = V(0, 0, 0), lookD = V(0, 0, 0), hp = V(0, 0, 0), qy = new THREE.Quaternion();
-  const out = {
-    N, parts: P, stretch: 0, reach: 0,
-    head: list.map(() => V(0, 0, 0)), chest: list.map(() => V(0, 0, 0)),
-    hand: list.map(() => [V(0, 0, 0), V(0, 0, 0)]), shoulder: [V(0, 0, 0), V(0, 0, 0)],
-  };
-  const hide = (i) => { for (const [, im] of Object.entries(P)) { const per = im.count / N; for (let j = 0; j < per; j++) im.setMatrixAt(i * per + j, zero); } };
-  // hip: pelvis centre; yaw: facing; lean: forward lean; tilt: sideways lean; feet(i, out) -> ground y under
-  // that foot (sets the ankle target); hands(i, shoulder, out): wrist target; look: world point to face.
-  out.pose = (i, { hip, yaw, lean = 0, tilt = 0, feet, hands, look, nod = 0, kneePole = null, sc = 1, root = null }) => {
-    if (sc <= 0.002) { hide(i); out.head[i].copy(hip); out.chest[i].copy(hip); out.hand[i][0].copy(hip); out.hand[i][1].copy(hip); return; }
-    SC = sc; if (root) R.copy(root); else R.set(hip.x, 0, hip.z);
-    const p = list[i];
-    fwdOf(yaw, F); sideOf(yaw, S);
-    qy.setFromAxisAngle(Y, yaw);
-    seg(P.pelvis, i, va.copy(hip).addScaledVector(S, -0.08), vb.copy(hip).addScaledVector(S, 0.08));
-    for (let s = 0; s < 2; s++) {
-      const sg = s ? 1 : -1, ix = i * 2 + s;
-      hipI.copy(hip).addScaledVector(S, sg * 0.1);
-      const gy = feet(s, ank) || 0;
-      pole.copy(kneePole || F).addScaledVector(S, sg * 0.08);
-      out.stretch = Math.max(out.stretch, hipI.distanceTo(ank) - (LT + LS));
-      ik(hipI, ank, LT, LS, pole, jnt);
-      seg(P.th, ix, hipI, jnt); seg(P.sh, ix, jnt, ank);
-      pv.copy(ank).addScaledVector(F, 0.05); pv.y = Math.max(gy + 0.038, ank.y - 0.045);
-      put(P.shoe, ix, mid.copy(pv), qy);
-    }
-    Dn.copy(F).multiplyScalar(lean).addScaledVector(S, tilt).add(Y).normalize();
-    top.copy(hip).addScaledVector(Dn, 0.5);
-    const cr = (p.chest || 0.145) / 0.145;
-    seg(P.torso, i, va.copy(hip).addScaledVector(Dn, 0.1), top, cr, cr * 0.92);
-    hp.copy(top).addScaledVector(Dn, 0.16).addScaledVector(F, 0.015);
-    seg(P.neck, i, top, hp);
-    lookD.subVectors(look, hp);
-    const flat = Math.max(0.01, Math.hypot(lookD.x, lookD.z));
-    lookD.y = clamp(lookD.y / flat, -0.9, 0.6) * flat;
-    lookD.normalize(); lookD.y -= nod; lookD.normalize();
-    hp.addScaledVector(lookD, 0.012);
-    put(P.head, i, hp, q.identity());
-    put(P.nose, i, va.copy(hp).addScaledVector(lookD, 0.098), q);
-    q.setFromUnitVectors(Y, vb.copy(Y).addScaledVector(lookD, -0.4).normalize());
-    put(P.hair, i, va.copy(hp).addScaledVector(lookD, -0.014).add(vb.set(0, 0.012, 0)), q);
-    if (p.bun) put(P.bun, i, va.copy(hp).addScaledVector(lookD, -0.1).add(vb.set(0, 0.03, 0)), q.identity());
-    else P.bun.setMatrixAt(i, zero);
-    xf(hp, out.head[i]); xf(va.copy(top).addScaledVector(Dn, -0.12).addScaledVector(F, 0.14), out.chest[i]);
-    for (let s = 0; s < 2; s++) {
-      const sg = s ? 1 : -1, ix = i * 2 + s;
-      const sh = out.shoulder[s].copy(top).addScaledVector(Dn, -0.04).addScaledVector(S, sg * 0.19);
-      hands(s, sh, wr);
-      pole.copy(Y).multiplyScalar(-1).addScaledVector(S, sg * 0.7).addScaledVector(F, -0.35);
-      out.reach = Math.max(out.reach, sh.distanceTo(wr) - (LU + LF));
-      ik(sh, wr, LU, LF, pole, jnt);
-      seg(P.ua, ix, sh, jnt); seg(P.fa, ix, jnt, wr);
-      vd.subVectors(wr, jnt).normalize();
-      va.copy(wr).addScaledVector(vd, 0.035);
-      q.setFromUnitVectors(Y, vd);
-      put(P.hand, ix, va, q, 0.8, 1.15, 1);
-      xf(va, out.hand[i][s]);
-    }
-  };
-  out.commit = () => { ALL.forEach((im) => { im.instanceMatrix.needsUpdate = true; }); };
-  return out;
-}
+// People come from the shared instanced crowd in ../person.js.
 
 // ------------------------------------------------------------------ canvas art
 // The talk slide every screen shows. n: talk number (0 = standby); a wipe carries one slide into the next.
@@ -427,7 +317,7 @@ export function build({ env }) {
     else look.set(-0.35, 1.15, 0.2).lerp(tmp.set(0, 1.4, 4), 0.3 * k(t, 8, 8.6));
     const gest = Math.max(...GEST.map(([a, b]) => Math.sin(Math.PI * k(t, a, b))));
     const [clap, beat] = clapAt(t, 0);
-    crowd.pose(0, {
+    crowd.pose(0, { t,
       hip: hipP, yaw, lean: 0.06 + 0.16 * pour * eio(k(t, 0.3, 0.6)) * (1 - k(t, 1.6, 1.95)) + 0.05 * w, tilt: 0.02 * Math.sin(t * 0.8),
       look, nod: 0.08 * Math.sin(Math.PI * k(t, 1.8, 2.0)),
       feet: (f, out) => {
@@ -476,7 +366,7 @@ export function build({ env }) {
     look.lerp(tmp.set(ROOMS[i % 2].cx, 1.3, WZ - 0.8), po);
     const nod = 0.08 * Math.max(...TALK_T.map((a) => Math.sin(Math.PI * k(t, a + 0.3 + i * 0.07, a + 0.6 + i * 0.07))));
     const [clap, beat] = clapAt(t, i);
-    crowd.pose(i, {
+    crowd.pose(i, { t,
       hip: hipP, yaw, lean: 0.08 + 0.05 * Math.sin(ph * 0.4) + 0.08 * sl, tilt: 0.03 * Math.sin(ph * 0.3),
       look, nod, kneePole: tmp2.copy(F).add(Y),
       feet: (f, out) => { out.copy(seat).addScaledVector(F, 0.36 + 0.04 * f).addScaledVector(S, (f ? 1 : -1) * 0.13); out.y = 0.085; return 0; },
@@ -503,7 +393,7 @@ export function build({ env }) {
     look.copy(roomScreens[ri].scr.position).lerp(tmp.set(R.side * 2.5, 1.55, z), 0.35 * (1 - turn) * (0.5 + 0.5 * Math.sin(t * 0.9 + j)));
     look.lerp(tmp.set(0, 1.5, 1.5), turn * (0.6 + 0.3 * cheer));
     const [clap, beat] = clapAt(t, j + 4);
-    crowd.pose(i, {
+    crowd.pose(i, { t,
       hip: hipP, yaw, lean: 0.04 - 0.06 * cheer, tilt: 0.03 * Math.sin(t * 0.7 + j * 2),
       look,
       feet: (f, out) => { out.copy(root).addScaledVector(S, (f ? 1 : -1) * 0.11).addScaledVector(F, f ? 0.05 : -0.03); out.y = 0.085; return 0; },

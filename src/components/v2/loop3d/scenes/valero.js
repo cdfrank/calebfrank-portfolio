@@ -10,6 +10,7 @@ import {
   canvasTex, grainTex, glow, label, roundRect, std, mesh, phone, dip, skyDome,
 } from '../kit.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { makeCrowd } from '../person.js';
 
 const D = 10;
 const TEAL = '#19b3c6', DEEP = '#0a2a44', AMBER = '#ffb81c', INK = '#0b1622';
@@ -269,12 +270,15 @@ export function build({ env }) {
   });
 
   // ----------------------------------------------------------- phase 2: six personas, each with a task
-  const body = new THREE.CapsuleGeometry(0.05, 0.13, 4, 12); body.translate(0, 0.115, 0);
-  const pM = std(0xb9c7cf, { roughness: 0.55 });
-  const bodies = new THREE.InstancedMesh(body, pM, 6), heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.043, 20, 14), pM, 6);
-  bodies.castShadow = heads.castShadow = true; bodies.frustumCulled = heads.frustumCulled = false;
-  scene.add(bodies, heads);
   const DOTS = [TEAL, AMBER, '#7fd06a', '#ff7a6a', '#a98bff', '#5fb0ff'];
+  // Six small people standing on the forecourt, each in the color of the task they came for.
+  const SKINS = [0xc68b68, 0x8a5a3e, 0xe2b08e, 0x5e3a28, 0xd6a083, 0xa86e4a];
+  const people = makeCrowd(scene, DOTS.map((d, i) => ({
+    skin: SKINS[i], top: new THREE.Color(d).getHex(), pants: [0x2b2f3a, 0x30343c, 0x3b3226][i % 3], hair: [0x2a1a12, 0x0e0b0a, 0x7a3b1c, 0x15100d, 0xb88a4a, 0x4a2a1a][i],
+    shoe: i % 2 ? 0x1b1d20 : 0xe9e4da, bun: i === 2 || i === 4, chest: 0.138 + (i % 3) * 0.006,
+  })));
+  const PSZ = 0.19;
+  const pRoot = new THREE.Vector3(), pHip = new THREE.Vector3(), pLook = new THREE.Vector3(), pF = new THREE.Vector3(), pS = new THREE.Vector3(), pT = new THREE.Vector3(), pT2 = new THREE.Vector3();
   const PZ = (i) => 0.98 + Math.abs(PX[i]) * 0.08;
   const chips = TASKS.map((tk, i) => { const c = chip(tk, DOTS[i]); scene.add(c); return c; });
   const CHIP_Y = (i) => (i % 2 ? 0.74 : 0.52);
@@ -480,11 +484,28 @@ export function build({ env }) {
     const sink = ei(k(t, 5.2, 5.7));
     for (let i = 0; i < 6; i++) {
       const r = spring(k(t, 3.9 + i * 0.09, 4.6 + i * 0.09));
-      const sy = Math.max(0.001, r * (1 - sink));
-      m4.compose(p4.set(PX[i], 0, PZ(i)), q4.identity(), s4.set(Math.max(0.001, clamp(r * 1.5) * (1 - sink)), sy, Math.max(0.001, clamp(r * 1.5) * (1 - sink))));
-      bodies.setMatrixAt(i, m4);
-      m4.compose(p4.set(PX[i], 0.29 * sy, PZ(i)), q4.identity(), s4.setScalar(sy));
-      heads.setMatrixAt(i, m4);
+      const sc = t > 3.85 ? Math.max(0, r * (1 - sink)) * PSZ : 0;
+      const yaw = Math.atan2(cpos.x - PX[i], cpos.z - PZ(i)) * 0.8;
+      pF.set(Math.sin(yaw), 0, Math.cos(yaw)); pS.set(Math.cos(yaw), 0, -Math.sin(yaw));
+      pRoot.set(PX[i], 0, PZ(i));
+      const sw = Math.sin(t * 1.2 + i * 1.7);
+      // Unscaled body space about their floor point; the crowd scales them down to figurines.
+      pHip.set(PX[i], 0.93 + 0.006 * Math.sin(t * 2 + i), PZ(i)).addScaledVector(pS, 0.02 * sw);
+      const wave = Math.sin(Math.PI * k(t, 4.25 + i * 0.09, 4.95 + i * 0.09));
+      const ask = Math.sin(Math.PI * k(t, 4.1 + i * 0.1, 4.95));
+      pLook.copy(pRoot).add(pT.set(0, 1.5, 0)).addScaledVector(pF, 3).add(pT2.set(0, ask * (i % 2 ? 1.6 : 0.8), 0));
+      people.pose(i, { t, sc, root: pRoot, hip: pHip, yaw, lean: 0.02, tilt: 0.03 * sw, look: pLook, nod: 0.05 * Math.max(0, sw),
+        kneePole: pT2.copy(pHip).addScaledVector(pF, 1),
+        feet: (f, out) => { out.copy(pRoot).addScaledVector(pS, (f ? 1 : -1) * 0.11).addScaledVector(pF, f ? 0.03 : -0.02); out.y = 0.085; return 0; },
+        hands: (h, sh, out) => {
+          const sg = h ? 1 : -1;
+          out.copy(sh).add(pT.set(0, -0.56, 0)).addScaledVector(pS, sg * 0.06).addScaledVector(pF, 0.04);
+          // App support and payments check a phone; promotions has hands on hips.
+          if (i < 2 && h === 0) out.copy(sh).add(pT.set(0, -0.3, 0)).addScaledVector(pF, 0.3).addScaledVector(pS, 0.12);
+          if (i === 3) out.copy(pHip).add(pT.set(0, 0.06, 0)).addScaledVector(pS, sg * 0.2).addScaledVector(pF, -0.02);
+          if (h === 1) out.lerp(pT.copy(sh).add(pT2.set(0, 0.42, 0)).addScaledVector(pS, 0.14 + 0.06 * Math.sin(t * 16 + i)).addScaledVector(pF, 0.06), wave);
+        },
+      });
       const c = chips[i], ca = back(k(t, 4.1 + i * 0.1, 4.45 + i * 0.1)), pop = k(t, 4.95 + i * 0.03, 5.15 + i * 0.03);
       c.position.set(PX[i], CHIP_Y(i) + Math.sin(t * 2 + i) * 0.01, PZ(i));
       c.lookAt(cpos);
@@ -492,8 +513,7 @@ export function build({ env }) {
       c.material.opacity = clamp(ca) * (1 - pop);
       c.visible = ca > 0.01 && pop < 1;
     }
-    bodies.instanceMatrix.needsUpdate = heads.instanceMatrix.needsUpdate = true;
-    bodies.visible = heads.visible = t > 3.85 && sink < 1;
+    people.commit();
 
     // The minimum viable site is placed first: the handful read its matrix to find their rows.
     const mIn = back(k(t, 7.15, 7.75));

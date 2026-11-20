@@ -8,6 +8,7 @@ import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, roundRect, std, mesh, dip, skyDome,
 } from '../kit.js';
+import { makePerson } from '../person.js';
 
 const D = 10;
 const SANS = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", monospace';
@@ -237,35 +238,20 @@ export function build({ env }) {
   const yawG = new THREE.Group(); skater.add(yawG);
   yawG.add(makeBoard());
   const pants = std(0x283552, { roughness: 0.85 }), hoodie = std(0xe2582c, { roughness: 0.8 }), skin = std(0xb98767, { roughness: 0.6 });
-  const bone = (r, len, m) => { const b = mesh(new THREE.CapsuleGeometry(r, len, 4, 10), m); yawG.add(b); return b; };
-  const thighs = [bone(0.075, 0.32, pants), bone(0.075, 0.32, pants)];
-  const shins = [bone(0.065, 0.34, pants), bone(0.065, 0.34, pants)];
-  const shoes = [0, 1].map(() => { const s = mesh(new THREE.BoxGeometry(0.27, 0.075, 0.11), std(0xe9e4da, { roughness: 0.7 })); yawG.add(s); return s; });
-  const torso = bone(0.15, 0.32, hoodie);
-  const uppers = [bone(0.055, 0.2, hoodie), bone(0.055, 0.2, hoodie)];
-  const fores = [bone(0.045, 0.2, skin), bone(0.045, 0.2, skin)];
-  const headM = mesh(new THREE.SphereGeometry(0.11, 18, 14), skin); yawG.add(headM);
-  const beanie = mesh(new THREE.SphereGeometry(0.118, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), std(0x1c1e24, { roughness: 0.9 })); yawG.add(beanie);
+  // The rider is the shared lit-loop person (../person.js) in a dark beanie, posed in the board's frame.
+  const rider = makePerson(yawG, { skin, top: hoodie, sleeve: hoodie, fore: skin, pants, shoeM: std(0xe9e4da, { roughness: 0.7 }), hairM: std(0x1c1e24, { roughness: 0.9 }), hairCap: 0.56, chestR: 0.155, seed: 4.2 });
   const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(0, 0, 1);
-  const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), vd = new THREE.Vector3(), ve = new THREE.Vector3();
-  const place = (m, a, b) => { m.position.addVectors(a, b).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(Y, vd.subVectors(b, a).normalize()); };
-  const LT = 0.47, LS = 0.47;
-  const knee = (foot, hip, out, splay = 0) => {
-    const dv = ve.subVectors(hip, foot), d = Math.min(dv.length(), LT + LS - 0.001);
-    dv.normalize();
-    const along = (LS * LS - LT * LT + d * d) / (2 * d), off = Math.sqrt(Math.max(0, LS * LS - along * along));
-    const n = vc.copy(Z).addScaledVector(X, splay); n.addScaledVector(dv, -n.dot(dv)).normalize();
-    return out.copy(foot).addScaledVector(dv, along).addScaledVector(n, off);
-  };
-  const feet = [new THREE.Vector3(), new THREE.Vector3()], hips = [new THREE.Vector3(), new THREE.Vector3()], knees = [new THREE.Vector3(), new THREE.Vector3()];
-  const hc = new THREE.Vector3(), top = new THREE.Vector3(), dT = new THREE.Vector3(), sh = new THREE.Vector3(), el = new THREE.Vector3(), hd = new THREE.Vector3();
+  const vb = new THREE.Vector3(), vc = new THREE.Vector3();
+  const feet = [new THREE.Vector3(), new THREE.Vector3()], hands = [new THREE.Vector3(), new THREE.Vector3()];
+  const hc = new THREE.Vector3(), top = new THREE.Vector3(), dT = new THREE.Vector3(), sh = new THREE.Vector3(), el = new THREE.Vector3(), look = new THREE.Vector3();
+  const FOOT_YAW = [0.12, 0.5], FOOT_X = [0.012, 0.022], FOOT_Z = [0.04, 0.035];
 
   // Body mechanics: a regular stance across the board, weight that leads into each wall and lags out of it,
   // hips and shoulders that open toward the direction of travel, a pump through every transition and
   // loose arms that trail the body. Everything is a function of t, so any frame can be drawn on its own.
   const vAt = (tt) => (sAt(tt + 0.02) - sAt(tt - 0.02)) / 0.04;
   const sm = (tt, f) => (f(tt - 0.08) + 2 * f(tt) + f(tt + 0.08)) / 4;
-  const shAx = new THREE.Vector3(), side = new THREE.Vector3(), up = new THREE.Vector3(), hand = new THREE.Vector3();
+  const shAx = new THREE.Vector3(), side = new THREE.Vector3(), up = new THREE.Vector3();
   function pose(t) {
     const s = sAt(t), r = onRamp(s);
     skater.position.set(r.x, r.y + 0.012, LANE);
@@ -281,37 +267,23 @@ export function build({ env }) {
     // Pump: compress down into the flat and the bottom of each wall, extend toward the lip.
     const bottom = Math.exp(-Math.pow((Math.abs(s) - F) / 0.55, 2));
     const crouch = clamp(0.24 + 0.26 * bottom + 0.16 * trans + 0.6 * tuck + 0.12 * Math.max(0, 1 - Math.abs(v) / 2.5) + 0.03 * Math.sin(t * 3.1));
-    const hh = 0.9 * (1 - 0.38 * crouch);
+    const hh = 0.88 * (1 - 0.34 * crouch);
     // Regular stance: back foot over the tail bolts, front foot over the nose bolts, angled toward the nose.
     feet[0].set(-0.25, 0.15, 0.01); feet[1].set(0.21, 0.15, 0.0);
-    shoes[0].rotation.set(0, -Math.PI / 2 + 0.12, 0); shoes[1].rotation.set(0, -Math.PI / 2 + 0.5, 0);
-    shoes[0].position.set(feet[0].x + 0.012, feet[0].y, 0.04); shoes[1].position.set(feet[1].x + 0.022, feet[1].y, 0.035);
     // Hips: lead into the wall, lag on the way out, sit back as the knees bend.
     hc.set(-0.02 + 0.06 * dir - 0.05 * acc + Math.sin(t * 2.3) * 0.012, 0.15 + hh, -0.02 - 0.09 * crouch);
     const hipYaw = 0.22 * dir;
-    for (let i = 0; i < 2; i++) {
-      const sg = i ? 1 : -1;
-      hips[i].set(hc.x + sg * 0.11 * Math.cos(hipYaw), hc.y, hc.z - sg * 0.11 * Math.sin(hipYaw));
-      knee(feet[i], hips[i], knees[i], sg * (0.18 + 0.12 * crouch));
-      place(thighs[i], hips[i], knees[i]);
-      place(shins[i], knees[i], va.copy(feet[i]).setY(feet[i].y + 0.04));
-    }
     // Spine: forward bend grows with the crouch; it leans into travel and whips back a little on the turn.
     const fwd = 0.22 + 0.5 * crouch;
     dT.set(0.16 * dir - 0.1 * acc, Math.cos(fwd), Math.sin(fwd)).normalize();
-    top.copy(hc).addScaledVector(dT, 0.6);
-    place(torso, va.copy(hc).addScaledVector(dT, 0.1), top);
-    // Head stays level-ish and looks where the board is going.
-    hd.copy(top).addScaledVector(dT, 0.19).add(vb.set(0.07 * dir, 0.015, 0.035));
-    headM.position.copy(hd); beanie.position.copy(hd).add(vb.set(0, 0.012, 0));
-    beanie.quaternion.setFromUnitVectors(Y, vc.set(0.25 * dir, 1, 0.12).normalize());
+    top.copy(hc).addScaledVector(dT, 0.5);
     // Shoulders open further than the hips.
     const shYaw = 0.42 * dir + 0.15 * acc;
     shAx.set(Math.cos(shYaw), 0, -Math.sin(shYaw));
     for (let i = 0; i < 2; i++) {
       const sg = i ? 1 : -1;
       const lead = Math.max(0, sg * dir);
-      sh.copy(top).addScaledVector(dT, -0.07).addScaledVector(shAx, sg * 0.19);
+      sh.copy(top).addScaledVector(dT, -0.04).addScaledVector(shAx, sg * 0.19);
       side.copy(shAx).multiplyScalar(sg);
       // Arms hang loose, rise for balance on the walls and in the air, the leading arm reaches ahead and
       // both trail behind the body's swing.
@@ -319,11 +291,24 @@ export function build({ env }) {
       up.copy(side).multiplyScalar(0.62 + 0.25 * tuck)
         .add(vb.set(-0.22 * acc - 0.1 * dir, -0.78 + raise, 0.18 + 0.18 * lead));
       el.copy(sh).addScaledVector(up.normalize(), 0.29);
-      place(uppers[i], sh, el);
       // Elbow stays soft: the forearm bends forward and in, more so in the air.
       vb.copy(side).multiplyScalar(0.3 + 0.2 * tuck).add(vc.set(-0.15 * acc, -0.55 + raise * 1.25, 0.6 + 0.2 * lead)).normalize();
-      hand.copy(el).addScaledVector(vb, 0.27);
-      place(fores[i], el, hand);
+      hands[i].copy(el).addScaledVector(vb, 0.27);
+    }
+    // Head looks where the board is going.
+    look.copy(top).add(vb.set(1.6 * dir, -0.25 - 0.3 * crouch, 1.4));
+    // The rider's yaw is the hips'; lean and tilt carry the spine onto dT, and the shoulders twist past.
+    const Fh = vb.set(Math.sin(hipYaw), 0, Math.cos(hipYaw)), Sh = vc.set(Math.cos(hipYaw), 0, -Math.sin(hipYaw));
+    const lean = dT.dot(Fh) / dT.y, tilt = dT.dot(Sh) / dT.y;
+    rider.pose({
+      t, hip: hc, yaw: hipYaw, lean, tilt, twist: shYaw - hipYaw, look, kneePole: Fh.clone().addScaledVector(X, 0),
+      feet: (i, o) => { o.set(feet[i].x + FOOT_X[i], 0.233, FOOT_Z[i] - 0.05); return 0.15; },
+      hands: (i, shp, o) => o.copy(hands[i]),
+    });
+    for (let i = 0; i < 2; i++) {
+      const sh2 = rider.shoe[i];
+      sh2.position.set(feet[i].x + FOOT_X[i], 0.188, FOOT_Z[i]);
+      sh2.rotation.set(0, FOOT_YAW[i], 0);
     }
   }
 

@@ -9,6 +9,7 @@ import {
   canvasTex, grainTex, glow, roundRect, std, mesh, dip,
 } from '../kit.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { makeCrowd } from '../person.js';
 
 const D = 10;
 const ORANGE = '#e8622c', TEAL = '#2f7f86', CREAM = '#f1e4cc', INK = '#17181c', GOLD = '#d9b13b';
@@ -272,12 +273,19 @@ export function build({ env }) {
   const rGeo = new THREE.BufferGeometry(); rGeo.setAttribute('position', new THREE.BufferAttribute(rpos, 3));
   const rain = new THREE.LineSegments(rGeo, new THREE.LineBasicMaterial({ color: 0x9cc8ff, transparent: true, opacity: 0.38, depthWrite: false }));
   rain.frustumCulled = false; scene.add(rain);
-  // The release-day line: six hooded silhouettes, instanced.
+  // The release-day line: six people in hoodies and beanies, hands in pockets, shuffling up in the rain.
   const PN = 6;
-  const capG = new THREE.CapsuleGeometry(0.16, 1.0, 4, 12); capG.translate(0, 0.66, 0);
-  const pM = std(0x1b1f27, { roughness: 0.7 });
-  const bodies = new THREE.InstancedMesh(capG, pM, PN), heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 20, 14), pM, PN);
-  [bodies, heads].forEach((b) => { b.castShadow = false; b.frustumCulled = false; scene.add(b); });
+  const crowd = makeCrowd(scene, [
+    { skin: 0xc68b68, top: 0x2a2f3a, pants: 0x1c1f26, hair: 0xd8582a, shoe: 0xe9e4da, chest: 0.15 },
+    { skin: 0x8a5a3e, top: 0x3a2a2c, pants: 0x23262d, hair: 0x15100d, shoe: 0x1b1d20, chest: 0.146 },
+    { skin: 0xe2b08e, top: 0x2f3a33, pants: 0x2a2620, hair: 0x2f7f86, shoe: 0xf2efe8, bun: true, chest: 0.138 },
+    { skin: 0x5e3a28, top: 0x1f2430, pants: 0x30343c, hair: 0x0e0b0a, shoe: 0xe9e4da, chest: 0.152 },
+    { skin: 0xd6a083, top: 0x3b3426, pants: 0x1c1f26, hair: 0x1b1d22, shoe: 0x1b1d20, chest: 0.144 },
+    { skin: 0xa86e4a, top: 0x26303d, pants: 0x262a33, hair: 0x4a2a1a, shoe: 0xd9b13b, chest: 0.148 },
+  ]);
+  const WV = (x, y, z) => new THREE.Vector3(x, y, z);
+  const root = WV(0, 0, 0), hipP = WV(0, 0, 0), look = WV(0, 0, 0), Fw = WV(0, 0, 0), Sw = WV(0, 0, 0), tmpv = WV(0, 0, 0);
+  const GROUND = -0.95, PS = 0.94;
 
   // ----------------------------------------------------------- payoff card
   const endTex = canvasTex(1024, 200, (c, w, h) => {
@@ -367,20 +375,46 @@ export function build({ env }) {
     shoeL.intensity = 9 * open; spill.intensity = 2.4 * open;
     shoe.rotation.y = 0.5 + t * 0.32;
 
-    // The line moves up and through the door, one customer at a time.
+    // The line moves up and through the door, one customer at a time: a few shuffling steps each time
+    // someone goes in, then a turn and a walk to the door.
     for (let pI = 0; pI < PN; pI++) {
       let slot = pI;
       for (let j = 0; j < pI; j++) slot -= eio(k(t, ENTER[j] + 0.05, ENTER[j] + 0.5));
       const w = eio(k(t, ENTER[pI], ENTER[pI] + 0.5));
-      const x = lerp(0.95 - 0.6 * slot, DOOR[0], w), z = lerp(QZ, DOOR[1], w);
-      const moving = Math.min(1, Math.abs(slot - Math.round(slot)) * 4 + Math.sin(Math.PI * w));
-      const bob = 0.025 * Math.abs(Math.sin(t * 10 + pI)) * moving;
-      const hs = 0.93 + rnd(pI, 3) * 0.14, gone = w >= 0.97 ? 0.0001 : 1;
-      q4.setFromEuler(e4.set(0, w * -0.9, Math.sin(t * 1.3 + pI) * 0.02 + moving * 0.04));
-      bodies.setMatrixAt(pI, m4.compose(p4.set(x, -0.95 + bob, z), q4, s4.set((0.95 + rnd(pI, 5) * 0.12) * gone, hs * gone, gone)));
-      heads.setMatrixAt(pI, m4.compose(p4.set(x + 0.02, -0.95 + bob + 1.32 * hs + 0.1, z), q4, s4.setScalar(gone)));
+      const x0 = 0.95 - 0.6 * slot;
+      const x = lerp(x0, DOOR[0], w), z = lerp(QZ, DOOR[1], w);
+      const gone = w >= 0.97;
+      const sc = gone ? 0 : PS * (0.95 + rnd(pI, 3) * 0.1);
+      // Distance walked so far drives the step cycle.
+      const dist = (pI - slot) * 0.6 + w * Math.hypot(DOOR[0] - x0, DOOR[1] - QZ);
+      const moving = clamp(Math.abs(slot - Math.round(slot)) * 6 + Math.sin(Math.PI * w) * 2);
+      const ph = dist / sc * Math.PI / 0.62 + pI;
+      const yaw = lerp(Math.PI / 2, Math.atan2(DOOR[0] - x0, DOOR[1] - QZ), eio(clamp(w * 2)));
+      Fw.set(Math.sin(yaw), 0, Math.cos(yaw)); Sw.set(Math.cos(yaw), 0, -Math.sin(yaw));
+      root.set(x, GROUND, z);
+      const sway = Math.sin(t * 0.9 + pI * 1.7);
+      hipP.copy(root).add(tmpv.set(0, 0.93 + 0.02 * moving * Math.abs(Math.cos(ph)), 0)).addScaledVector(Sw, 0.02 * sway * (1 - moving) + 0.02 * Math.sin(ph) * moving);
+      // Hunched against the rain; some watch the shop sign, some their feet.
+      look.copy(hipP).addScaledVector(Fw, 2.5).add(tmpv.set(0, pI % 2 ? 0.2 : 1.1, 0)).addScaledVector(Sw, Math.sin(pI * 2.3));
+      crowd.pose(pI, { t, sc, root,
+        hip: hipP, yaw, lean: 0.1 + 0.06 * moving, tilt: 0.03 * sway, look, nod: 0.04,
+        kneePole: tmpv.copy(hipP).addScaledVector(Fw, 1),
+        feet: (f, out) => {
+          const sg = f ? 1 : -1, s2 = Math.sin(ph + (f ? Math.PI : 0));
+          out.copy(root).addScaledVector(Sw, sg * 0.1).addScaledVector(Fw, (f ? 0.03 : -0.03) * (1 - moving) + 0.2 * s2 * moving);
+          out.y = root.y + 0.085 + 0.07 * Math.max(0, Math.cos(ph + (f ? Math.PI : 0))) * moving;
+          return root.y;
+        },
+        hands: (h, sh, out) => {
+          // Hands in the hoodie pocket, swinging out a little when they walk.
+          const sg = h ? 1 : -1;
+          out.copy(hipP).add(tmpv.set(0, 0.12, 0)).addScaledVector(Fw, 0.17).addScaledVector(Sw, sg * 0.05);
+          const sw = Math.sin(ph + (h ? 0 : Math.PI));
+          out.lerp(tmpv.copy(sh).add(WV(0, -0.5, 0)).addScaledVector(Sw, sg * 0.06).addScaledVector(Fw, 0.16 * sw), moving * 0.6);
+        },
+      });
     }
-    bodies.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true;
+    crowd.commit();
 
     // Each sale takes a shoebox off the counter and out the door.
     BOX.forEach(([bx, row], j) => {
