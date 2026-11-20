@@ -31,6 +31,21 @@ const SCENES = {
   'self-initiated-tart': () => import('./scenes/tart.js'),
   'self-initiated-design-system-scanner': () => import('./scenes/ds-scanner.js'),
   'self-initiated-portfolios-please': () => import('./scenes/portfolios-please.js'),
+  'corebridge-financial-new-business-story': () => import('./scenes/corebridge.js'),
+  'new-york-lottery-alexa-skills-and-help-center': () => import('./scenes/nyl-alexa.js'),
+  'mcdonald-s-crm-pitch': () => import('./scenes/mcdonalds-crm.js'),
+  'fujifilm-instax-instax-north-america-website': () => import('./scenes/instax.js'),
+  'self-initiated-indoor-skatepark-proposal': () => import('./scenes/indoor-skatepark.js'),
+  'us-marine-corps-marine-corps-pitch': () => import('./scenes/marine-corps.js'),
+  'mrm-ai-and-asset-management-vision': () => import('./scenes/mrm-ai-dam.js'),
+  'optum-experience-design-support': () => import('./scenes/optum.js'),
+  'fujifilm-direct-to-consumer-platform': () => import('./scenes/fujifilm-d2c.js'),
+  'fujifilm-amazon-experience-review': () => import('./scenes/fujifilm-amazon.js'),
+  'new-york-lottery-crm-overhaul': () => import('./scenes/nyl-crm.js'),
+  'astrazeneca-farxiga-landing-pages': () => import('./scenes/farxiga.js'),
+  'thomas-edison-center-thomas-edison-center-website': () => import('./scenes/edison-center.js'),
+  'new-york-lottery-quick-draw-rebrand': () => import('./scenes/nyl-quick-draw.js'),
+  'honeywell-cart-and-checkout': () => import('./scenes/honeywell-cart.js'),
 };
 
 let R = null;          // { renderer, env }

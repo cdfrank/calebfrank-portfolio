@@ -24,6 +24,21 @@ export const LIT = new Set([
   'self-initiated-tart',
   'self-initiated-design-system-scanner',
   'self-initiated-portfolios-please',
+  'corebridge-financial-new-business-story',
+  'new-york-lottery-alexa-skills-and-help-center',
+  'mcdonald-s-crm-pitch',
+  'fujifilm-instax-instax-north-america-website',
+  'self-initiated-indoor-skatepark-proposal',
+  'us-marine-corps-marine-corps-pitch',
+  'mrm-ai-and-asset-management-vision',
+  'optum-experience-design-support',
+  'fujifilm-direct-to-consumer-platform',
+  'fujifilm-amazon-experience-review',
+  'new-york-lottery-crm-overhaul',
+  'astrazeneca-farxiga-landing-pages',
+  'thomas-edison-center-thomas-edison-center-website',
+  'new-york-lottery-quick-draw-rebrand',
+  'honeywell-cart-and-checkout',
 ]);
 
 let rt = null;
