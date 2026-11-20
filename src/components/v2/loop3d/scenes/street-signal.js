@@ -75,16 +75,18 @@ function makeBoard(deckTex) {
 export function build({ env, renderer }) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x06070a);
-  scene.fog = new THREE.Fog(0x06070a, 9, 26);
+  scene.fog = new THREE.Fog(0x06070a, 6, 19);
   scene.environment = env;
-  scene.environmentIntensity = 0.35;
+  scene.environmentIntensity = 0.22;
   const camera = new THREE.PerspectiveCamera(34, 16 / 10, 0.05, 60);
   scene.add(camera);
   const setDip = dip(camera);
 
   // ----------------------------------------------------------- set
-  const asphalt = grainTex('#25272c', { size: 512, speck: 0.32, blot: 0.1, seed: 3, repeat: 6 });
-  const ground = mesh(new THREE.PlaneGeometry(60, 60), std(0xffffff, { map: asphalt, roughness: 0.92 }), { cast: false });
+  const asphalt = grainTex('#1d1e22', { size: 512, speck: 0.1, blot: 0.14, seed: 3, repeat: 6 });
+  // Wet patches: low roughness where the blotches are, so the lamp and the sparks reflect in the street.
+  const wet = grainTex('#9a9a9a', { size: 256, speck: 0.05, blot: 0.55, seed: 21, repeat: 3 });
+  const ground = mesh(new THREE.PlaneGeometry(60, 60), std(0xffffff, { map: asphalt, roughness: 0.55, roughnessMap: wet, metalness: 0.05, envMapIntensity: 0.6 }), { cast: false });
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
   // Painted curb line, worn
@@ -111,15 +113,15 @@ export function build({ env, renderer }) {
     c.fillStyle = '#0c0d11'; c.fillRect(0, 0, w, h);
     for (let y = 8; y < h - 8; y += 22) for (let x = 8; x < w - 8; x += 20) {
       const r = rnd(x * 13 + y, seed);
-      if (r > 0.62) { c.fillStyle = r > 0.9 ? '#7fa2ff' : '#ffbe73'; c.globalAlpha = 0.35 + r * 0.6; c.fillRect(x, y, 11, 14); c.globalAlpha = 1; }
-      else { c.fillStyle = '#16181e'; c.fillRect(x, y, 11, 14); }
+      if (r > 0.84) { c.fillStyle = r > 0.97 ? '#8fa8ff' : '#ffb766'; c.globalAlpha = 0.25 + (r - 0.84) * 4; c.fillRect(x + 2, y + 2, 8, 11); c.globalAlpha = 1; }
+      else { c.fillStyle = '#121318'; c.fillRect(x + 2, y + 2, 8, 11); }
     }
   }).tex;
-  const blocks = [[-7.5, -7, 4, 6.5], [-2.6, -8, 5.2, 8], [3.2, -7.4, 4.2, 5.4], [8.2, -6.5, 4.6, 7.2], [-12, -4, 4, 7], [12.5, -2, 4, 6]];
+  const blocks = [[-7.5, -9, 4, 6.5], [-2.6, -10, 5.2, 8], [3.2, -9.4, 4.2, 5.4], [8.2, -8.5, 4.6, 7.2], [-12, -6, 4, 7], [12.5, -4, 4, 6]];
   blocks.forEach(([x, z, w, h], i) => {
     const t = winTex(i + 2);
     t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(w / 2.2, h / 4);
-    const m = mesh(new THREE.BoxGeometry(w, h, 3), std(0x15161b, { roughness: 0.9, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 0.55, map: t }), { cast: false });
+    const m = mesh(new THREE.BoxGeometry(w, h, 3), std(0x15161b, { roughness: 0.9, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 0.4, map: t }), { cast: false });
     m.position.set(x, h / 2, z);
     scene.add(m);
   });
@@ -133,8 +135,8 @@ export function build({ env, renderer }) {
   const bulbHalo = glow(0xff9a3c, 5, 0.22, 0.4); bulbHalo.position.copy(bulb.position); scene.add(bulbHalo);
 
   // ----------------------------------------------------------- light
-  scene.add(new THREE.HemisphereLight(0x2b3a66, 0x09090b, 0.55));
-  const key = new THREE.SpotLight(0xffb468, 90, 0, 0.62, 0.75, 1.6);
+  scene.add(new THREE.HemisphereLight(0x2b3a66, 0x09090b, 0.22));
+  const key = new THREE.SpotLight(0xffb468, 130, 0, 0.7, 0.8, 1.6);
   key.position.set(-1.9, 4.0, -1.7);
   key.target.position.set(0.4, 0, 0.6);
   key.castShadow = true;
@@ -142,7 +144,7 @@ export function build({ env, renderer }) {
   key.shadow.camera.near = 1; key.shadow.camera.far = 12;
   key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(B, 2.4);
+  const rim = new THREE.DirectionalLight(B, 1.8);
   rim.position.set(4, 3, -5);
   scene.add(rim);
   const fill = new THREE.DirectionalLight(0x8fa6ff, 0.25);
@@ -214,13 +216,34 @@ export function build({ env, renderer }) {
   const makeRing = () => { const r = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: ringTex, color: Y, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); r.rotation.x = -Math.PI / 2; return r; };
   const pin = makePin(1); scene.add(pin);
   const ring = makeRing(); scene.add(ring);
-  const others = [[-5.4, -3.2], [4.6, -3.8], [6.2, 2.6], [-3.8, 4.2]].map(([x, z]) => { const p = makePin(1.6); p.position.set(x, 0, z); scene.add(p); const r = makeRing(); r.position.set(x, 0.01, z); scene.add(r); return { p, r }; });
+  const others = [[-2.7, -1.5], [2.6, -1.9], [3.1, 1.9], [-2.3, 2.5]].map(([x, z]) => { const p = makePin(1.2); p.position.set(x, 0, z); scene.add(p); const r = makeRing(); r.position.set(x, 0.01, z); scene.add(r); return { p, r }; });
   // Route from the spot to the next ones: a lit line drawn on the street.
-  const routePts = [new THREE.Vector3(0, 0.02, 0.9), new THREE.Vector3(0, 0.02, 2.4), new THREE.Vector3(-3.8, 0.02, 2.4), new THREE.Vector3(-3.8, 0.02, 4.2)];
+  const routePts = [new THREE.Vector3(0, 0.02, 0.9), new THREE.Vector3(0, 0.02, 1.75), new THREE.Vector3(-2.3, 0.02, 1.75), new THREE.Vector3(-2.3, 0.02, 2.5)];
   const route = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(routePts, false, 'catmullrom', 0.02), 64, 0.035, 6), new THREE.MeshBasicMaterial({ color: Y, toneMapped: false }));
   route.geometry.setDrawRange(0, 0);
   const routeCount = route.geometry.index.count;
   scene.add(route);
+
+  // Map layer: as the camera cranes up, the street resolves into the Atlas map, a lit street grid.
+  const gridTex = canvasTex(1024, 1024, (c, w) => {
+    c.clearRect(0, 0, w, w);
+    const step = w / 8;
+    c.strokeStyle = 'rgba(120,160,255,0.55)'; c.lineWidth = 3;
+    for (let i = 0; i <= 8; i++) { c.beginPath(); c.moveTo(i * step, 0); c.lineTo(i * step, w); c.stroke(); c.beginPath(); c.moveTo(0, i * step); c.lineTo(w, i * step); c.stroke(); }
+    c.strokeStyle = 'rgba(120,160,255,0.18)'; c.lineWidth = 1.5;
+    for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { if (rnd(i * 8 + j, 31) > 0.45) { c.strokeRect(i * step + 14, j * step + 14, step - 28, step - 28); } }
+    // fade the edges out so the grid has no hard border
+    c.globalCompositeOperation = 'destination-in';
+    const g = c.createRadialGradient(w / 2, w / 2, w * 0.15, w / 2, w / 2, w / 2);
+    g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.fillRect(0, 0, w, w);
+  }).tex;
+  const grid = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.MeshBasicMaterial({ map: gridTex, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+  grid.rotation.x = -Math.PI / 2; grid.position.set(0.25, 0.012, 0.6);
+  scene.add(grid);
+  const night = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshBasicMaterial({ color: 0x05060a, transparent: true, opacity: 0, depthWrite: false }));
+  night.rotation.x = -Math.PI / 2; night.position.y = 0.008;
+  scene.add(night);
 
   // ----------------------------------------------------------- the board
   const deckTex = canvasTex(512, 172, (c, w, h) => {
@@ -235,10 +258,10 @@ export function build({ env, renderer }) {
   const ghosts = ghostMats.map((m) => { const g = sk8.clone(true); g.traverse((o) => { if (o.isMesh) { o.material = m; o.castShadow = false; o.receiveShadow = false; } }); scene.add(g); return g; });
   const place = (o, s) => { o.position.set(s[0], s[1], s[2]); o.rotation.set(s[4], s[5], s[3], 'XYZ'); };
   // Sparks off the coping: each spark's birth time and velocity are fixed, so any t can be drawn.
-  const SN = 90, sp = new Float32Array(SN * 3), sv = [];
+  const SN = 160, sp = new Float32Array(SN * 3), sv = [];
   for (let i = 0; i < SN; i++) sv.push({ b: 5.74 + (i / SN) * 1.18, vx: -0.6 - rnd(i, 11) * 1.6, vy: 0.5 + rnd(i, 12) * 1.7, vz: (rnd(i, 13) - 0.2) * 1.4, life: 0.22 + rnd(i, 14) * 0.3 });
   const sparkGeo = new THREE.BufferGeometry(); sparkGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-  const sparks = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ color: 0xffd27a, size: 0.035, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+  const sparks = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ color: 0xffe2a0, size: 0.05, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
   sparks.frustumCulled = false;
   scene.add(sparks);
   const contactGlow = glow(0xffc35a, 0.5, 0); scene.add(contactGlow);
@@ -279,12 +302,12 @@ export function build({ env, renderer }) {
   const camPos = (t) => kf(t, [
     [0, [-0.75, 1.42, 5.7]], [3.25, [-0.1, 1.32, 5.3], (x) => x],
     [4.15, [-3.7, 0.58, 2.75]], [5.3, [-2.7, 0.72, 2.95], (x) => x], [6.35, [-0.5, 0.78, 3.0], (x) => x], [7.25, [1.1, 0.86, 3.05], (x) => x], [8.15, [2.5, 1.15, 3.7], eo],
-    [9.45, [0.9, 9.6, 3.2]], [10, [0.9, 9.9, 3.1], (x) => x],
+    [9.45, [0.4, 6.4, 7.4]], [10, [0.4, 6.7, 7.6], (x) => x],
   ]);
   const camTgt = (t) => kf(t, [
     [0, [0.25, 0.48, 0]], [3.25, [0.3, 0.5, 0], (x) => x],
     [4.15, [-2.6, 0.32, 0.65]], [5.3, [-1.9, 0.55, 0.5], (x) => x], [6.35, [-0.05, 0.56, 0.3], (x) => x], [7.25, [1.7, 0.6, 0.5], (x) => x], [8.15, [3.0, 0.32, 0.85], eo],
-    [9.45, [0.2, 0, 0.6]], [10, [0.2, 0, 0.6], (x) => x],
+    [9.45, [0.1, 0, 0.4]], [10, [0.1, 0, 0.4], (x) => x],
   ]);
   const tgt = new THREE.Vector3();
 
@@ -297,7 +320,7 @@ export function build({ env, renderer }) {
     tgt.set(q[0], q[1], q[2]);
     camera.lookAt(tgt);
     // Lens: wider for the street-level run, tighter for the map.
-    camera.fov = kf(t, [[0, 34], [3.3, 33], [4.15, 40], [8.15, 40], [9.45, 30]]);
+    camera.fov = kf(t, [[0, 34], [3.3, 33], [4.15, 40], [8.15, 40], [9.45, 34]]);
     // Dip to black across the seam.
     setDip(Math.max(1 - k(t, 0, 0.35), k(t, 9.55, 10)));
 
@@ -319,17 +342,21 @@ export function build({ env, renderer }) {
     found.scale.setScalar(Math.max(0.001, back(k(t, 2.42, 2.72))));
     const drop = spring(k(t, 2.5, 3.3));
     const pinBack = back(k(t, 8.45, 8.85));
-    const pinOn = t < 4.1 ? drop : t > 8.45 ? pinBack * 2.2 : 0;
+    const pinOn = t < 4.1 ? drop : t > 8.45 ? pinBack * 1.6 : 0;
     pin.visible = pinOn > 0.001;
     pin.scale.setScalar(Math.max(0.001, t < 4.1 ? 1 - k(t, 3.85, 4.1) : pinOn));
     pin.position.set(0, (t < 4.1 ? lerp(2.2, 0, drop) : 0) + LH, 0);
     pin.rotation.y = t * 1.6;
     const shock = (t0, r) => { const s2 = k(t, t0, t0 + 0.7); r.scale.setScalar(0.2 + eo(s2) * 2.2); r.material.opacity = (1 - s2) * (s2 > 0 ? 1 : 0); r.visible = s2 > 0 && s2 < 1; };
     ring.position.set(0, LH + 0.01, 0); shock(2.95, ring);
-    others.forEach(({ p: o, r }, i) => { const a = 8.75 + i * 0.16; const s2 = spring(k(t, a, a + 0.55)); o.visible = s2 > 0.001 && t < 9.98; o.scale.setScalar(Math.max(0.001, s2 * 1.6)); o.rotation.y = t * 1.6 + i; shock(a + 0.12, r); });
+    others.forEach(({ p: o, r }, i) => { const a = 8.75 + i * 0.16; const s2 = spring(k(t, a, a + 0.55)); o.visible = s2 > 0.001 && t < 9.98; o.scale.setScalar(Math.max(0.001, s2 * 1.2)); o.rotation.y = t * 1.6 + i; shock(a + 0.12, r); });
     const rd = k(t, 8.6, 9.5);
     route.geometry.setDrawRange(0, Math.floor(eio(rd) * routeCount / 6) * 6);
     route.visible = rd > 0;
+    const mp = eio(k(t, 8.35, 9.3));
+    grid.material.opacity = mp; grid.visible = mp > 0.001;
+    grid.scale.setScalar(lerp(0.85, 1, mp));
+    night.material.opacity = mp * 0.55; night.visible = mp > 0.001;
 
     // Board and its smear ghosts.
     const s = board(t);
@@ -349,7 +376,7 @@ export function build({ env, renderer }) {
     }
     pos.needsUpdate = true;
     const grind = s[6] ? 1 - 0.3 * Math.abs(Math.sin(t * 40)) : 0;
-    spark.intensity = grind * 5;
+    spark.intensity = grind * 9;
     spark.position.set(s[0] - 0.2, CY + 0.08, CZ + 0.15);
     contactGlow.position.set(s[0] - 0.22, CY + 0.01, CZ + 0.03);
     contactGlow.material.opacity = grind * 0.9;
@@ -358,8 +385,8 @@ export function build({ env, renderer }) {
     // Phone: rises in handheld, holds on the ledge, then drops out of frame for the whip.
     const out = ei(k(t, 3.1, 3.7));
     ph.visible = t < 3.75;
-    ph.position.set(-1.12 + Math.sin(t * 1.1) * 0.012, lerp(0.2, 1.2, eo(k(t, 0, 0.9))) - out * 1.2 + Math.sin(t * 1.9) * 0.006, 4.2);
-    ph.rotation.set(-0.06 + Math.sin(t * 1.5) * 0.015, 0.2 + Math.sin(t * 0.9) * 0.02, 0.05 + out * 0.4);
+    ph.position.set(-0.78 + Math.sin(t * 1.1) * 0.01, lerp(0.55, 1.08, eo(k(t, 0, 0.9))) - out * 1.1 + Math.sin(t * 1.9) * 0.005, 4.55);
+    ph.rotation.set(-0.08 + Math.sin(t * 1.5) * 0.012, 0.16 + Math.sin(t * 0.9) * 0.015, 0.04 + out * 0.4);
     ph.userData.sheen.position.x = Math.sin(t * 0.8) * 0.05;
     if (ph.visible) {
       // Live viewfinder: render the set from the phone's lens into its screen.
