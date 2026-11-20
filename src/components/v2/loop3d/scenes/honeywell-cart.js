@@ -4,8 +4,8 @@
 // valve actuator and a controller each get their add button pressed and hop into the tote while the
 // cart card counts 1, 2, 3. Quick cart: a bulk list is pasted in, its three lines fly into the cart, and
 // forty-five cartons rain onto the pallet as every row counts up and the badge climbs to 48. Checkout:
-// the steps fill, the load is stretch-wrapped, the dock door rolls up into morning light, and a red
-// check lands over the pallet.
+// the steps fill, the load is stretch-wrapped, the dock door rolls up into morning light, a red check
+// lands over the pallet, and the pallet and the tote roll down a conveyor and out through the door.
 import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, label, roundRect, std, mesh, dip,
@@ -193,6 +193,43 @@ export function build({ env }) {
   scene.add(check);
   const checkGlow = glow(0xff3a55, 0.9, 0, 0.35); scene.add(checkGlow);
 
+  // ----------------------------------------------------------- the outbound conveyor
+  // A roller conveyor runs from the back edge of the bench down the aisle to the dock door, so the order
+  // can ship: the wrapped pallet goes first, the tote follows, and both roll out into the morning light.
+  const CV0 = new THREE.Vector3(0.66, 0, -0.44), CV1 = new THREE.Vector3(0.55, FLOOR_Y + 0.42, -5.5);
+  const cvDir = new THREE.Vector3().subVectors(CV1, CV0), CVL = cvDir.length(); cvDir.normalize();
+  const NR = Math.floor(CVL / 0.11);
+  const rollerI = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.021, 0.021, 0.6, 12), std(0x9aa3ad, { metalness: 0.85, roughness: 0.3 }), NR);
+  const rq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+  for (let i = 0; i < NR; i++) { p4.copy(CV0).addScaledVector(cvDir, (i + 0.5) * 0.11); p4.y -= 0.022; m4.compose(p4, rq, s4.set(1, 1, 1)); rollerI.setMatrixAt(i, m4); }
+  rollerI.receiveShadow = true; scene.add(rollerI);
+  const railQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), cvDir);
+  const railI = new THREE.InstancedMesh(new THREE.BoxGeometry(0.03, 0.07, CVL), std(0x2f5f9a, { metalness: 0.5, roughness: 0.45 }), 2);
+  [-0.315, 0.315].forEach((dx, i) => { p4.copy(CV0).addScaledVector(cvDir, CVL / 2); p4.x += dx; p4.y -= 0.03; m4.compose(p4, railQ, s4.set(1, 1, 1)); railI.setMatrixAt(i, m4); });
+  railI.receiveShadow = true; scene.add(railI);
+  const NLEG = Math.floor(CVL / 0.9);
+  const cvLegI = new THREE.InstancedMesh(new THREE.BoxGeometry(0.035, 1, 0.035), std(0x3d434b, { metalness: 0.7, roughness: 0.4 }), NLEG * 2);
+  for (let i = 0; i < NLEG; i++) {
+    p4.copy(CV0).addScaledVector(cvDir, 0.5 + i * 0.9);
+    const hgt = p4.y - 0.06 - FLOOR_Y;
+    [-0.3, 0.3].forEach((dx, j) => { m4.compose(s4.set(p4.x + dx, FLOOR_Y + hgt / 2, p4.z), q4.identity(), new THREE.Vector3(1, hgt, 1)); cvLegI.setMatrixAt(i * 2 + j, m4); });
+  }
+  scene.add(cvLegI);
+  // Where a load sits after d metres of travel: across the bench to the conveyor, down the conveyor,
+  // then on through the doorway, where the daylight plane hides it.
+  const CV2 = new THREE.Vector3(0.55, FLOOR_Y + 0.42, -6.3);
+  const shipAt = (home, d, out) => {
+    const l0 = Math.hypot(CV0.x - home.x, CV0.z - home.z), l1 = CVL, l2 = CV1.distanceTo(CV2);
+    if (d <= l0) return out.copy(home).lerp(CV0, d / l0);
+    if (d <= l0 + l1) return out.copy(CV0).lerp(CV1, (d - l0) / l1);
+    return out.copy(CV1).lerp(CV2, Math.min(1, (d - l0 - l1) / l2));
+  };
+  const shipLen = (home) => Math.hypot(CV0.x - home.x, CV0.z - home.z) + CVL + CV1.distanceTo(CV2);
+  const PAL_HOME = new THREE.Vector3(PAL[0], 0, PAL[2]), TOTE_HOME = new THREE.Vector3(TOTE[0], 0, TOTE[2]);
+  const SHIP_P = [7.25, 8.95], SHIP_T = [7.6, 9.3];
+  const palOff = new THREE.Vector3(), toteOff = new THREE.Vector3(), shipV = new THREE.Vector3();
+  const shipOff = (home, win, t, out) => out.copy(shipAt(home, shipLen(home) * eio(k(t, win[0], win[1])), shipV)).sub(home);
+
   // ----------------------------------------------------------- cart card and quick cart card
   const PW = 0.94, PH = 0.76;
   const pTex = canvasTex(768, 620);
@@ -318,6 +355,11 @@ export function build({ env }) {
     tgt.set(q[0], q[1], q[2]); camera.lookAt(tgt);
     camera.fov = kf(t, [[0, 33], [2.95, 33], [3.75, 36], [6.9, 36], [10, 36]]);
     setDip(Math.max(1 - k(t, 0, 0.35), k(t, 9.55, 10)));
+    // Shipping: how far the pallet and the tote have travelled toward the dock.
+    shipOff(PAL_HOME, SHIP_P, t, palOff); shipOff(TOTE_HOME, SHIP_T, t, toteOff);
+    tote.position.set(TOTE[0], 0, TOTE[2]).add(toteOff);
+    band.position.set(TOTE[0], TH - 0.02, TOTE[2]).add(toteOff);
+    pallet.position.set(PAL[0], 0.03, PAL[2]).add(palOff);
 
     // Cart: press the button, the part hops into the tote with a spin and lands with a squash.
     parts.forEach((g, i) => {
@@ -331,6 +373,7 @@ export function build({ env }) {
       const idle = (1 - hop) * Math.sin(t * 1.4 + i * 2) * 0.12;
       g.rotation.set(he * (i === 0 ? -0.9 : 0.25) + (i === 0 ? -0.15 : 0), lerp(0.28 - i * 0.2, IN_POS[i][2], he) + idle + he * Math.PI * 2, 0);
       g.scale.set(1 + sq * 0.08, 1 - sq * 0.12, 1 + sq * 0.08);
+      if (t > IN[i]) g.position.add(toteOff);
       // The button: dips on the press, turns to a red check, then fades as the part leaves.
       const btn = btns[i];
       btn.material.map = t > ADD[i] + 0.06 ? okTex : plusTex;
@@ -372,32 +415,35 @@ export function build({ env }) {
       e3.set((rnd(i, 3) - 0.5) * 0.9 * (1 - f), (rnd(i, 4) - 0.5) * 1.4 * (1 - f), (rnd(i, 5) - 0.5) * 0.9 * (1 - f));
       q4.setFromEuler(e3);
       const s = f > 0 ? 1 : 0.0001;
-      m4.compose(p4.set(a.x, y, a.z), q4, s4.set(s, s, s));
+      m4.compose(p4.set(a.x, y, a.z).add(palOff), q4, s4.set(s, s, s));
       cartons.setMatrixAt(i, m4);
     }
     cartons.instanceMatrix.needsUpdate = true;
     cartons.visible = t > dropT(0);
 
-    // Checkout: the load is wrapped, the dock door rolls up, a red check lands over the pallet.
-    const wp = eio(k(t, 6.1, 7.0));
+    // Checkout: the load is wrapped, the dock door rolls up, a red check lands over the pallet, and the
+    // order ships down the conveyor and out through the door.
+    const wp = eio(k(t, 6.0, 6.8));
     wrap.scale.y = Math.max(0.001, wp * (STACK_H + 0.012));
     wrapM.opacity = 0.32 * clamp(wp * 3);
     wrap.visible = wp > 0;
-    wrapRing.position.set(PAL[0], 0.06 + wp * STACK_H, PAL[2] + 0.17);
+    wrap.position.set(PAL[0], 0.06, PAL[2]).add(palOff);
+    wrapRing.position.set(PAL[0], 0.06 + wp * STACK_H, PAL[2] + 0.17).add(palOff);
     wrapRing.material.opacity = Math.sin(Math.PI * wp) * 0.8;
-    const dp = eio(k(t, 6.4, 7.6));
+    const dp = eio(k(t, 6.2, 7.2));
     const ds = Math.max(0.001, 1 - dp * 0.94);
     door.scale.y = ds; door.position.y = DOOR[1] + 0.81 - 0.81 * ds;
     dayM.color.setRGB(1, 0.77, 0.54).multiplyScalar(lerp(0.25, 0.95, dp));
     dayGlow.material.opacity = 0.75 * dp;
     dawn.intensity = lerp(0.25, 1.5, dp);
-    const ck = back(k(t, 7.45, 7.9));
-    check.position.set(PAL[0], 0.06 + STACK_H + 0.2 + Math.sin(t * 2) * 0.008, PAL[2]);
+    const ck = back(k(t, 6.85, 7.25)), cOut = 1 - eo(k(t, 7.75, 8.25));
+    check.position.set(PAL[0], 0.06 + STACK_H + 0.2 + Math.sin(t * 2) * 0.008, PAL[2]).add(palOff);
     check.scale.setScalar(Math.max(0.001, 0.17 * ck));
-    check.visible = ck > 0;
+    check.material.opacity = cOut;
+    check.visible = ck > 0 && cOut > 0.01;
     checkGlow.position.copy(check.position);
-    checkGlow.material.opacity = 0.5 * clamp(ck) + 0.6 * Math.exp(-5 * Math.max(0, t - 7.6)) * (t > 7.6 ? 1 : 0);
-    checkL.position.copy(check.position); checkL.intensity = 0.8 * clamp(ck);
+    checkGlow.material.opacity = (0.5 * clamp(ck) + 0.6 * Math.exp(-5 * Math.max(0, t - 7.0)) * (t > 7.0 ? 1 : 0)) * cOut;
+    checkL.position.copy(check.position); checkL.intensity = 0.8 * clamp(ck) * cOut;
 
     // Title for the last beat.
     const ti = eo(k(t, 7.9, 8.4));

@@ -2,8 +2,8 @@
 // Ann Arbor on a snowy winter night. A sawtooth-roof warehouse stands dark in the snow under a hazy moon,
 // one sodium street lamp beside it. Its four bays flicker on one by one, the roll-up door rises and warm
 // light spills across the snow; the camera follows it in. Inside, a skater pumps a mini ramp under the
-// lights, with murals on the walls. The twelve months light up across the back wall behind the ramp, the
-// skater boosts the biggest air of the session, and the proposal's name glows on above.
+// lights, with murals on the walls. The skater boosts the biggest air of the session, and the
+// proposal's name glows on above.
 import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, roundRect, std, mesh, dip, skyDome,
@@ -17,8 +17,7 @@ const BAR_ON = new THREE.Color(1.6, 1.35, 1.05), CELL_ON = new THREE.Color(1.25,
 const BW = 16, BD = 12, WH = 5, DOOR_W = 4.6, DOOR_H = 3.8;
 const BAY_ON = [2.3, 2.6, 2.9, 3.2];
 const DOOR0 = 3.25, DOOR1 = 4.25;
-const MONTHS = 'JFMAMJJASOND'.split('');
-const MON0 = 5.5, MON_STEP = 0.15, TITLE = 7.5;
+const TITLE = 7.5;
 // Shrinks a font until the line fits, so long lines never clip on the canvas.
 const fitFont = (c, text, maxW, px, rest) => { c.font = `${rest.replace('#', px)}`; const w = c.measureText(text).width; if (w > maxW) c.font = rest.replace('#', Math.floor(px * maxW / w)); };
 // Mini ramp: transitions of radius R, height H, flat bottom 2F, decks to XD.
@@ -219,24 +218,8 @@ export function build({ env }) {
   const fillR = new THREE.PointLight(0xffbe78, 0, 10, 1.5); fillR.position.set(5, 4.2, -2); scene.add(fillR);
   const rimIn = new THREE.DirectionalLight(0x8fb2ff, 0); rimIn.position.set(-2, 3, -8); scene.add(rimIn);
 
-  // ----------------------------------------------------------- twelve months and the sign
-  const MX = (i) => -3.85 + i * 0.7, MY = 2.85, MZ = -BD / 2 + 0.2;
-  const cells = new THREE.InstancedMesh(new THREE.BoxGeometry(0.6, 0.6, 0.08), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), 12);
-  for (let i = 0; i < 12; i++) cells.setColorAt(i, GLASS_OFF);
-  scene.add(cells);
-  const monTex = canvasTex(1024, 74);
-  const monPlane = new THREE.Mesh(new THREE.PlaneGeometry(8.4, 0.6), new THREE.MeshBasicMaterial({ map: monTex.tex, transparent: true, depthWrite: false, toneMapped: false }));
-  monPlane.position.set(0, MY, MZ + 0.05); scene.add(monPlane);
-  let monKey = -1;
-  const drawMonths = (n) => {
-    if (n === monKey) return; monKey = n;
-    monTex.redraw((c, w, h) => {
-      c.clearRect(0, 0, w, h);
-      c.font = `800 46px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'middle';
-      MONTHS.forEach((m, i) => { c.fillStyle = i < n ? '#2a1606' : 'rgba(200,214,240,0.45)'; c.fillText(m, (i + 0.5) * (w / 12), h / 2 + 3); });
-    });
-  };
-  const rowGlow = glow(0xffb347, 4, 0, 0.5); rowGlow.position.set(0, MY, MZ + 0.4); rowGlow.scale.set(9.5, 1.6, 1); scene.add(rowGlow);
+  // ----------------------------------------------------------- the sign
+  const MZ = -BD / 2 + 0.2;
   const signTex = canvasTex(1024, 260, (c, w, h) => {
     c.textAlign = 'center'; c.textBaseline = 'middle';
     c.shadowColor = 'rgba(255,170,80,0.9)'; c.shadowBlur = 16;
@@ -263,55 +246,84 @@ export function build({ env }) {
   const fores = [bone(0.045, 0.2, skin), bone(0.045, 0.2, skin)];
   const headM = mesh(new THREE.SphereGeometry(0.11, 18, 14), skin); yawG.add(headM);
   const beanie = mesh(new THREE.SphereGeometry(0.118, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), std(0x1c1e24, { roughness: 0.9 })); yawG.add(beanie);
-  const Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(0, 0, 1);
+  const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(0, 0, 1);
   const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), vd = new THREE.Vector3(), ve = new THREE.Vector3();
   const place = (m, a, b) => { m.position.addVectors(a, b).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(Y, vd.subVectors(b, a).normalize()); };
   const LT = 0.47, LS = 0.47;
-  const knee = (foot, hip, out) => {
+  const knee = (foot, hip, out, splay = 0) => {
     const dv = ve.subVectors(hip, foot), d = Math.min(dv.length(), LT + LS - 0.001);
     dv.normalize();
     const along = (LS * LS - LT * LT + d * d) / (2 * d), off = Math.sqrt(Math.max(0, LS * LS - along * along));
-    const n = vc.copy(Z).addScaledVector(dv, -Z.dot(dv)).normalize();
+    const n = vc.copy(Z).addScaledVector(X, splay); n.addScaledVector(dv, -n.dot(dv)).normalize();
     return out.copy(foot).addScaledVector(dv, along).addScaledVector(n, off);
   };
   const feet = [new THREE.Vector3(), new THREE.Vector3()], hips = [new THREE.Vector3(), new THREE.Vector3()], knees = [new THREE.Vector3(), new THREE.Vector3()];
   const hc = new THREE.Vector3(), top = new THREE.Vector3(), dT = new THREE.Vector3(), sh = new THREE.Vector3(), el = new THREE.Vector3(), hd = new THREE.Vector3();
 
+  // Body mechanics: a regular stance across the board, weight that leads into each wall and lags out of it,
+  // hips and shoulders that open toward the direction of travel, a pump through every transition and
+  // loose arms that trail the body. Everything is a function of t, so any frame can be drawn on its own.
+  const vAt = (tt) => (sAt(tt + 0.02) - sAt(tt - 0.02)) / 0.04;
+  const sm = (tt, f) => (f(tt - 0.08) + 2 * f(tt) + f(tt + 0.08)) / 4;
+  const shAx = new THREE.Vector3(), side = new THREE.Vector3(), up = new THREE.Vector3(), hand = new THREE.Vector3();
   function pose(t) {
     const s = sAt(t), r = onRamp(s);
-    const v = (sAt(t + 0.02) - sAt(t - 0.02)) / 0.04;
     skater.position.set(r.x, r.y + 0.012, LANE);
     skater.rotation.set(0, 0, r.tilt);
     let yaw = 0; AIRS.forEach((ta) => { yaw += Math.PI * eio(k(t, ta - 0.38, ta + 0.04)); });
     yawG.rotation.y = yaw;
+    // Velocity in the rider's own frame (flips after each 180), plus a lagged copy for follow-through.
+    const flip = Math.cos(yaw);
+    const v = sm(t, vAt) * flip, vLag = sm(t - 0.16, vAt) * flip;
+    const dir = Math.tanh(v / 1.4), acc = clamp((v - vLag) / 0.16 / 7, -1, 1);
     const trans = clamp((Math.abs(s) - F) / 0.6) * (r.air > 0 ? 0 : 1);
     const tuck = clamp(r.air / 0.45);
-    const crouch = clamp(0.22 + 0.32 * trans + 0.55 * tuck + 0.1 * Math.max(0, 1 - Math.abs(v) / 3));
-    const hh = 0.9 * (1 - 0.36 * crouch);
-    feet[0].set(-0.24, 0.15, 0); feet[1].set(0.24, 0.15, 0);
-    hc.set(Math.sin(t * 2.3) * 0.02 - Math.sign(v) * 0.04 * clamp(Math.abs(v) / 4), 0.15 + hh, -0.03);
-    hips[0].set(hc.x - 0.11, hc.y, hc.z); hips[1].set(hc.x + 0.11, hc.y, hc.z);
-    for (let i = 0; i < 2; i++) {
-      knee(feet[i], hips[i], knees[i]);
-      place(thighs[i], hips[i], knees[i]);
-      place(shins[i], knees[i], va.copy(feet[i]).setY(feet[i].y + 0.04));
-      shoes[i].position.set(feet[i].x + (i ? 0.03 : -0.03), feet[i].y, 0.02);
-    }
-    const fwd = 0.18 + 0.4 * crouch;
-    dT.set(-Math.sign(v) * 0.08 * clamp(Math.abs(v) / 4), Math.cos(fwd), Math.sin(fwd)).normalize();
-    top.copy(hc).addScaledVector(dT, 0.6);
-    place(torso, va.copy(hc).addScaledVector(dT, 0.1), top);
-    hd.copy(top).addScaledVector(dT, 0.2).add(vb.set(0, 0, 0.03));
-    headM.position.copy(hd); beanie.position.copy(hd).addScaledVector(dT, 0.015); beanie.quaternion.setFromUnitVectors(Y, dT);
+    // Pump: compress down into the flat and the bottom of each wall, extend toward the lip.
+    const bottom = Math.exp(-Math.pow((Math.abs(s) - F) / 0.55, 2));
+    const crouch = clamp(0.24 + 0.26 * bottom + 0.16 * trans + 0.6 * tuck + 0.12 * Math.max(0, 1 - Math.abs(v) / 2.5) + 0.03 * Math.sin(t * 3.1));
+    const hh = 0.9 * (1 - 0.38 * crouch);
+    // Regular stance: back foot over the tail bolts, front foot over the nose bolts, angled toward the nose.
+    feet[0].set(-0.25, 0.15, 0.01); feet[1].set(0.21, 0.15, 0.0);
+    shoes[0].rotation.set(0, -Math.PI / 2 + 0.12, 0); shoes[1].rotation.set(0, -Math.PI / 2 + 0.5, 0);
+    shoes[0].position.set(feet[0].x + 0.012, feet[0].y, 0.04); shoes[1].position.set(feet[1].x + 0.022, feet[1].y, 0.035);
+    // Hips: lead into the wall, lag on the way out, sit back as the knees bend.
+    hc.set(-0.02 + 0.06 * dir - 0.05 * acc + Math.sin(t * 2.3) * 0.012, 0.15 + hh, -0.02 - 0.09 * crouch);
+    const hipYaw = 0.22 * dir;
     for (let i = 0; i < 2; i++) {
       const sg = i ? 1 : -1;
-      sh.copy(top).addScaledVector(dT, -0.06); sh.x += sg * 0.2;
-      const raise = 0.25 * tuck + 0.12 * Math.sin(t * 2.6 + i * 1.7) + 0.15 * trans;
-      va.set(sg * 0.8, -0.55 + raise, 0.22 - 0.1 * i).normalize();
-      el.copy(sh).addScaledVector(va, 0.29);
+      hips[i].set(hc.x + sg * 0.11 * Math.cos(hipYaw), hc.y, hc.z - sg * 0.11 * Math.sin(hipYaw));
+      knee(feet[i], hips[i], knees[i], sg * (0.18 + 0.12 * crouch));
+      place(thighs[i], hips[i], knees[i]);
+      place(shins[i], knees[i], va.copy(feet[i]).setY(feet[i].y + 0.04));
+    }
+    // Spine: forward bend grows with the crouch; it leans into travel and whips back a little on the turn.
+    const fwd = 0.22 + 0.5 * crouch;
+    dT.set(0.16 * dir - 0.1 * acc, Math.cos(fwd), Math.sin(fwd)).normalize();
+    top.copy(hc).addScaledVector(dT, 0.6);
+    place(torso, va.copy(hc).addScaledVector(dT, 0.1), top);
+    // Head stays level-ish and looks where the board is going.
+    hd.copy(top).addScaledVector(dT, 0.19).add(vb.set(0.07 * dir, 0.015, 0.035));
+    headM.position.copy(hd); beanie.position.copy(hd).add(vb.set(0, 0.012, 0));
+    beanie.quaternion.setFromUnitVectors(Y, vc.set(0.25 * dir, 1, 0.12).normalize());
+    // Shoulders open further than the hips.
+    const shYaw = 0.42 * dir + 0.15 * acc;
+    shAx.set(Math.cos(shYaw), 0, -Math.sin(shYaw));
+    for (let i = 0; i < 2; i++) {
+      const sg = i ? 1 : -1;
+      const lead = Math.max(0, sg * dir);
+      sh.copy(top).addScaledVector(dT, -0.07).addScaledVector(shAx, sg * 0.19);
+      side.copy(shAx).multiplyScalar(sg);
+      // Arms hang loose, rise for balance on the walls and in the air, the leading arm reaches ahead and
+      // both trail behind the body's swing.
+      const raise = 0.1 * trans + 0.35 * tuck + 0.07 * Math.sin(t * 2.2 + i * 1.9) + 0.12 * lead;
+      up.copy(side).multiplyScalar(0.62 + 0.25 * tuck)
+        .add(vb.set(-0.22 * acc - 0.1 * dir, -0.78 + raise, 0.18 + 0.18 * lead));
+      el.copy(sh).addScaledVector(up.normalize(), 0.29);
       place(uppers[i], sh, el);
-      vb.set(sg * 0.55, -0.35 + raise * 1.3, 0.5).normalize();
-      place(fores[i], el, vc.copy(el).addScaledVector(vb, 0.28));
+      // Elbow stays soft: the forearm bends forward and in, more so in the air.
+      vb.copy(side).multiplyScalar(0.3 + 0.2 * tuck).add(vc.set(-0.15 * acc, -0.55 + raise * 1.25, 0.6 + 0.2 * lead)).normalize();
+      hand.copy(el).addScaledVector(vb, 0.27);
+      place(fores[i], el, hand);
     }
   }
 
@@ -374,18 +386,7 @@ export function build({ env }) {
 
     pose(t);
 
-    // Months light up one by one, then the sign buzzes on.
-    const n = MONTHS.filter((_, i) => t > MON0 + i * MON_STEP).length;
-    for (let i = 0; i < 12; i++) {
-      const u = k(t, MON0 + i * MON_STEP, MON0 + i * MON_STEP + 0.35), b = back(u);
-      m4.compose(p4.set(MX(i), MY, MZ), q4.identity(), s4.setScalar(u > 0 ? 0.85 + 0.15 * b : 1));
-      cells.setMatrixAt(i, m4);
-      col.copy(GLASS_OFF).lerp(CELL_ON, clamp(u * 3));
-      cells.setColorAt(i, col);
-    }
-    cells.instanceMatrix.needsUpdate = true; cells.instanceColor.needsUpdate = true;
-    drawMonths(n);
-    rowGlow.material.opacity = 0.32 * (n / 12) + 0.25 * Math.exp(-6 * Math.max(0, t - (MON0 + 11 * MON_STEP))) * (n === 12 ? 1 : 0);
+    // The sign buzzes on.
     const sOn = t < TITLE ? 0 : t < TITLE + 0.3 ? (rnd(Math.floor(t * 30), 41) > 0.4 ? 0.85 : 0.2) : eo(k(t, TITLE + 0.3, TITLE + 0.6));
     sign.material.opacity = sOn;
 

@@ -2,7 +2,7 @@
 // A plum night studio with three stations left to right. A preference console: its pill switches slide
 // on one by one, but one is left off. A newsletter assembles in the middle, block by block, from those
 // choices. It folds into an envelope, the flap seals, and the envelope rides a lit track up through the
-// four rings of the email journey, lighting each as it passes. The camera pulls back to all three lit,
+// four checkpoints of the email journey; each ring lights and its badge ticks a check as it passes. The camera pulls back to all three lit,
 // and the project's name settles where the newsletter stood.
 import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
@@ -155,8 +155,41 @@ export function build({ env }) {
     const r = mesh(new THREE.TorusGeometry(0.115, 0.014, 14, 56), m);
     r.position.copy(p); r.quaternion.setFromUnitVectors(zAxis, tg); scene.add(r);
     const g = glow(CORAL_HEX, 0.55, 0, 0.4); g.position.copy(p); scene.add(g);
-    return { r, m, g, p };
+    // Each ring is a process checkpoint: a badge above it waits with its step number, then fills and
+    // draws a check the moment the envelope passes through.
+    const bt = canvasTex(160, 160);
+    const badge = new THREE.Mesh(new THREE.PlaneGeometry(0.085, 0.085), new THREE.MeshBasicMaterial({ map: bt.tex, transparent: true, depthWrite: false, toneMapped: false }));
+    badge.position.copy(p).add(new THREE.Vector3(0, 0.175, 0)); scene.add(badge);
+    return { r, m, g, p, bt, badge, key: '' };
   });
+  const drawBadge = (b, i, prog) => {
+    const key = prog <= 0 ? 'w' : String(Math.round(prog * 12));
+    if (key === b.key) return; b.key = key;
+    b.bt.redraw((c, w, h) => {
+      c.clearRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2;
+      if (prog <= 0) {
+        c.strokeStyle = 'rgba(180,156,255,0.75)'; c.lineWidth = 7; c.beginPath(); c.arc(cx, cy, 62, 0, 7); c.stroke();
+        c.fillStyle = 'rgba(236,226,255,0.8)'; c.font = `700 52px ${MONO}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText(String(i + 1), cx, cy + 3);
+        return;
+      }
+      const fill = clamp(prog * 2);
+      c.fillStyle = CORAL; c.beginPath(); c.arc(cx, cy, 30 + 38 * fill, 0, 7); c.fill();
+      c.strokeStyle = 'rgba(255,214,200,0.9)'; c.lineWidth = 5; c.beginPath(); c.arc(cx, cy, 70, 0, 7); c.stroke();
+      // The check draws itself: short stroke down, long stroke up.
+      const d = clamp(prog * 1.6 - 0.35);
+      const P = [[-30, 2], [-9, 24], [33, -22]];
+      const L1 = Math.hypot(21, 22), L2 = Math.hypot(42, 46), go = d * (L1 + L2);
+      c.strokeStyle = '#fff6ef'; c.lineWidth = 15; c.lineCap = 'round'; c.lineJoin = 'round';
+      if (go > 0) {
+        c.beginPath(); c.moveTo(cx + P[0][0], cy + P[0][1]);
+        const a = Math.min(1, go / L1); c.lineTo(cx + lerp(P[0][0], P[1][0], a), cy + lerp(P[0][1], P[1][1], a));
+        if (go > L1) { const b2 = (go - L1) / L2; c.lineTo(cx + lerp(P[1][0], P[2][0], b2), cy + lerp(P[1][1], P[2][1], b2)); }
+        c.stroke();
+      }
+    });
+  };
 
   // ----------------------------------------------------------- words
   const prefLabel = label('Preference center', { font: `800 60px ${SANS}`, fg: '#f4ece2', bg: 'rgba(26,14,36,0.8)', h: 0.13, pad: 34, track: 1 });
@@ -253,8 +286,15 @@ export function build({ env }) {
     lit.geometry.setDrawRange(0, Math.floor((IDX * clamp(u)) / 6) * 6);
     lit.visible = u > 0.002;
     const wave = k(t, 8.2, 9.0);
-    rings.forEach(({ m, g }, i) => {
+    rings.forEach((rg, i) => {
+      const { m, g, badge } = rg;
       const hit = t > PASS[i] ? 1 : 0;
+      const prog = k(t, PASS[i], PASS[i] + 0.45);
+      drawBadge(rg, i, prog);
+      badge.lookAt(camera.position);
+      badge.scale.setScalar(prog > 0 ? 0.8 + 0.3 * back(clamp(prog * 1.6)) : 0.8);
+      badge.material.opacity = eo(k(t, 5.4, 5.9)) * (1 - ei(k(t, 9.2, 9.6)));
+      badge.visible = badge.material.opacity > 0.01;
       const flare = hit * Math.exp(-5 * Math.max(0, t - PASS[i]));
       const pulse = Math.max(0, Math.sin(Math.PI * clamp(wave * 4 - i * 0.6)));
       m.emissiveIntensity = hit * (0.9 + 1.4 * flare + 0.8 * pulse);

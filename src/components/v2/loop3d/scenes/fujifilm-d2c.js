@@ -1,9 +1,10 @@
-// Fujifilm direct-to-consumer platform lit loop, 10 s. "Pick the film, get the prints."
+// Fujifilm direct-to-consumer platform lit loop, 10 s. "Your photo, on the things you keep."
 // A film boutique after hours: a walnut wall of cubbies lit by warm strips, each holding a film box.
 // One box slides out with a little hitch, spins to the camera and drops into a kraft mailer on the
 // stone counter. The lid slams, green tape seals it, and the mailer spins away as the light turns to
-// golden hour. The lid pops again, warm light spills out, and a print rises out as an orange negative,
-// then develops into a clear mountain lake while the title settles above it.
+// golden hour. The lid pops again, warm light spills out, and personalized goods rise out of it: a mug,
+// a folded fleece blanket and a throw pillow, each printing the customer's lake photo onto itself while
+// the title settles above them.
 import {
   THREE, k, kf, lerp, eo, eio, ei, back, spring, rnd, clamp,
   canvasTex, grainTex, glow, label, roundRect, std, mesh, dip,
@@ -20,11 +21,11 @@ const BOX = [0.16, 0.22, 0.1];
 const BOX_COLS = [0x1f8a4c, 0xb8235a, 0x1e5aa8, 0xd99a1e, 0xc23a2b, 0x5a3e9a, 0x2a9a8a, 0x1f8a4c, 0xd99a1e, 0x1e5aa8, 0xb8235a, 0x2a9a8a, 0xc23a2b, 0x1f8a4c, 0x5a3e9a];
 const MAIL = new THREE.Vector3(0.66, 0, 0.24);
 const MW = 0.44, MH = 0.12, MD = 0.32, WALL = 0.008;
-const HOVER = new THREE.Vector3(0.5, 0.52, 0.5), PRINT_GROW = 1.75;
+const HOVER = new THREE.Vector3(0.5, 0.52, 0.5), GOODS_GROW = 1.45;
 
 const cellPos = (c, r, out = new THREE.Vector3()) => out.set(SH.x - (COLS * CW) / 2 + CW / 2 + c * CW, SH.y + BOARD / 2 + r * CH + BOX[1] / 2, SH.z + 0.01);
 
-// The print: a mountain lake on a clear day, with a red canoe. Drawn once; the negative is derived from it.
+// The customer's photo: a mountain lake on a clear day, with a red canoe. Drawn once, printed onto the goods.
 function drawLake(c, w, h) {
   const HZ = h * 0.56;
   const sky = c.createLinearGradient(0, 0, 0, HZ); sky.addColorStop(0, '#3f7fc4'); sky.addColorStop(1, '#bfdff0');
@@ -166,39 +167,89 @@ export function build({ env }) {
   const boxGlow = glow(0xffc27a, 0.9, 0, 0.45); boxGlow.position.set(0, 0.14, 0); mailG.add(boxGlow);
   const puffs = [0, 1, 2, 3].map((i) => { const g = glow(0xe9cfa8, 0.2, 0, 0.6); mailG.add(g); return g; });
 
-  // ----------------------------------------------------------- the print
-  const PW = 0.3, PHT = 0.212;
+  // ----------------------------------------------------------- the personalized goods
+  // The customer's photo (a mountain lake with a red canoe) gets printed onto three things that rise out
+  // of the mailer: a mug, a folded fleece blanket and a throw pillow. Each starts blank, and the photo
+  // wipes onto it left to right as if it is being printed.
   const IW = 704, IH = 480;
-  const pos = canvasTex(IW, IH, drawLake);
-  const neg = canvasTex(IW, IH, (c, w, h) => {
-    c.drawImage(pos.cv, 0, 0);
-    const img = c.getImageData(0, 0, w, h), d = img.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const r = 255 - d[i], g = 255 - d[i + 1], b = 255 - d[i + 2];
-      d[i] = 70 + r * 0.66; d[i + 1] = 34 + g * 0.5; d[i + 2] = 12 + b * 0.34;
-    }
-    c.putImageData(img, 0, 0);
-  });
-  const printTex = canvasTex(768, 544);
-  let prKey = '';
-  const drawPrint = (t) => {
-    const veil = eo(k(t, 6.0, 6.6)), mix = eio(k(t, 6.7, 8.1));
-    const key2 = Math.round(veil * 20) + '|' + Math.round(mix * 48);
-    if (key2 === prKey) return; prKey = key2;
-    printTex.redraw((c, w, h) => {
-      c.fillStyle = '#ebe5da'; c.fillRect(0, 0, w, h);
-      const bx = 32, by = 32;
-      c.globalAlpha = 1; c.drawImage(neg.cv, bx, by);
-      c.globalAlpha = mix; c.drawImage(pos.cv, bx, by);
-      c.globalAlpha = 1;
-      c.fillStyle = `rgba(28,18,14,${0.85 * (1 - veil)})`; c.fillRect(bx, by, IW, IH);
-    });
+  const photo = canvasTex(IW, IH, drawLake);
+  const goods = [];
+  // Draws the photo into rect (x, y, w, h) of a canvas, revealed left to right by mix, with a bright
+  // print-head line at the edge of the wipe.
+  const printOn = (c, x, y, w, h, mix, base) => {
+    c.fillStyle = base; c.fillRect(x, y, w, h);
+    if (mix <= 0) return;
+    c.save(); c.beginPath(); c.rect(x, y, w * mix, h); c.clip();
+    const s = Math.max(w / IW, h / IH), dw = IW * s, dh = IH * s;
+    c.drawImage(photo.cv, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    c.restore();
+    if (mix < 1) { c.fillStyle = 'rgba(255,236,200,0.9)'; c.fillRect(x + w * mix - 3, y, 6, h); }
   };
-  const printG = new THREE.Group(); printG.rotation.order = 'YXZ'; scene.add(printG);
-  printG.add(mesh(new THREE.BoxGeometry(PW + 0.004, PHT + 0.004, 0.003), std(0xd8d2c8, { roughness: 0.6 })));
-  const printFace = new THREE.Mesh(new THREE.PlaneGeometry(PW, PHT), std(0xd4cdc2, { map: printTex.tex, emissive: 0xffffff, emissiveMap: printTex.tex, emissiveIntensity: 0.25, roughness: 0.32 }));
-  printFace.position.z = 0.0021; printG.add(printFace);
-  const printGlow = glow(0xff9a5a, 1.2, 0, 0.5); printGlow.position.z = -0.08; printGlow.scale.set(1.3, 0.95, 1); printG.add(printGlow);
+  const goodsTex = (w, h, draw) => {
+    const ct = canvasTex(w, h);
+    const g = { ct, key: '', draw };
+    goods.push(g);
+    return ct.tex;
+  };
+  const goodsG = new THREE.Group(); scene.add(goodsG);
+  const fromV = new THREE.Vector3();
+
+  // Mug: white ceramic, the photo wrapped around the front half.
+  const mug = new THREE.Group(); goodsG.add(mug);
+  const MR = 0.042, MHh = 0.096;
+  const mugTex = goodsTex(1024, 384, (c, w, h, mix) => { c.fillStyle = '#f4f1ec'; c.fillRect(0, 0, w, h); printOn(c, w * 0.29, h * 0.12, w * 0.42, h * 0.76, mix, '#f4f1ec'); });
+  const ceramic = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.22, clearcoat: 0.8, clearcoatRoughness: 0.1 });
+  const mugSide = mesh(new THREE.CylinderGeometry(MR, MR * 0.96, MHh, 56, 1, true, Math.PI, Math.PI * 2),
+    new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: mugTex, roughness: 0.22, clearcoat: 0.8, clearcoatRoughness: 0.1 }));
+  mug.add(mugSide);
+  const mugIn = mesh(new THREE.CylinderGeometry(MR * 0.9, MR * 0.86, MHh * 0.96, 40, 1, true), new THREE.MeshPhysicalMaterial({ color: 0xf2eee8, roughness: 0.3, side: THREE.BackSide }), { cast: false });
+  mugIn.position.y = 0.002; mug.add(mugIn);
+  const coffee = mesh(new THREE.CircleGeometry(MR * 0.89, 40), std(0x3a2116, { roughness: 0.15 }), { cast: false });
+  coffee.rotation.x = -Math.PI / 2; coffee.position.y = MHh * 0.32; mug.add(coffee);
+  const rimT = mesh(new THREE.TorusGeometry(MR * 0.95, MR * 0.055, 8, 56), ceramic, { cast: false });
+  rimT.rotation.x = Math.PI / 2; rimT.position.y = MHh / 2; mug.add(rimT);
+  const mugBase = mesh(new THREE.CircleGeometry(MR * 0.96, 40), ceramic); mugBase.rotation.x = Math.PI / 2; mugBase.position.y = -MHh / 2; mug.add(mugBase);
+  const handle = mesh(new THREE.TorusGeometry(0.026, 0.0075, 10, 28, Math.PI * 1.15), ceramic);
+  handle.rotation.z = Math.PI / 2 + 0.25; handle.position.set(-MR - 0.004, 0.0, 0); mug.add(handle);
+
+  // Blanket: soft fleece folded in thirds, the photo across the top fold, standing up for the camera.
+  const blanket = new THREE.Group(); goodsG.add(blanket);
+  const BWd = 0.23, BHt = 0.165, BDp = 0.05;
+  const fleece = std(0xe8e0d2, { roughness: 0.95 });
+  [0, 1, 2].forEach((i) => {
+    const slab = mesh(new RoundedBoxGeometry(BWd - i * 0.004, BHt - i * 0.003, BDp / 3 + 0.004, 3, 0.008), fleece);
+    slab.position.set(i * 0.0015, -i * 0.001, -i * (BDp / 3)); blanket.add(slab);
+  });
+  const blanketTex = goodsTex(640, 460, (c, w, h, mix) => printOn(c, 0, 0, w, h, mix, '#e8e0d2'));
+  const blanketFace = mesh(new THREE.PlaneGeometry(BWd - 0.018, BHt - 0.016),
+    std(0xffffff, { map: blanketTex, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), { cast: false });
+  blanketFace.position.z = (BDp / 3 + 0.004) / 2 + 0.0012; blanket.add(blanketFace);
+  // A rolled fold along the bottom edge so it reads as cloth, not a board.
+  const roll = mesh(new THREE.CapsuleGeometry(BDp * 0.5, BWd - 0.03, 6, 16), fleece);
+  roll.rotation.z = Math.PI / 2; roll.position.set(0.0015, -BHt / 2 + 0.006, -BDp / 3); blanket.add(roll);
+
+  // Pillow: a plump square with the photo cropped on its face.
+  const pillow = new THREE.Group(); goodsG.add(pillow);
+  const pillowBody = mesh(new RoundedBoxGeometry(0.135, 0.135, 0.055, 5, 0.026), std(0xf0ebe3, { roughness: 0.85 }));
+  pillowBody.scale.z = 0.9; pillow.add(pillowBody);
+  const pillowTex = goodsTex(420, 420, (c, w, h, mix) => printOn(c, 0, 0, w, h, mix, '#f0ebe3'));
+  const pillowFace = mesh(new THREE.PlaneGeometry(0.108, 0.108),
+    std(0xffffff, { map: pillowTex, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), { cast: false });
+  pillowFace.position.z = 0.0255; pillow.add(pillowFace);
+
+  const ITEMS = [
+    // group, final local position, final rotation (x, y, z), when it rises, when its photo prints
+    { g: blanket, at: [0.0, 0.04, -0.03], rot: [-0.06, 0.0, 0.0], up: 5.75, ink: 6.55 },
+    { g: mug, at: [-0.165, -0.035, 0.07], rot: [0.05, 0.42, 0.0], up: 5.9, ink: 6.85 },
+    { g: pillow, at: [0.165, -0.02, 0.05], rot: [-0.04, -0.38, 0.06], up: 6.05, ink: 7.15 },
+  ];
+  const drawGoods = (t) => goods.forEach((g, i) => {
+    const mix = eio(k(t, ITEMS[i].ink, ITEMS[i].ink + 0.85));
+    const key = String(Math.round(mix * 40));
+    if (key === g.key) return; g.key = key;
+    g.ct.redraw((c, w, h) => g.draw(c, w, h, mix));
+  });
+  const printGlow = glow(0xff9a5a, 1.2, 0, 0.5); printGlow.position.z = -0.12; printGlow.scale.set(1.5, 0.95, 1); goodsG.add(printGlow);
 
   // A 35 mm canister on the counter, for scale and for film.
   const can = new THREE.Group(); can.position.set(-0.08, 0, 0.42); scene.add(can);
@@ -261,7 +312,7 @@ export function build({ env }) {
       );
       const bounce = t > 3.3 ? Math.abs(Math.sin((t - 3.3) * 12)) * Math.exp(-7 * (t - 3.3)) * 0.04 : 0;
       hero.position.copy(a); hero.position.y += bounce;
-      hero.rotation.set(lerp(-0.06, -Math.PI / 2, fly), lerp(Math.PI * 2 - 0.25, Math.PI * 2 + mailG.rotation.y, fly), 0);
+      hero.rotation.set(lerp(-0.06, -Math.PI / 2, fly), lerp(Math.PI * 2 - 0.25, Math.PI * 2 + (-0.22 + eio(k(t, 4.45, 5.35)) * Math.PI * 2), fly), 0);
     }
     hFace.material.emissiveIntensity = 0.25 * Math.sin(Math.PI * k(t, 1.1, 3.3));
     heroGlow.material.opacity = 0.55 * Math.sin(Math.PI * k(t, 1.05, 3.2));
@@ -289,28 +340,34 @@ export function build({ env }) {
     key.position.set(lerp(-1.3, -1.9, gold), lerp(2.5, 1.7, gold), 2.1);
     rim.intensity = 1.3 + gold * 0.5;
 
-    // Beat 3: the lid pops, light spills out, a print rises as a negative.
+    // Beat 3: the lid pops, light spills out, and the personalized goods rise out one after another.
     const spill = eo(k(t, 5.45, 5.9)) * (1 - 0.6 * eo(k(t, 6.4, 7.6)));
     boxLight.intensity = 2.4 * spill; boxGlow.material.opacity = 0.7 * spill;
-    const rise = back(k(t, 5.75, 6.85));
-    const start = a.set(MAIL.x, 0.07, MAIL.z);
-    printG.position.set(lerp(start.x, HOVER.x, clamp(rise)), lerp(start.y, HOVER.y, rise) + Math.sin(t * 1.6) * 0.008 * clamp(rise), lerp(start.z, HOVER.z, clamp(rise)));
-    printG.rotation.set(lerp(-Math.PI / 2, -0.08, clamp(rise)), lerp(0.6, -0.12, clamp(rise)) + Math.sin(t * 0.9) * 0.03, lerp(0.3, 0.0, clamp(rise)));
-    printG.scale.setScalar(lerp(1, PRINT_GROW, eio(k(t, 6.0, 7.2))));
-    printG.visible = t > 5.7;
-    drawPrint(t);
-    const dev = eio(k(t, 6.7, 8.1));
-    printFace.material.emissiveIntensity = 0.12 + 0.3 * eo(k(t, 6.0, 6.6));
-    printGlow.material.color.setRGB(lerp(1, 0.5, dev), lerp(0.42, 0.78, dev), lerp(0.2, 1, dev));
+    goodsG.position.set(HOVER.x, HOVER.y + Math.sin(t * 1.6) * 0.006, HOVER.z);
+    goodsG.rotation.set(0, -0.06 + Math.sin(t * 0.9) * 0.025, 0);
+    goodsG.scale.setScalar(lerp(1.0, GOODS_GROW, eio(k(t, 6.0, 7.4))));
+    goodsG.updateMatrixWorld();
+    const from = goodsG.worldToLocal(fromV.set(MAIL.x, 0.07, MAIL.z));
+    ITEMS.forEach((it, i) => {
+      const rise = back(k(t, it.up, it.up + 1.0));
+      it.g.position.set(lerp(from.x, it.at[0], clamp(rise)), lerp(from.y, it.at[1], rise), lerp(from.z, it.at[2], clamp(rise)));
+      it.g.position.y += Math.sin(t * 1.3 + i * 2.1) * 0.004 * clamp(rise);
+      it.g.rotation.set(lerp(-1.2, it.rot[0], clamp(rise)), lerp(0.9 - i * 0.6, it.rot[1], clamp(rise)) + Math.sin(t * 0.8 + i) * 0.03 * clamp(rise), lerp(0.4, it.rot[2], clamp(rise)));
+      it.g.scale.setScalar(lerp(0.55, 1, eo(clamp(rise))));
+      it.g.visible = t > it.up - 0.05;
+    });
+    drawGoods(t);
+    const dev = eio(k(t, 6.6, 8.0));
+    printGlow.material.color.setRGB(lerp(1, 0.6, dev), lerp(0.42, 0.75, dev), lerp(0.2, 0.9, dev));
     printGlow.material.opacity = 0.42 * eo(k(t, 6.2, 7.0)) * (1 - 0.3 * dev) + 0.25 * Math.exp(-3 * Math.max(0, t - 8.1)) * (t > 8.1 ? 1 : 0);
 
-    // The wall dims a touch as the print takes over the frame.
+    // The wall dims a touch as the goods take over the frame.
     const dim = 1 - 0.45 * eo(k(t, 6.0, 7.5));
     stripM.color.setRGB(1 * dim, 0.79 * dim, 0.54 * dim);
     stripGlows.forEach((g) => { g.material.opacity = 0.22 * dim; });
     shelfLight.intensity = 1.6 * dim;
 
-    // Beat 4: the title over the finished print.
+    // Beat 4: the title over the finished goods.
     const ti = eo(k(t, 7.75, 8.35)), li = eo(k(t, 8.05, 8.65)), to = ei(k(t, 9.25, 9.6));
     lk.copy(camera.position); lk.y = 1.0;
     [[kicker, 1.07, ti], [title, 0.96, ti], [line, 0.835, li]].forEach(([l, y, al]) => {
